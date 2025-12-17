@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 import pfLogo from './assets/PFlogo.png'
+import { RoutePlanner } from './components/RoutePlanner'
 
 const version = '1.1.0'
 
@@ -48,30 +49,7 @@ function App() {
           <div className="panel">
             <h2>Route Planner</h2>
             <p className="text-muted">Select your start and destination to calculate exit distances for each Aaron Halo band.</p>
-
-            <div className="form-group">
-              <label>Start Location</label>
-              <select>
-                <option value="">Select start...</option>
-                <option value="arc-l1">ARC-L1 Wide Forest Station</option>
-                <option value="hur-l2">HUR-L2 Faithful Dream Station</option>
-                <option value="cru-l1">CRU-L1 Ambitious Dream Station</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label>Destination</label>
-              <select>
-                <option value="">Select destination...</option>
-                <option value="hur-l5">HUR-L5 High Course Station</option>
-                <option value="cru-l4">CRU-L4 Shallow Fields Station</option>
-                <option value="arc-l3">ARC-L3 Modern Express Station</option>
-              </select>
-            </div>
-
-            {/* Placeholder for results */}
-            <div className="display-label">Exit Distance to Band 5</div>
-            <div className="display-large">14,292,609 km</div>
+            <RoutePlanner />
           </div>
         )}
 

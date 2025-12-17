@@ -1,0 +1,210 @@
+/* Route Planner Component Styles */
+
+.route-planner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.route-selectors {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 600px) {
+  .route-selectors {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Route Summary */
+.route-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem;
+  background: var(--bg-dark);
+  border-radius: 4px;
+  border-left: 3px solid var(--accent-blue);
+}
+
+.route-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.route-path {
+  font-family: var(--font-heading);
+  color: var(--accent-cyan);
+  font-weight: 600;
+}
+
+.route-distance {
+  margin-left: auto;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Band Table */
+.band-table {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.band-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 80px;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--bg-dark);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.band-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 1fr 80px;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  transition: background-color 0.2s ease;
+}
+
+.band-row:hover {
+  background: var(--bg-medium);
+}
+
+/* Density-based highlighting */
+.band-row.density-high {
+  background: rgba(0, 255, 136, 0.08);
+}
+
+.band-row.density-high:hover {
+  background: rgba(0, 255, 136, 0.15);
+}
+
+.band-row.density-high .band-col-name {
+  color: var(--success);
+}
+
+.band-row.density-medium {
+  background: rgba(255, 170, 0, 0.05);
+}
+
+.band-row.density-medium:hover {
+  background: rgba(255, 170, 0, 0.1);
+}
+
+.band-col-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.band-col-stanton,
+.band-col-dest {
+  font-family: var(--font-heading);
+  color: var(--accent-cyan);
+  font-size: 0.9rem;
+}
+
+.band-col-density {
+  display: flex;
+  align-items: center;
+}
+
+.density-bar {
+  height: 6px;
+  background: linear-gradient(90deg, var(--accent-blue), var(--success));
+  border-radius: 3px;
+  min-width: 10%;
+}
+
+/* Peak density indicator */
+.peak-indicator {
+  display: inline-block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+}
+
+.peak-badge {
+  color: var(--accent-gold);
+  margin-left: 0.25rem;
+  font-size: 0.8rem;
+}
+
+.band-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Route Instructions */
+.route-instructions {
+  padding: 1rem;
+  background: var(--bg-dark);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.instruction-title {
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.route-instructions ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.route-instructions li {
+  margin-bottom: 0.5rem;
+}
+
+.route-instructions li:last-child {
+  margin-bottom: 0;
+}
+
+.route-instructions strong {
+  color: var(--accent-cyan);
+}
+
+/* Empty States */
+.placeholder-message,
+.no-route {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.no-route {
+  color: var(--warning);
+}
+
+/* Mobile adjustments */
+@media (max-width: 599px) {
+  .band-header,
+  .band-row {
+    grid-template-columns: 60px 1fr 1fr 60px;
+    font-size: 0.8rem;
+    padding: 0.5rem;
+  }
+
+  .band-col-stanton,
+  .band-col-dest {
+    font-size: 0.8rem;
+  }
+}

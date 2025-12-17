@@ -65,7 +65,7 @@ function setItem<T>(key: string, value: T): void {
 /**
  * Remove a value from localStorage
  */
-function removeItem(key: string): void {
+export function removeItem(key: string): void {
   try {
     localStorage.removeItem(STORAGE_PREFIX + key);
   } catch (error) {

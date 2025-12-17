@@ -6,6 +6,7 @@ import {
   findBandByDistance,
   findClosestBand,
   isInHalo,
+  getPositionContext,
   HALO_INNER_EDGE,
   HALO_OUTER_EDGE
 } from '../types/bands';
