@@ -10,10 +10,10 @@ function App() {
       <header className="app-header">
         <div className="header-content">
           <div className="header-title">
-            <h1>Aaron Halo Guide</h1>
-            <span className="subtitle">Star Citizen Navigation</span>
+            <h1>Band Hopper</h1>
+            <span className="subtitle">Aaron Halo Mining Navigator</span>
           </div>
-          <span className="version">v1.0.0</span>
+          <span className="version">v1.1.0</span>
         </div>
       </header>
 

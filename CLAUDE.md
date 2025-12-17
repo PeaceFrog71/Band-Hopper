@@ -1,10 +1,10 @@
-# Aaron Halo Guide - Project Memory
+# Band Hopper - Project Memory
 
-This document provides Claude with persistent context about the Aaron Halo Guide project.
+This document provides Claude with persistent context about the Band Hopper project.
 
 ## Project Overview
 
-**Aaron Halo Guide** is a Star Citizen navigation tool that helps miners and travelers reach specific locations in the Aaron Halo asteroid belt.
+**Band Hopper** is a Star Citizen navigation tool that helps miners and travelers reach specific locations in the Aaron Halo asteroid belt.
 
 - **Version**: See `package.json` for current version
 - **Tech Stack**: React 19 + TypeScript + Vite

@@ -1,8 +1,8 @@
 {
-  "name": "aaron-halo-guide",
+  "name": "band-hopper",
   "private": true,
-  "version": "1.0.0",
-  "description": "Star Citizen Aaron Halo Navigation Guide",
+  "version": "1.1.0",
+  "description": "Band Hopper - Aaron Halo Mining Navigator for Star Citizen",
   "author": "PeaceFrog Gaming",
   "type": "module",
   "scripts": {
