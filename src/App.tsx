@@ -1,12 +1,26 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import './App.css'
 import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
+import { analyzePosition, parseDistance, formatDistance } from './utils/calculator'
+import { HALO_INNER_EDGE, HALO_OUTER_EDGE } from './types/bands'
 
 const version = '1.2.0'
 
 function App() {
   const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
+  const [distanceInput, setDistanceInput] = useState<string>('')
+
+  // Analyze position when input changes
+  const positionAnalysis = useMemo(() => {
+    if (!distanceInput.trim()) return null;
+
+    // Try parsing the input
+    const distance = parseDistance(distanceInput);
+    if (distance === null || distance <= 0) return null;
+
+    return analyzePosition(distance);
+  }, [distanceInput]);
 
   return (
     <div className="app">
@@ -60,11 +74,81 @@ function App() {
 
             <div className="form-group">
               <label>Distance to Stanton (km)</label>
-              <input type="number" placeholder="e.g., 20300000" />
+              <input
+                type="text"
+                placeholder="e.g., 20300000 or 20.3M"
+                value={distanceInput}
+                onChange={(e) => setDistanceInput(e.target.value)}
+              />
+              <span className="text-muted" style={{ fontSize: '0.8rem' }}>
+                Accepts: plain numbers, "20.3M km", or "20300K"
+              </span>
             </div>
 
-            <div className="display-label">Current Position</div>
-            <div className="display-large text-success">Band 5</div>
+            {positionAnalysis && (
+              <div className="position-results">
+                <div className="display-label">Current Position</div>
+                <div className={`display-large ${positionAnalysis.isInHalo ? 'text-success' : 'text-warning'}`}>
+                  {positionAnalysis.currentBand
+                    ? positionAnalysis.currentBand.name
+                    : positionAnalysis.isInHalo
+                      ? 'Between Bands'
+                      : 'Outside Halo'}
+                </div>
+
+                <div className="position-details">
+                  <p>{positionAnalysis.positionDescription}</p>
+
+                  {positionAnalysis.currentBand && (
+                    <div className="band-info">
+                      <span className="info-label">Band Range:</span>
+                      <span className="info-value">
+                        {formatDistance(positionAnalysis.currentBand.innerDistance)} - {formatDistance(positionAnalysis.currentBand.outerDistance)}
+                      </span>
+                    </div>
+                  )}
+
+                  {positionAnalysis.currentBand && (
+                    <div className="band-info">
+                      <span className="info-label">Density:</span>
+                      <span className="info-value">
+                        {Math.round(positionAnalysis.currentBand.relativeDensity * 100)}%
+                      </span>
+                    </div>
+                  )}
+
+                  {!positionAnalysis.isInHalo && (
+                    <div className="halo-range-hint">
+                      <span className="info-label">Aaron Halo Range:</span>
+                      <span className="info-value">
+                        {formatDistance(HALO_INNER_EDGE)} - {formatDistance(HALO_OUTER_EDGE)}
+                      </span>
+                    </div>
+                  )}
+
+                  {positionAnalysis.nearbyBands.length > 0 && !positionAnalysis.currentBand && (
+                    <div className="nearby-bands">
+                      <span className="info-label">Closest Band:</span>
+                      <span className="info-value">
+                        {positionAnalysis.closestBand.name} ({formatDistance(positionAnalysis.distanceToClosestBand)} away)
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!positionAnalysis && distanceInput.trim() && (
+              <div className="text-warning" style={{ textAlign: 'center', padding: '1rem' }}>
+                Enter a valid distance (e.g., 20300000 or 20.3M)
+              </div>
+            )}
+
+            {!distanceInput.trim() && (
+              <div className="placeholder-message">
+                Enter your distance to Stanton to see your position in the Aaron Halo.
+              </div>
+            )}
           </div>
         )}
 
