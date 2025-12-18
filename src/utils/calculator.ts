@@ -305,7 +305,7 @@ export function getRecommendedBands(
   return BANDS
     .map(band => {
       let score = band.relativeDensity;
-      let reasons: string[] = [];
+      const reasons: string[] = [];
 
       if (prioritizeDensity && band.relativeDensity >= 0.8) {
         score += 0.2;
