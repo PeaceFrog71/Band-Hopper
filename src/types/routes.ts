@@ -10,6 +10,16 @@ export interface BandExit {
   distanceFromStart: number;     // km - how far traveled from start
 }
 
+/**
+ * BandExit with calculated exit width (margin for error)
+ * Width is the gap between this band's exit and adjacent bands
+ */
+export interface BandExitWithWidth extends BandExit {
+  exitWidth: number;             // km - margin for error when exiting at this band
+  gapToPreviousBand?: number;    // km - gap to previous band (undefined for Band 1)
+  gapToNextBand?: number;        // km - gap to next band (undefined for Band 10)
+}
+
 export interface PreCalculatedRoute {
   id: string;                    // 'arc-l1_to_hur-l5'
   startId: string;
@@ -463,4 +473,97 @@ export function getRouteWithBandInfo(
   });
 
   return { route, bandDetails };
+}
+
+/**
+ * Calculate exit widths for all bands on a route
+ * Width = gap between this band's exit distance and adjacent bands
+ * A wider gap means more margin for error when exiting QT
+ */
+export function calculateExitWidths(bandExits: BandExit[]): BandExitWithWidth[] {
+  // Sort by band ID to ensure correct order
+  const sorted = [...bandExits].sort((a, b) => a.bandId - b.bandId);
+
+  return sorted.map((exit, index) => {
+    const prevExit = sorted[index - 1];
+    const nextExit = sorted[index + 1];
+
+    // Calculate gaps using distanceToDestination (what pilot sees)
+    const gapToPrevious = prevExit
+      ? Math.abs(exit.distanceToDestination - prevExit.distanceToDestination)
+      : undefined;
+    const gapToNext = nextExit
+      ? Math.abs(nextExit.distanceToDestination - exit.distanceToDestination)
+      : undefined;
+
+    // Exit width is the minimum gap (limiting factor for stopping accuracy)
+    // For edge bands (1 and 10), use the only available gap
+    let exitWidth: number;
+    if (gapToPrevious !== undefined && gapToNext !== undefined) {
+      exitWidth = Math.min(gapToPrevious, gapToNext);
+    } else {
+      exitWidth = gapToPrevious ?? gapToNext ?? 0;
+    }
+
+    return {
+      ...exit,
+      gapToPreviousBand: gapToPrevious,
+      gapToNextBand: gapToNext,
+      exitWidth
+    };
+  });
+}
+
+/**
+ * Get exit width for a specific band on a route
+ */
+export function getExitWidth(
+  startId: string,
+  destinationId: string,
+  bandId: number
+): number | null {
+  const route = getRoute(startId, destinationId);
+  if (!route) return null;
+
+  const withWidths = calculateExitWidths(route.bandExits);
+  const bandExit = withWidths.find(be => be.bandId === bandId);
+
+  return bandExit?.exitWidth ?? null;
+}
+
+/**
+ * Get available destinations from a start location, sorted by exit width for a specific band
+ * Returns destinations with widest exit margin first (easiest to stop at)
+ */
+export function getDestinationsByBandWidth(
+  startId: string,
+  bandId: number
+): Array<{
+  destinationId: string;
+  exitDistance: number;
+  exitWidth: number;
+  gapToPreviousBand?: number;
+  gapToNextBand?: number;
+}> {
+  const routes = getRoutesFromLocation(startId);
+
+  const results = routes
+    .map(route => {
+      const withWidths = calculateExitWidths(route.bandExits);
+      const bandExit = withWidths.find(be => be.bandId === bandId);
+
+      if (!bandExit) return null;
+
+      return {
+        destinationId: route.destinationId,
+        exitDistance: bandExit.distanceToDestination,
+        exitWidth: bandExit.exitWidth,
+        gapToPreviousBand: bandExit.gapToPreviousBand,
+        gapToNextBand: bandExit.gapToNextBand
+      };
+    })
+    .filter((r): r is NonNullable<typeof r> => r !== null);
+
+  // Sort by exit width descending (widest first = easiest)
+  return results.sort((a, b) => b.exitWidth - a.exitWidth);
 }
