@@ -99,14 +99,12 @@ export function RoutePlanner() {
           <div className="band-table">
             <div className="band-header">
               <span className="band-col-name">Band</span>
-              <span className="band-col-stanton">Stanton Marker</span>
-              <span className="band-col-dest">To Destination</span>
+              <span className="band-col-dest">Exit at Distance</span>
               <span className="band-col-density">Density</span>
             </div>
             {routeData.bandDetails.map(({ band, exit }) => (
               <div key={band.id} className={`band-row density-${getDensityClass(band.relativeDensity)}`}>
                 <span className="band-col-name">{band.name}</span>
-                <span className="band-col-stanton">{formatDistance(exit.distanceFromStanton)}</span>
                 <span className="band-col-dest">{formatDistance(exit.distanceToDestination)}</span>
                 <span className="band-col-density">
                   <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
@@ -119,9 +117,8 @@ export function RoutePlanner() {
             <p className="instruction-title">How to use:</p>
             <ol>
               <li>Start quantum travel toward <strong>{destLocation.shortName}</strong></li>
-              <li>Open MobiGlas and select the <strong>Stanton</strong> marker</li>
-              <li>Watch the distance to Stanton marker</li>
-              <li>Exit QT when it matches your target band distance</li>
+              <li>Watch the remaining distance to your destination</li>
+              <li>Exit QT when it matches your target band's exit distance</li>
             </ol>
           </div>
         </div>

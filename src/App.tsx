@@ -56,14 +56,14 @@ function App() {
         {activeTab === 'whereami' && (
           <div className="panel">
             <h2>Where Am I?</h2>
-            <p className="text-muted">Enter your current distance to the Stanton marker to find your position in the Aaron Halo.</p>
+            <p className="text-muted">Reference tool: Enter a distance from Stanton to see which Aaron Halo band it corresponds to.</p>
 
             <div className="form-group">
-              <label>Distance to Stanton (km)</label>
+              <label>Distance from Stanton (km)</label>
               <input type="number" placeholder="e.g., 20300000" />
             </div>
 
-            <div className="display-label">Current Position</div>
+            <div className="display-label">Band at this Distance</div>
             <div className="display-large text-success">Band 5</div>
           </div>
         )}
