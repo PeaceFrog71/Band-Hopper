@@ -14,7 +14,6 @@ export interface PreCalculatedRoute {
   id: string;                    // 'arc-l1_to_hur-l5'
   startId: string;
   destinationId: string;
-  totalDistance: number;         // km (approximate)
   crossesHalo: boolean;
   bandExits: BandExit[];
 }
@@ -22,812 +21,359 @@ export interface PreCalculatedRoute {
 /**
  * Pre-Calculated Route Database
  *
- * Routes are calculated based on the geometry of the Stanton system:
- * - Quantum travel follows straight lines between locations
- * - The Aaron Halo is a ring at fixed distances from Stanton marker
- * - Exit distances are where the route line crosses each band
+ * Source: CaptSheppard's Aaron Halo Travel Routes (cstone.space)
+ * Version: 3.19.1-LIVE
  *
- * Note: Some routes may not cross all bands depending on angle.
- * Routes that don't cross the halo at all have crossesHalo: false.
+ * Exit distances (distanceToDestination) are measured in-game values
+ * representing the remaining distance to destination when exiting QT
+ * at each band's peak density point.
  *
- * Distance values are approximations. For maximum accuracy, verify
- * exit distances in-game and update this database.
+ * Note: distanceFromStanton values are the band's peak density distance.
+ * distanceFromStart is calculated as totalDistance - distanceToDestination.
+ *
+ * Only routes involving ARC-L1 or ARC-L2 are currently verified from source charts.
  */
 export const ROUTES: PreCalculatedRoute[] = [
   // ==================== ARC-L1 Routes ====================
+  // Source: ARC-L1_3.19.1-LIVE.png & Band Jump Distances.csv
   {
     id: 'arc-l1_to_cru-l4',
     startId: 'arc-l1',
     destinationId: 'cru-l4',
-    totalDistance: 21_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_257_000, distanceFromStart: 12_743_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_043_000, distanceFromStart: 12_957_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_907_000, distanceFromStart: 13_093_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_673_000, distanceFromStart: 13_327_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_493_000, distanceFromStart: 13_507_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_213_000, distanceFromStart: 13_787_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_946_000, distanceFromStart: 14_054_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_668_000, distanceFromStart: 14_332_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_549_000, distanceFromStart: 14_451_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_364_000, distanceFromStart: 14_636_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 12_744_803, distanceFromStart: 8_256_962 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 13_157_847, distanceFromStart: 7_843_918 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 13_510_150, distanceFromStart: 7_491_615 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 13_934_165, distanceFromStart: 7_067_600 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 14_292_609, distanceFromStart: 6_709_156 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 14_637_246, distanceFromStart: 6_364_519 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 15_058_764, distanceFromStart: 5_943_001 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 15_524_706, distanceFromStart: 5_477_059 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 15_938_061, distanceFromStart: 5_063_704 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 16_188_952, distanceFromStart: 4_812_813 }
     ]
   },
   {
     id: 'arc-l1_to_crusader',
     startId: 'arc-l1',
     destinationId: 'crusader',
-    totalDistance: 41_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_573_000, distanceFromStart: 32_427_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_339_000, distanceFromStart: 32_661_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_190_000, distanceFromStart: 32_810_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_938_000, distanceFromStart: 33_062_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_745_000, distanceFromStart: 33_255_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_443_000, distanceFromStart: 33_557_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_156_000, distanceFromStart: 33_844_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_858_000, distanceFromStart: 34_142_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_730_000, distanceFromStart: 34_270_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_531_000, distanceFromStart: 34_469_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 32_477_533, distanceFromStart: 9_173_467 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 32_661_536, distanceFromStart: 8_989_464 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 32_824_869, distanceFromStart: 8_826_131 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 33_028_998, distanceFromStart: 8_622_002 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 33_207_787, distanceFromStart: 8_443_213 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 33_384_898, distanceFromStart: 8_266_102 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 33_608_233, distanceFromStart: 8_042_767 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 33_863_390, distanceFromStart: 7_787_610 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 34_096_746, distanceFromStart: 7_554_254 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 34_241_481, distanceFromStart: 7_409_519 }
     ]
   },
   {
     id: 'arc-l1_to_cru-l5',
     startId: 'arc-l1',
     destinationId: 'cru-l5',
-    totalDistance: 45_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 6_324_000, distanceFromStart: 38_676_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 6_098_000, distanceFromStart: 38_902_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 5_958_000, distanceFromStart: 39_042_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 5_719_000, distanceFromStart: 39_281_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 5_536_000, distanceFromStart: 39_464_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 5_250_000, distanceFromStart: 39_750_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 4_977_000, distanceFromStart: 40_023_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 4_694_000, distanceFromStart: 40_306_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 4_572_000, distanceFromStart: 40_428_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 4_383_000, distanceFromStart: 40_617_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 38_842_891, distanceFromStart: 6_325_109 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 38_997_920, distanceFromStart: 6_170_080 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 39_135_946, distanceFromStart: 6_032_054 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 39_308_978, distanceFromStart: 5_859_022 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 39_461_005, distanceFromStart: 5_706_995 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 39_612_032, distanceFromStart: 5_555_968 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 39_803_066, distanceFromStart: 5_364_934 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 40_022_104, distanceFromStart: 5_145_896 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 40_223_137, distanceFromStart: 4_944_863 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 40_348_158, distanceFromStart: 4_819_842 }
     ]
   },
   {
     id: 'arc-l1_to_hurston',
     startId: 'arc-l1',
     destinationId: 'hurston',
-    totalDistance: 27_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 12_601_000, distanceFromStart: 14_399_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 12_384_000, distanceFromStart: 14_616_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 12_256_000, distanceFromStart: 14_744_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 12_039_000, distanceFromStart: 14_961_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 11_872_000, distanceFromStart: 15_128_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 11_612_000, distanceFromStart: 15_388_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 11_364_000, distanceFromStart: 15_636_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 11_107_000, distanceFromStart: 15_893_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 10_996_000, distanceFromStart: 16_004_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 10_824_000, distanceFromStart: 16_176_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 12_680_614, distanceFromStart: 7_630_386 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 12_881_847, distanceFromStart: 7_429_153 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 13_060_115, distanceFromStart: 7_250_885 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 13_282_453, distanceFromStart: 7_028_547 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 13_476_792, distanceFromStart: 6_834_208 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 13_668_952, distanceFromStart: 6_642_048 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 13_910_778, distanceFromStart: 6_400_222 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 14_186_429, distanceFromStart: 6_124_571 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 14_437_964, distanceFromStart: 5_873_036 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 14_593_715, distanceFromStart: 5_717_285 }
     ]
   },
   {
     id: 'arc-l1_to_cru-l3',
     startId: 'arc-l1',
     destinationId: 'cru-l3',
-    totalDistance: 18_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 9_723_000, distanceFromStart: 8_277_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 9_446_000, distanceFromStart: 8_554_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 9_265_000, distanceFromStart: 8_735_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_958_000, distanceFromStart: 9_042_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_723_000, distanceFromStart: 9_277_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 8_356_000, distanceFromStart: 9_644_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_006_000, distanceFromStart: 9_994_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 7_643_000, distanceFromStart: 10_357_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 7_486_000, distanceFromStart: 10_514_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 7_244_000, distanceFromStart: 10_756_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 10_989_473, distanceFromStart: 11_722_527 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_446_936, distanceFromStart: 11_265_064 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_832_950, distanceFromStart: 10_879_050 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 12_293_296, distanceFromStart: 10_418_704 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 12_679_383, distanceFromStart: 10_032_617 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 13_048_324, distanceFromStart: 9_663_676 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 13_496_942, distanceFromStart: 9_215_058 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 13_989_945, distanceFromStart: 8_722_055 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 14_425_115, distanceFromStart: 8_286_885 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 14_688_359, distanceFromStart: 8_023_641 }
     ]
   },
 
   // ==================== ARC-L2 Routes ====================
+  // Source: Band Jump Distances.csv
   {
     id: 'arc-l2_to_cru-l4',
     startId: 'arc-l2',
     destinationId: 'cru-l4',
-    totalDistance: 29_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 9_362_000, distanceFromStart: 19_638_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 9_140_000, distanceFromStart: 19_860_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_999_000, distanceFromStart: 20_001_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_754_000, distanceFromStart: 20_246_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_568_000, distanceFromStart: 20_432_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 8_278_000, distanceFromStart: 20_722_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_000_000, distanceFromStart: 21_000_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 7_713_000, distanceFromStart: 21_287_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 7_590_000, distanceFromStart: 21_410_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 7_399_000, distanceFromStart: 21_601_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_282_791, distanceFromStart: 20_717_209 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_819_520, distanceFromStart: 20_180_480 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 9_261_296, distanceFromStart: 19_738_704 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 9_384_727, distanceFromStart: 19_615_273 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 10_213_088, distanceFromStart: 18_786_912 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 10_619_534, distanceFromStart: 18_380_466 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 11_108_954, distanceFromStart: 17_891_046 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 11_641_854, distanceFromStart: 17_358_146 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 12_109_387, distanceFromStart: 16_890_613 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 12_389_524, distanceFromStart: 16_610_476 }
     ]
   },
   {
     id: 'arc-l2_to_crusader',
     startId: 'arc-l2',
     destinationId: 'crusader',
-    totalDistance: 41_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 17_644_000, distanceFromStart: 23_356_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 17_418_000, distanceFromStart: 23_582_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 17_286_000, distanceFromStart: 23_714_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 17_062_000, distanceFromStart: 23_938_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 16_890_000, distanceFromStart: 24_110_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 16_622_000, distanceFromStart: 24_378_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 16_366_000, distanceFromStart: 24_634_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 16_100_000, distanceFromStart: 24_900_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 15_985_000, distanceFromStart: 25_015_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 15_809_000, distanceFromStart: 25_191_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 29_835_087, distanceFromStart: 11_164_913 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 30_020_198, distanceFromStart: 10_979_802 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 30_183_988, distanceFromStart: 10_816_012 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 30_416_953, distanceFromStart: 10_583_047 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 32_090_899, distanceFromStart: 8_909_101 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 32_273_873, distanceFromStart: 8_726_127 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 32_503_681, distanceFromStart: 8_496_319 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 32_766_911, distanceFromStart: 8_233_089 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 33_005_926, distanceFromStart: 7_994_074 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 33_155_143, distanceFromStart: 7_844_857 }
     ]
   },
   {
     id: 'arc-l2_to_hur-l5',
     startId: 'arc-l2',
     destinationId: 'hur-l5',
-    totalDistance: 24_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_204_000, distanceFromStart: 16_796_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 6_991_000, distanceFromStart: 17_009_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 6_854_000, distanceFromStart: 17_146_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 6_621_000, distanceFromStart: 17_379_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 6_443_000, distanceFromStart: 17_557_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_166_000, distanceFromStart: 17_834_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 5_902_000, distanceFromStart: 18_098_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_627_000, distanceFromStart: 18_373_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_509_000, distanceFromStart: 18_491_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_327_000, distanceFromStart: 18_673_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_043_371, distanceFromStart: 16_956_629 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_201_232, distanceFromStart: 16_798_768 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_341_201, distanceFromStart: 16_658_799 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_536_360, distanceFromStart: 16_463_640 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_671_815, distanceFromStart: 16_328_185 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_825_770, distanceFromStart: 16_174_230 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_019_481, distanceFromStart: 15_980_519 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 8_242_037, distanceFromStart: 15_757_963 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 8_446_266, distanceFromStart: 15_553_734 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 8_573_334, distanceFromStart: 15_426_666 }
     ]
   },
   {
     id: 'arc-l2_to_hurston',
     startId: 'arc-l2',
     destinationId: 'hurston',
-    totalDistance: 25_000_000,
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 11_933_000, distanceFromStart: 13_067_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_719_000, distanceFromStart: 13_281_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_595_000, distanceFromStart: 13_405_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 11_382_000, distanceFromStart: 13_618_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 11_219_000, distanceFromStart: 13_781_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 10_965_000, distanceFromStart: 14_035_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 10_722_000, distanceFromStart: 14_278_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 10_471_000, distanceFromStart: 14_529_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 10_362_000, distanceFromStart: 14_638_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 10_195_000, distanceFromStart: 14_805_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 11_591_569, distanceFromStart: 13_408_431 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_789_853, distanceFromStart: 13_210_147 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_964_198, distanceFromStart: 13_035_802 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 12_205_207, distanceFromStart: 12_794_793 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 12_373_993, distanceFromStart: 12_626_007 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 12_562_456, distanceFromStart: 12_437_544 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 12_801_159, distanceFromStart: 12_198_841 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 13_072_050, distanceFromStart: 11_927_950 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 13_320_467, distanceFromStart: 11_679_533 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 13_473_594, distanceFromStart: 11_526_406 }
     ]
   },
 
-  // ==================== ARC-L4 Routes ====================
+  // ==================== CRUSADER Routes (Verified) ====================
+  // Source: Band Jump Distances.csv
   {
-    id: 'arc-l4_to_hur-l5',
-    startId: 'arc-l4',
-    destinationId: 'hur-l5',
-    totalDistance: 27_000_000,
+    id: 'crusader_to_arc-l1',
+    startId: 'crusader',
+    destinationId: 'arc-l1',
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 10_391_000, distanceFromStart: 16_609_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 10_183_000, distanceFromStart: 16_817_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 10_046_000, distanceFromStart: 16_954_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 9_823_000, distanceFromStart: 17_177_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 9_652_000, distanceFromStart: 17_348_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 9_385_000, distanceFromStart: 17_615_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 9_130_000, distanceFromStart: 17_870_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 8_866_000, distanceFromStart: 18_134_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 8_752_000, distanceFromStart: 18_248_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 8_576_000, distanceFromStart: 18_424_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_173_358, distanceFromStart: 34_477_642 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 6_989_355, distanceFromStart: 34_661_645 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 6_826_022, distanceFromStart: 34_824_978 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 6_621_894, distanceFromStart: 35_029_106 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 6_443_104, distanceFromStart: 35_207_896 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_265_993, distanceFromStart: 35_385_007 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_042_658, distanceFromStart: 35_608_342 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_787_501, distanceFromStart: 35_863_499 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_554_145, distanceFromStart: 36_096_855 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_409_410, distanceFromStart: 36_241_590 }
     ]
   },
   {
-    id: 'arc-l4_to_hurston',
-    startId: 'arc-l4',
-    destinationId: 'hurston',
-    totalDistance: 24_000_000,
+    id: 'crusader_to_arc-l2',
+    startId: 'crusader',
+    destinationId: 'arc-l2',
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_070_000, distanceFromStart: 16_930_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 6_858_000, distanceFromStart: 17_142_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 6_722_000, distanceFromStart: 17_278_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 6_505_000, distanceFromStart: 17_495_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 6_339_000, distanceFromStart: 17_661_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_080_000, distanceFromStart: 17_920_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 5_833_000, distanceFromStart: 18_167_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_577_000, distanceFromStart: 18_423_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_466_000, distanceFromStart: 18_534_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_296_000, distanceFromStart: 18_704_000 }
-    ]
-  },
-  {
-    id: 'arc-l4_to_crusader',
-    startId: 'arc-l4',
-    destinationId: 'crusader',
-    totalDistance: 48_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_843_000, distanceFromStart: 39_157_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_607_000, distanceFromStart: 39_393_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_463_000, distanceFromStart: 39_537_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_219_000, distanceFromStart: 39_781_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_032_000, distanceFromStart: 39_968_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_740_000, distanceFromStart: 40_260_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_462_000, distanceFromStart: 40_538_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 7_173_000, distanceFromStart: 40_827_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 7_049_000, distanceFromStart: 40_951_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_857_000, distanceFromStart: 41_143_000 }
-    ]
-  },
-  {
-    id: 'arc-l4_to_hur-l4',
-    startId: 'arc-l4',
-    destinationId: 'hur-l4',
-    totalDistance: 22_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 12_057_000, distanceFromStart: 9_943_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_843_000, distanceFromStart: 10_157_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_712_000, distanceFromStart: 10_288_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 11_491_000, distanceFromStart: 10_509_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 11_322_000, distanceFromStart: 10_678_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 11_058_000, distanceFromStart: 10_942_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 10_806_000, distanceFromStart: 11_194_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 10_545_000, distanceFromStart: 11_455_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 10_432_000, distanceFromStart: 11_568_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 10_259_000, distanceFromStart: 11_741_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 13_643_681, distanceFromStart: 27_356_319 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 13_458_570, distanceFromStart: 27_541_430 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 13_294_910, distanceFromStart: 27_705_090 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 13_061_778, distanceFromStart: 27_938_222 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 12_898_644, distanceFromStart: 28_101_356 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 12_715_670, distanceFromStart: 28_284_330 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 12_485_862, distanceFromStart: 28_514_138 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 12_222_632, distanceFromStart: 28_777_368 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 11_983_618, distanceFromStart: 29_016_382 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 11_834_401, distanceFromStart: 29_165_599 }
     ]
   },
 
-  // ==================== CRU-L1 Routes ====================
+  // ==================== CRU-L3 Routes ====================
   {
-    id: 'cru-l1_to_arc-l3',
-    startId: 'cru-l1',
-    destinationId: 'arc-l3',
-    totalDistance: 15_000_000,
+    id: 'cru-l3_to_arc-l1',
+    startId: 'cru-l3',
+    destinationId: 'arc-l1',
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_250_000, distanceFromStart: 6_750_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_051_000, distanceFromStart: 6_949_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_927_000, distanceFromStart: 7_073_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_706_000, distanceFromStart: 7_294_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_537_000, distanceFromStart: 7_463_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_274_000, distanceFromStart: 7_726_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_022_000, distanceFromStart: 7_978_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_761_000, distanceFromStart: 8_239_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_648_000, distanceFromStart: 8_352_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_474_000, distanceFromStart: 8_526_000 }
-    ]
-  },
-  {
-    id: 'cru-l1_to_microtech',
-    startId: 'cru-l1',
-    destinationId: 'microtech',
-    totalDistance: 48_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 23_693_000, distanceFromStart: 24_307_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 23_836_000, distanceFromStart: 24_164_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 23_953_000, distanceFromStart: 24_047_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 24_140_000, distanceFromStart: 23_860_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_294_000, distanceFromStart: 23_706_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 24_534_000, distanceFromStart: 23_466_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 24_764_000, distanceFromStart: 23_236_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 25_001_000, distanceFromStart: 22_999_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 25_104_000, distanceFromStart: 22_896_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 25_262_000, distanceFromStart: 22_738_000 }
-    ]
-  },
-  {
-    id: 'cru-l1_to_arccorp',
-    startId: 'cru-l1',
-    destinationId: 'arccorp',
-    totalDistance: 21_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_495_000, distanceFromStart: 12_505_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_269_000, distanceFromStart: 12_731_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_128_000, distanceFromStart: 12_872_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_892_000, distanceFromStart: 13_108_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_711_000, distanceFromStart: 13_289_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_429_000, distanceFromStart: 13_571_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_160_000, distanceFromStart: 13_840_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_881_000, distanceFromStart: 14_119_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_762_000, distanceFromStart: 14_238_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_576_000, distanceFromStart: 14_424_000 }
-    ]
-  },
-  {
-    id: 'cru-l1_to_arc-l5',
-    startId: 'cru-l1',
-    destinationId: 'arc-l5',
-    totalDistance: 17_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 10_794_000, distanceFromStart: 6_206_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 10_560_000, distanceFromStart: 6_440_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 10_424_000, distanceFromStart: 6_576_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 10_191_000, distanceFromStart: 6_809_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 10_013_000, distanceFromStart: 6_987_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 9_736_000, distanceFromStart: 7_264_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 9_472_000, distanceFromStart: 7_528_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 9_199_000, distanceFromStart: 7_801_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 9_081_000, distanceFromStart: 7_919_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 8_899_000, distanceFromStart: 8_101_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 11_722_536, distanceFromStart: 10_989_464 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_265_073, distanceFromStart: 11_446_927 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 10_879_059, distanceFromStart: 11_832_941 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 10_418_713, distanceFromStart: 12_293_287 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 10_032_626, distanceFromStart: 12_679_374 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 9_663_684, distanceFromStart: 13_048_316 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 9_215_066, distanceFromStart: 13_496_934 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 8_722_063, distanceFromStart: 13_989_937 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 8_286_894, distanceFromStart: 14_425_106 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 8_023_649, distanceFromStart: 14_688_351 }
     ]
   },
 
-  // ==================== HUR-L1 Routes ====================
+  // ==================== CRU-L4 Routes ====================
   {
-    id: 'hur-l1_to_arc-l3',
-    startId: 'hur-l1',
-    destinationId: 'arc-l3',
-    totalDistance: 17_000_000,
+    id: 'cru-l4_to_arc-l1',
+    startId: 'cru-l4',
+    destinationId: 'arc-l1',
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_826_000, distanceFromStart: 9_174_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_604_000, distanceFromStart: 9_396_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_476_000, distanceFromStart: 9_524_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_257_000, distanceFromStart: 9_743_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_090_000, distanceFromStart: 9_910_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_829_000, distanceFromStart: 10_171_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_580_000, distanceFromStart: 10_420_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_322_000, distanceFromStart: 10_678_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_211_000, distanceFromStart: 10_789_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_039_000, distanceFromStart: 10_961_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 11_256_961, distanceFromStart: 9_743_039 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 10_843_917, distanceFromStart: 10_156_083 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 10_491_614, distanceFromStart: 10_508_386 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 10_067_599, distanceFromStart: 10_932_401 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 9_709_155, distanceFromStart: 11_290_845 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 9_364_518, distanceFromStart: 11_635_482 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_943_000, distanceFromStart: 12_057_000 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 8_477_058, distanceFromStart: 12_522_942 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 8_063_703, distanceFromStart: 12_936_297 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 7_812_812, distanceFromStart: 13_187_188 }
     ]
   },
   {
-    id: 'hur-l1_to_microtech',
-    startId: 'hur-l1',
-    destinationId: 'microtech',
-    totalDistance: 50_000_000,
+    id: 'cru-l4_to_arc-l2',
+    startId: 'cru-l4',
+    destinationId: 'arc-l2',
     crossesHalo: true,
     bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 23_901_000, distanceFromStart: 26_099_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 24_078_000, distanceFromStart: 25_922_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 24_181_000, distanceFromStart: 25_819_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 24_358_000, distanceFromStart: 25_642_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_493_000, distanceFromStart: 25_507_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 24_704_000, distanceFromStart: 25_296_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 24_906_000, distanceFromStart: 25_094_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 25_115_000, distanceFromStart: 24_885_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 25_206_000, distanceFromStart: 24_794_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 25_345_000, distanceFromStart: 24_655_000 }
-    ]
-  },
-  {
-    id: 'hur-l1_to_arc-l4',
-    startId: 'hur-l1',
-    destinationId: 'arc-l4',
-    totalDistance: 18_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_779_000, distanceFromStart: 10_221_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_555_000, distanceFromStart: 10_445_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_424_000, distanceFromStart: 10_576_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_202_000, distanceFromStart: 10_798_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_032_000, distanceFromStart: 10_968_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_767_000, distanceFromStart: 11_233_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_514_000, distanceFromStart: 11_486_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_252_000, distanceFromStart: 11_748_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_139_000, distanceFromStart: 11_861_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_964_000, distanceFromStart: 12_036_000 }
-    ]
-  },
-  {
-    id: 'hur-l1_to_arccorp',
-    startId: 'hur-l1',
-    destinationId: 'arccorp',
-    totalDistance: 22_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_697_000, distanceFromStart: 13_303_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_470_000, distanceFromStart: 13_530_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_338_000, distanceFromStart: 13_662_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_112_000, distanceFromStart: 13_888_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_939_000, distanceFromStart: 14_061_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 7_669_000, distanceFromStart: 14_331_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_411_000, distanceFromStart: 14_589_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 7_144_000, distanceFromStart: 14_856_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 7_028_000, distanceFromStart: 14_972_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_850_000, distanceFromStart: 15_150_000 }
-    ]
-  },
-  {
-    id: 'hur-l1_to_arc-l5',
-    startId: 'hur-l1',
-    destinationId: 'arc-l5',
-    totalDistance: 33_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 8_290_000, distanceFromStart: 24_710_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 8_473_000, distanceFromStart: 24_527_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_580_000, distanceFromStart: 24_420_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_762_000, distanceFromStart: 24_238_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_902_000, distanceFromStart: 24_098_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 9_120_000, distanceFromStart: 23_880_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 9_328_000, distanceFromStart: 23_672_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 9_544_000, distanceFromStart: 23_456_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 9_637_000, distanceFromStart: 23_363_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 9_781_000, distanceFromStart: 23_219_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 20_117_293, distanceFromStart: 8_882_707 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 19_581_064, distanceFromStart: 9_418_936 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 19_139_288, distanceFromStart: 9_860_712 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 18_565_856, distanceFromStart: 10_434_144 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 18_187_496, distanceFromStart: 10_812_504 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 17_781_049, distanceFromStart: 11_218_951 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 17_291_629, distanceFromStart: 11_708_371 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 16_758_730, distanceFromStart: 12_241_270 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 16_291_196, distanceFromStart: 12_708_804 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 16_011_059, distanceFromStart: 12_988_941 }
     ]
   },
 
-  // ==================== HUR-L2 Routes ====================
+  // ==================== CRU-L5 Routes ====================
   {
-    id: 'hur-l2_to_microtech',
-    startId: 'hur-l2',
-    destinationId: 'microtech',
-    totalDistance: 52_000_000,
+    id: 'cru-l5_to_arc-l1',
+    startId: 'cru-l5',
+    destinationId: 'arc-l1',
     crossesHalo: true,
     bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 25_352_000, distanceFromStart: 26_648_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 25_210_000, distanceFromStart: 26_790_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 25_119_000, distanceFromStart: 26_881_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 24_907_000, distanceFromStart: 27_093_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 24_703_000, distanceFromStart: 27_297_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_490_000, distanceFromStart: 27_510_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 24_354_000, distanceFromStart: 27_646_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 24_175_000, distanceFromStart: 27_825_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 24_070_000, distanceFromStart: 27_930_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 23_891_000, distanceFromStart: 28_109_000 }
-    ]
-  },
-  {
-    id: 'hur-l2_to_arc-l4',
-    startId: 'hur-l2',
-    destinationId: 'arc-l4',
-    totalDistance: 18_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_344_000, distanceFromStart: 10_656_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_120_000, distanceFromStart: 10_880_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 6_988_000, distanceFromStart: 11_012_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 6_763_000, distanceFromStart: 11_237_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 6_590_000, distanceFromStart: 11_410_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_321_000, distanceFromStart: 11_679_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_064_000, distanceFromStart: 11_936_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_797_000, distanceFromStart: 12_203_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_682_000, distanceFromStart: 12_318_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_505_000, distanceFromStart: 12_495_000 }
-    ]
-  },
-  {
-    id: 'hur-l2_to_arccorp',
-    startId: 'hur-l2',
-    destinationId: 'arccorp',
-    totalDistance: 20_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 9_327_000, distanceFromStart: 10_673_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 9_103_000, distanceFromStart: 10_897_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 8_972_000, distanceFromStart: 11_028_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 8_750_000, distanceFromStart: 11_250_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_579_000, distanceFromStart: 11_421_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 8_313_000, distanceFromStart: 11_687_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_059_000, distanceFromStart: 11_941_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 7_796_000, distanceFromStart: 12_204_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 7_682_000, distanceFromStart: 12_318_000 },
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 7_507_000, distanceFromStart: 12_493_000 }
-    ]
-  },
-  {
-    id: 'hur-l2_to_arc-l5',
-    startId: 'hur-l2',
-    destinationId: 'arc-l5',
-    totalDistance: 35_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 8_679_000, distanceFromStart: 26_321_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 8_536_000, distanceFromStart: 26_464_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 8_443_000, distanceFromStart: 26_557_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 8_229_000, distanceFromStart: 26_771_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 8_023_000, distanceFromStart: 26_977_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 7_807_000, distanceFromStart: 27_193_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_669_000, distanceFromStart: 27_331_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_488_000, distanceFromStart: 27_512_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_382_000, distanceFromStart: 27_618_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_200_000, distanceFromStart: 27_800_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 6_324_828, distanceFromStart: 38_843_172 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 6_169_798, distanceFromStart: 38_998_202 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 6_031_773, distanceFromStart: 39_136_227 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 5_858_741, distanceFromStart: 39_309_259 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 5_706_713, distanceFromStart: 39_461_287 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 5_555_686, distanceFromStart: 39_612_314 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 5_364_653, distanceFromStart: 39_803_347 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_145_615, distanceFromStart: 40_022_385 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_944_581, distanceFromStart: 40_223_419 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 4_819_561, distanceFromStart: 40_348_439 }
     ]
   },
 
-  // ==================== MIC-L1 Routes ====================
+  // ==================== HURSTON Routes ====================
   {
-    id: 'mic-l1_to_arccorp',
-    startId: 'mic-l1',
-    destinationId: 'arccorp',
-    totalDistance: 56_000_000,
+    id: 'hurston_to_arc-l1',
+    startId: 'hurston',
+    destinationId: 'arc-l1',
     crossesHalo: true,
     bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 25_895_000, distanceFromStart: 30_105_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 25_748_000, distanceFromStart: 30_252_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 25_652_000, distanceFromStart: 30_348_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 25_429_000, distanceFromStart: 30_571_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 25_214_000, distanceFromStart: 30_786_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_989_000, distanceFromStart: 31_011_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 24_845_000, distanceFromStart: 31_155_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 24_657_000, distanceFromStart: 31_343_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 24_547_000, distanceFromStart: 31_453_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 24_358_000, distanceFromStart: 31_642_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 7_630_180, distanceFromStart: 12_680_820 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 7_428_947, distanceFromStart: 12_882_053 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 7_250_679, distanceFromStart: 13_060_321 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 7_028_341, distanceFromStart: 13_282_659 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 6_834_002, distanceFromStart: 13_476_998 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_641_842, distanceFromStart: 13_669_158 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_400_015, distanceFromStart: 13_910_985 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_124_364, distanceFromStart: 14_186_636 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_872_830, distanceFromStart: 14_438_170 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_717_079, distanceFromStart: 14_593_921 }
     ]
   },
   {
-    id: 'mic-l1_to_hurston',
-    startId: 'mic-l1',
-    destinationId: 'hurston',
-    totalDistance: 26_000_000,
+    id: 'hurston_to_arc-l2',
+    startId: 'hurston',
+    destinationId: 'arc-l2',
     crossesHalo: true,
     bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 12_426_000, distanceFromStart: 13_574_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 12_278_000, distanceFromStart: 13_722_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 12_183_000, distanceFromStart: 13_817_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 11_960_000, distanceFromStart: 14_040_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 11_745_000, distanceFromStart: 14_255_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 11_520_000, distanceFromStart: 14_480_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 11_376_000, distanceFromStart: 14_624_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_188_000, distanceFromStart: 14_812_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 11_078_000, distanceFromStart: 14_922_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 10_889_000, distanceFromStart: 15_111_000 }
-    ]
-  },
-  {
-    id: 'mic-l1_to_hur-l4',
-    startId: 'mic-l1',
-    destinationId: 'hur-l4',
-    totalDistance: 27_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 6_854_000, distanceFromStart: 20_146_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_707_000, distanceFromStart: 20_293_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_611_000, distanceFromStart: 20_389_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 6_389_000, distanceFromStart: 20_611_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 6_175_000, distanceFromStart: 20_825_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 5_951_000, distanceFromStart: 21_049_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 5_807_000, distanceFromStart: 21_193_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 5_620_000, distanceFromStart: 21_380_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 5_510_000, distanceFromStart: 21_490_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 5_322_000, distanceFromStart: 21_678_000 }
-    ]
-  },
-  {
-    id: 'mic-l1_to_crusader',
-    startId: 'mic-l1',
-    destinationId: 'crusader',
-    totalDistance: 42_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 19_356_000, distanceFromStart: 22_644_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 19_209_000, distanceFromStart: 22_791_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 19_114_000, distanceFromStart: 22_886_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 18_892_000, distanceFromStart: 23_108_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 18_678_000, distanceFromStart: 23_322_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 18_454_000, distanceFromStart: 23_546_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 18_310_000, distanceFromStart: 23_690_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 18_123_000, distanceFromStart: 23_877_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 18_013_000, distanceFromStart: 23_987_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 17_824_000, distanceFromStart: 24_176_000 }
-    ]
-  },
-  {
-    id: 'mic-l1_to_cru-l5',
-    startId: 'mic-l1',
-    destinationId: 'cru-l5',
-    totalDistance: 50_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 24_971_000, distanceFromStart: 25_029_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 24_823_000, distanceFromStart: 25_177_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 24_727_000, distanceFromStart: 25_273_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 24_504_000, distanceFromStart: 25_496_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 24_289_000, distanceFromStart: 25_711_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_064_000, distanceFromStart: 25_936_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 23_920_000, distanceFromStart: 26_080_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 23_732_000, distanceFromStart: 26_268_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 23_621_000, distanceFromStart: 26_379_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 23_432_000, distanceFromStart: 26_568_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 13_932_455, distanceFromStart: 11_067_545 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 13_734_171, distanceFromStart: 11_265_829 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 13_559_263, distanceFromStart: 11_440_737 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 13_318_817, distanceFromStart: 11_681_183 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 13_150_031, distanceFromStart: 11_849_969 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 12_961_568, distanceFromStart: 12_038_432 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 12_722_865, distanceFromStart: 12_277_135 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 12_451_974, distanceFromStart: 12_548_026 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 12_203_557, distanceFromStart: 12_796_443 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 12_050_430, distanceFromStart: 12_949_570 }
     ]
   },
 
-  // ==================== MIC-L2 Routes ====================
+  // ==================== HUR-L5 Routes ====================
   {
-    id: 'mic-l2_to_cru-l3',
-    startId: 'mic-l2',
-    destinationId: 'cru-l3',
-    totalDistance: 38_000_000,
+    id: 'hur-l5_to_arc-l2',
+    startId: 'hur-l5',
+    destinationId: 'arc-l2',
     crossesHalo: true,
     bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 1_767_000, distanceFromStart: 36_233_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 2_136_000, distanceFromStart: 35_864_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 2_479_000, distanceFromStart: 35_521_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 3_098_000, distanceFromStart: 34_902_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 3_666_000, distanceFromStart: 34_334_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 4_190_000, distanceFromStart: 33_810_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 4_525_000, distanceFromStart: 33_475_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 4_988_000, distanceFromStart: 33_012_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 5_260_000, distanceFromStart: 32_740_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 5_728_000, distanceFromStart: 32_272_000 }
-    ]
-  },
-  {
-    id: 'mic-l2_to_hurston',
-    startId: 'mic-l2',
-    destinationId: 'hurston',
-    totalDistance: 53_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 36_963_000, distanceFromStart: 16_037_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 36_816_000, distanceFromStart: 16_184_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 36_721_000, distanceFromStart: 16_279_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 36_498_000, distanceFromStart: 16_502_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 36_283_000, distanceFromStart: 16_717_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 36_058_000, distanceFromStart: 16_942_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 35_914_000, distanceFromStart: 17_086_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 35_726_000, distanceFromStart: 17_274_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 35_615_000, distanceFromStart: 17_385_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 35_426_000, distanceFromStart: 17_574_000 }
-    ]
-  },
-  {
-    id: 'mic-l2_to_hur-l4',
-    startId: 'mic-l2',
-    destinationId: 'hur-l4',
-    totalDistance: 56_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 28_089_000, distanceFromStart: 27_911_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 27_941_000, distanceFromStart: 28_059_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 27_846_000, distanceFromStart: 28_154_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 27_623_000, distanceFromStart: 28_377_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 27_408_000, distanceFromStart: 28_592_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 27_183_000, distanceFromStart: 28_817_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 27_039_000, distanceFromStart: 28_961_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 26_851_000, distanceFromStart: 29_149_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 26_740_000, distanceFromStart: 29_260_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 26_551_000, distanceFromStart: 29_449_000 }
-    ]
-  },
-  {
-    id: 'mic-l2_to_crusader',
-    startId: 'mic-l2',
-    destinationId: 'crusader',
-    totalDistance: 60_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 32_298_000, distanceFromStart: 27_702_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 32_151_000, distanceFromStart: 27_849_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 32_056_000, distanceFromStart: 27_944_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 31_833_000, distanceFromStart: 28_167_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 31_618_000, distanceFromStart: 28_382_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 31_393_000, distanceFromStart: 28_607_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 31_249_000, distanceFromStart: 28_751_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 31_061_000, distanceFromStart: 28_939_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 30_950_000, distanceFromStart: 29_050_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 30_761_000, distanceFromStart: 29_239_000 }
-    ]
-  },
-  {
-    id: 'mic-l2_to_cru-l5',
-    startId: 'mic-l2',
-    destinationId: 'cru-l5',
-    totalDistance: 42_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 5_641_000, distanceFromStart: 36_359_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 6_249_000, distanceFromStart: 35_751_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 6_739_000, distanceFromStart: 35_261_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 7_366_000, distanceFromStart: 34_634_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 8_207_000, distanceFromStart: 33_793_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 8_718_000, distanceFromStart: 33_282_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 9_046_000, distanceFromStart: 32_954_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 9_504_000, distanceFromStart: 32_496_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 9_773_000, distanceFromStart: 32_227_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 10_238_000, distanceFromStart: 31_762_000 }
-    ]
-  },
-
-  // ==================== MIC-L5 Routes ====================
-  {
-    id: 'mic-l5_to_cru-l4',
-    startId: 'mic-l5',
-    destinationId: 'cru-l4',
-    totalDistance: 52_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 25_688_000, distanceFromStart: 26_312_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 25_543_000, distanceFromStart: 26_457_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 25_450_000, distanceFromStart: 26_550_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 25_234_000, distanceFromStart: 26_766_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 25_026_000, distanceFromStart: 26_974_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 24_808_000, distanceFromStart: 27_192_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 24_669_000, distanceFromStart: 27_331_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 24_486_000, distanceFromStart: 27_514_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 24_379_000, distanceFromStart: 27_621_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 24_195_000, distanceFromStart: 27_805_000 }
-    ]
-  },
-  {
-    id: 'mic-l5_to_crusader',
-    startId: 'mic-l5',
-    destinationId: 'crusader',
-    totalDistance: 50_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 23_905_000, distanceFromStart: 26_095_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 23_761_000, distanceFromStart: 26_239_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 23_668_000, distanceFromStart: 26_332_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 23_453_000, distanceFromStart: 26_547_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 23_246_000, distanceFromStart: 26_754_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 23_029_000, distanceFromStart: 26_971_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 22_890_000, distanceFromStart: 27_110_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 22_709_000, distanceFromStart: 27_291_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 22_602_000, distanceFromStart: 27_398_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 22_419_000, distanceFromStart: 27_581_000 }
-    ]
-  },
-  {
-    id: 'mic-l5_to_hurston',
-    startId: 'mic-l5',
-    destinationId: 'hurston',
-    totalDistance: 27_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 12_490_000, distanceFromStart: 14_510_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 12_611_000, distanceFromStart: 14_389_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 12_690_000, distanceFromStart: 14_310_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 12_873_000, distanceFromStart: 14_127_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 13_049_000, distanceFromStart: 13_951_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 13_233_000, distanceFromStart: 13_767_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 13_351_000, distanceFromStart: 13_649_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 13_505_000, distanceFromStart: 13_495_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 13_596_000, distanceFromStart: 13_404_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 13_751_000, distanceFromStart: 13_249_000 }
-    ]
-  },
-  {
-    id: 'mic-l5_to_cru-l3',
-    startId: 'mic-l5',
-    destinationId: 'cru-l3',
-    totalDistance: 24_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 575_000, distanceFromStart: 23_425_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 740_000, distanceFromStart: 23_260_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 850_000, distanceFromStart: 23_150_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 1_079_000, distanceFromStart: 22_921_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 1_299_000, distanceFromStart: 22_701_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 1_530_000, distanceFromStart: 22_470_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 1_678_000, distanceFromStart: 22_322_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 1_871_000, distanceFromStart: 22_129_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 1_984_000, distanceFromStart: 22_016_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 2_178_000, distanceFromStart: 21_822_000 }
-    ]
-  },
-  {
-    id: 'mic-l5_to_hur-l4',
-    startId: 'mic-l5',
-    destinationId: 'hur-l4',
-    totalDistance: 40_000_000,
-    crossesHalo: true,
-    bandExits: [
-      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 26_401_000, distanceFromStart: 13_599_000 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 26_256_000, distanceFromStart: 13_744_000 },
-      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 26_163_000, distanceFromStart: 13_837_000 },
-      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 25_948_000, distanceFromStart: 14_052_000 },
-      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 25_740_000, distanceFromStart: 14_260_000 },
-      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 25_523_000, distanceFromStart: 14_477_000 },
-      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 25_384_000, distanceFromStart: 14_616_000 },
-      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 25_203_000, distanceFromStart: 14_797_000 },
-      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 25_096_000, distanceFromStart: 14_904_000 },
-      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 24_913_000, distanceFromStart: 15_087_000 }
+      { bandId: 1, distanceFromStanton: 19_702_000, distanceToDestination: 12_240_389, distanceFromStart: 11_759_611 },
+      { bandId: 2, distanceFromStanton: 19_887_000, distanceToDestination: 12_082_529, distanceFromStart: 11_917_471 },
+      { bandId: 3, distanceFromStanton: 19_995_000, distanceToDestination: 11_942_560, distanceFromStart: 12_057_440 },
+      { bandId: 4, distanceFromStanton: 20_179_000, distanceToDestination: 11_747_400, distanceFromStart: 12_252_600 },
+      { bandId: 5, distanceFromStanton: 20_320_000, distanceToDestination: 11_611_945, distanceFromStart: 12_388_055 },
+      { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 11_457_990, distanceFromStart: 12_542_010 },
+      { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 11_264_279, distanceFromStart: 12_735_721 },
+      { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 11_041_724, distanceFromStart: 12_958_276 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 10_837_495, distanceFromStart: 13_162_505 },
+      { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 10_710_426, distanceFromStart: 13_289_574 }
     ]
   }
 ];

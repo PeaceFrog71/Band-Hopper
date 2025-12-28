@@ -113,8 +113,6 @@ export interface RouteAnalysis {
     travelTimeFromStart?: number;
     formattedTravelTime?: string;
   }>;
-  totalTravelTime?: number;
-  formattedTotalTime?: string;
   recommendedBands: AaronHaloBand[];
 }
 
@@ -147,14 +145,6 @@ export function analyzeRoute(
     return result;
   });
 
-  // Calculate total travel time
-  let totalTravelTime: number | undefined;
-  let formattedTotalTime: string | undefined;
-  if (ship) {
-    totalTravelTime = calculateTravelTime(route.totalDistance, ship);
-    formattedTotalTime = formatTravelTime(totalTravelTime);
-  }
-
   // Recommend bands based on density (highest density bands)
   const recommendedBands = [...bandDetails]
     .sort((a, b) => b.band.relativeDensity - a.band.relativeDensity)
@@ -164,8 +154,6 @@ export function analyzeRoute(
   return {
     route,
     bandExits,
-    totalTravelTime,
-    formattedTotalTime,
     recommendedBands
   };
 }

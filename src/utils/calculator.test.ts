@@ -76,7 +76,6 @@ describe('Route Analysis', () => {
         expect(result.route).toBeDefined();
         expect(result.bandExits.length).toBe(10);
         expect(result.recommendedBands.length).toBeLessThanOrEqual(3);
-        expect(result.totalTravelTime).toBeUndefined();
       }
     });
 
@@ -85,8 +84,6 @@ describe('Route Analysis', () => {
       const result = analyzeRoute('arc-l1', 'cru-l4', prospector);
 
       if (result) {
-        expect(result.totalTravelTime).toBeDefined();
-        expect(result.formattedTotalTime).toBeDefined();
         expect(result.bandExits[0].travelTimeFromStart).toBeDefined();
       }
     });

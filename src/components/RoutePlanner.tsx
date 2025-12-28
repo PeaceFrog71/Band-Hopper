@@ -91,9 +91,6 @@ export function RoutePlanner() {
             <span className="route-path">
               {startLocation.shortName} → {destLocation.shortName}
             </span>
-            <span className="route-distance">
-              {formatDistance(routeData.route.totalDistance)}
-            </span>
           </div>
 
           <div className="band-table">
