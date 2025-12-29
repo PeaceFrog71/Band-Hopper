@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { getLocationById } from '../types/locations';
+import { useState, useMemo, Fragment } from 'react';
+import { getLocationById, getGroupedLocationsForDropdown } from '../types/locations';
 import { BANDS } from '../types/bands';
 import {
   getAvailableStartLocations,
@@ -36,23 +36,17 @@ export function RoutePlanner({
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
   const [bandSelectorCollapsed, setBandSelectorCollapsed] = useState(false);
 
-  // Get available start locations
-  const availableStarts = useMemo(() => {
+  // Get available start locations grouped by planet
+  const groupedStarts = useMemo(() => {
     const startIds = getAvailableStartLocations();
-    return startIds
-      .map(id => getLocationById(id))
-      .filter((loc): loc is NonNullable<typeof loc> => loc !== null)
-      .sort((a, b) => a.shortName.localeCompare(b.shortName));
+    return getGroupedLocationsForDropdown(startIds);
   }, []);
 
-  // Get available destinations based on selected start (for destination mode)
-  const availableDestinations = useMemo(() => {
+  // Get available destinations grouped by planet (for destination mode)
+  const groupedDestinations = useMemo(() => {
     if (!startId) return [];
     const destIds = getAvailableDestinations(startId);
-    return destIds
-      .map(id => getLocationById(id))
-      .filter((loc): loc is NonNullable<typeof loc> => loc !== null)
-      .sort((a, b) => a.shortName.localeCompare(b.shortName));
+    return getGroupedLocationsForDropdown(destIds);
   }, [startId]);
 
   // Get route data (for destination mode)
@@ -206,10 +200,14 @@ export function RoutePlanner({
               onChange={(e) => handleStartChange(e.target.value)}
             >
               <option value="">Select start...</option>
-              {availableStarts.map(loc => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.name}
-                </option>
+              {groupedStarts.map(group => (
+                <Fragment key={group.planet}>
+                  {group.locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                    </option>
+                  ))}
+                </Fragment>
               ))}
             </select>
           </div>
@@ -224,10 +222,14 @@ export function RoutePlanner({
                 disabled={!startId}
               >
                 <option value="">Select destination...</option>
-                {availableDestinations.map(loc => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.name}
-                  </option>
+                {groupedDestinations.map(group => (
+                  <Fragment key={group.planet}>
+                    {group.locations.map(loc => (
+                      <option key={loc.id} value={loc.id}>
+                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                      </option>
+                    ))}
+                  </Fragment>
                 ))}
               </select>
             </div>
