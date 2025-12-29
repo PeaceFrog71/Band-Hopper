@@ -157,7 +157,6 @@
   color: var(--text-primary);
 }
 
-.band-col-stanton,
 .band-col-dest {
   font-family: var(--font-heading);
   color: var(--accent-cyan);
