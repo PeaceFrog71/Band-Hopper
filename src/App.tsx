@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
@@ -21,6 +21,17 @@ function App() {
   const [startId, setStartId] = useState<string>('')
   const [destinationId, setDestinationId] = useState<string>('')
 
+  // Close help modal on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showHelp) {
+        setShowHelp(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [showHelp])
+
   return (
     <div className="app">
       <header className="app-header">
@@ -37,7 +48,7 @@ function App() {
             rel="noopener noreferrer"
             className="feedback-link"
           >
-            Bug Report / Features Request / Feedback
+            Bug Report / Feature Requests / Feedback
           </a>
         </div>
         <a
@@ -123,10 +134,10 @@ function App() {
 
         {/* Help Modal - Mobile only */}
         {showHelp && (
-          <div className="help-modal-overlay" onClick={() => setShowHelp(false)}>
-            <div className="help-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="help-modal-overlay" onClick={() => setShowHelp(false)} role="presentation">
+            <div className="help-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
               <button className="help-modal-close" onClick={() => setShowHelp(false)} aria-label="Close">×</button>
-              <h3>Help</h3>
+              <h3 id="help-modal-title">Help</h3>
               <p>{helpText[activeTab]}</p>
             </div>
           </div>
