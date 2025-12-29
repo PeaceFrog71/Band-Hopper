@@ -197,7 +197,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1rem;
   text-align: center;
   border-top: 1px solid var(--border);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -286,6 +286,11 @@ h1, h2, h3, h4, h5, h6 {
     min-width: auto;
     padding: 0.6rem 0.5rem;
     font-size: 0.75rem;
+  }
+
+  /* Hide instruction text on mobile */
+  .panel > .text-muted {
+    display: none;
   }
 }
 
@@ -413,5 +418,107 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 1.5rem;
     padding: 0.4rem 1rem;
     border-width: 3px;
+  }
+}
+
+/* Panel Header with Help Button */
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-header h2 {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* Help Button - Hidden on desktop */
+.help-btn {
+  display: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-medium);
+  border: 1px solid var(--accent-blue);
+  color: var(--accent-blue);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.help-btn:hover {
+  background: var(--accent-blue);
+  color: var(--bg-dark);
+}
+
+/* Help Modal */
+.help-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+}
+
+.help-modal {
+  background: var(--bg-light);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1rem;
+  max-width: 400px;
+  position: relative;
+}
+
+.help-modal h3 {
+  font-family: var(--font-heading);
+  color: var(--accent-blue);
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+}
+
+.help-modal p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.help-modal-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.help-modal-close:hover {
+  color: var(--text-primary);
+}
+
+/* Mobile: Show help button and modal */
+@media (max-width: 480px) {
+  .help-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .help-modal-overlay {
+    display: flex;
   }
 }
