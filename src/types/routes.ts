@@ -324,7 +324,7 @@ export const ROUTES: PreCalculatedRoute[] = [
       { bandId: 6, distanceFromStanton: 20_540_000, distanceToDestination: 5_555_686, distanceFromStart: 39_612_314 },
       { bandId: 7, distanceFromStanton: 20_750_000, distanceToDestination: 5_364_653, distanceFromStart: 39_803_347 },
       { bandId: 8, distanceFromStanton: 20_968_000, distanceToDestination: 5_145_615, distanceFromStart: 40_022_385 },
-      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 5_944_581, distanceFromStart: 40_223_419 },
+      { bandId: 9, distanceFromStanton: 21_062_000, distanceToDestination: 4_944_581, distanceFromStart: 40_223_419 },
       { bandId: 10, distanceFromStanton: 21_207_000, distanceToDestination: 4_819_561, distanceFromStart: 40_348_439 }
     ]
   },
