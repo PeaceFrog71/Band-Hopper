@@ -75,15 +75,15 @@ export function formatDistanceDisplay(distanceKm: number): string {
   const millions = distanceKm / 1_000_000;
 
   if (millions >= 10) {
-    return `${millions.toFixed(1)}M km`;
+    return `${millions.toFixed(1)} Gm`;
   } else if (millions >= 1) {
-    return `${millions.toFixed(2)}M km`;
+    return `${millions.toFixed(2)} Gm`;
   } else {
     const thousands = distanceKm / 1_000;
     if (thousands >= 100) {
-      return `${thousands.toFixed(0)}K km`;
+      return `${thousands.toFixed(0)} Mm`;
     } else if (thousands >= 1) {
-      return `${thousands.toFixed(1)}K km`;
+      return `${thousands.toFixed(1)} Mm`;
     }
     return `${distanceKm.toFixed(0)} km`;
   }
@@ -101,14 +101,14 @@ export function formatDistanceLarge(distanceKm: number): {
   if (millions >= 1) {
     return {
       value: millions.toFixed(2),
-      unit: 'M km'
+      unit: 'Gm'
     };
   }
 
   const thousands = distanceKm / 1_000;
   return {
     value: thousands.toFixed(0),
-    unit: 'K km'
+    unit: 'Mm'
   };
 }
 

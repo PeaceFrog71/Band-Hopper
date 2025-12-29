@@ -14,16 +14,27 @@ import './RoutePlanner.css';
 type PlannerMode = 'destination' | 'band';
 type BandSortBy = 'number' | 'density';
 
-export function RoutePlanner() {
+interface RoutePlannerProps {
+  startId: string;
+  destinationId: string;
+  onStartChange: (id: string) => void;
+  onDestinationChange: (id: string) => void;
+}
+
+export function RoutePlanner({
+  startId,
+  destinationId,
+  onStartChange,
+  onDestinationChange
+}: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
-  const [startId, setStartId] = useState<string>('');
-  const [destinationId, setDestinationId] = useState<string>('');
   const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
   const [bandSortBy, setBandSortBy] = useState<BandSortBy>('density');
   const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('density');
   const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
   const [destTableCollapsed, setDestTableCollapsed] = useState(false);
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
+  const [bandSelectorCollapsed, setBandSelectorCollapsed] = useState(false);
 
   // Get available start locations
   const availableStarts = useMemo(() => {
@@ -89,23 +100,24 @@ export function RoutePlanner() {
 
   // Handle start change
   const handleStartChange = (newStartId: string) => {
-    setStartId(newStartId);
+    onStartChange(newStartId);
     setSelectedDestBandId(null);
     setDestTableCollapsed(false);
     setBandModeCollapsed(false);
+    setBandSelectorCollapsed(false);
     if (newStartId) {
       const validDests = getAvailableDestinations(newStartId);
       if (!validDests.includes(destinationId)) {
-        setDestinationId('');
+        onDestinationChange('');
       }
     } else {
-      setDestinationId('');
+      onDestinationChange('');
     }
   };
 
   // Handle destination change in destination mode
   const handleDestinationChange = (newDestId: string) => {
-    setDestinationId(newDestId);
+    onDestinationChange(newDestId);
     setSelectedDestBandId(null);
     setDestTableCollapsed(false);
   };
@@ -125,11 +137,24 @@ export function RoutePlanner() {
   const handleModeChange = (newMode: PlannerMode) => {
     setMode(newMode);
     // Reset selections when switching modes
-    setDestinationId('');
+    onDestinationChange('');
     setSelectedBandId(null);
     setSelectedDestBandId(null);
     setDestTableCollapsed(false);
     setBandModeCollapsed(false);
+    setBandSelectorCollapsed(false);
+  };
+
+  // Handle band selection in band mode
+  const handleBandSelect = (bandId: number) => {
+    if (selectedBandId === bandId && bandSelectorCollapsed) {
+      // Clicking the same band again expands the selector
+      setBandSelectorCollapsed(false);
+    } else {
+      setSelectedBandId(bandId);
+      onDestinationChange('');
+      setBandSelectorCollapsed(true);
+    }
   };
 
   // Handle band mode destination selection
@@ -138,7 +163,7 @@ export function RoutePlanner() {
       // Clicking the same destination again expands
       setBandModeCollapsed(false);
     } else {
-      setDestinationId(destId);
+      onDestinationChange(destId);
       setBandModeCollapsed(true);
     }
   };
@@ -351,36 +376,37 @@ export function RoutePlanner() {
           {!bandModeCollapsed && (
             <div className="band-selector-section">
               <div className="band-selector-header">
-                <label>Select Target Band</label>
-                <div className="band-sort-toggle">
-                  <button
-                    className={`sort-btn ${bandSortBy === 'density' ? 'active' : ''}`}
-                    onClick={() => setBandSortBy('density')}
-                  >
-                    By Density
-                  </button>
-                  <button
-                    className={`sort-btn ${bandSortBy === 'number' ? 'active' : ''}`}
-                    onClick={() => setBandSortBy('number')}
-                  >
-                    By Number
-                  </button>
-                </div>
+                <label>{bandSelectorCollapsed ? 'Target Band' : 'Select Target Band'}</label>
+                {!bandSelectorCollapsed && (
+                  <div className="band-sort-toggle">
+                    <button
+                      className={`sort-btn ${bandSortBy === 'density' ? 'active' : ''}`}
+                      onClick={() => setBandSortBy('density')}
+                    >
+                      By Density
+                    </button>
+                    <button
+                      className={`sort-btn ${bandSortBy === 'number' ? 'active' : ''}`}
+                      onClick={() => setBandSortBy('number')}
+                    >
+                      By Number
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="band-selector-grid">
-                {sortedBands.map(band => (
+                {(bandSelectorCollapsed && selectedBand ? [selectedBand] : sortedBands).map(band => (
                   <button
                     key={band.id}
                     className={`band-select-btn ${selectedBandId === band.id ? 'selected' : ''} density-${getDensityClass(band.relativeDensity)}`}
-                    onClick={() => {
-                      setSelectedBandId(band.id);
-                      setDestinationId('');
-                      setBandModeCollapsed(false);
-                    }}
+                    onClick={() => handleBandSelect(band.id)}
                   >
                     <span className="band-select-name">{band.name}</span>
                     <span className="band-select-density">{Math.round(band.relativeDensity * 100)}%</span>
+                    {bandSelectorCollapsed && selectedBandId === band.id && (
+                      <span className="band-select-hint">Tap to change</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -461,5 +487,5 @@ function getWidthClass(width: number): string {
 
 function formatDistanceCompact(distanceKm: number): string {
   const thousands = distanceKm / 1_000;
-  return `${Math.round(thousands)}K km`;
+  return `${Math.round(thousands)} Mm`;
 }

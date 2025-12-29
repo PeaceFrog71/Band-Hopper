@@ -2,11 +2,16 @@ import { useState } from 'react'
 import './App.css'
 import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
+import { WhereAmI } from './components/WhereAmI'
 
-const version = '1.1.2'
+const version = '1.4.1'
 
 function App() {
   const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
+
+  // Lifted route state - persists across tab switches
+  const [startId, setStartId] = useState<string>('')
+  const [destinationId, setDestinationId] = useState<string>('')
 
   return (
     <div className="app">
@@ -49,33 +54,32 @@ function App() {
           <div className="panel">
             <h2>Route Planner</h2>
             <p className="text-muted">Select your start and destination to calculate exit distances for each Aaron Halo band.</p>
-            <RoutePlanner />
+            <RoutePlanner
+              startId={startId}
+              destinationId={destinationId}
+              onStartChange={setStartId}
+              onDestinationChange={setDestinationId}
+            />
           </div>
         )}
 
         {activeTab === 'whereami' && (
           <div className="panel">
             <h2>Where Am I?</h2>
-            <p className="text-muted">Reference tool: Enter a distance from Stanton to see which Aaron Halo band it corresponds to.</p>
-
-            <div className="form-group">
-              <label>Distance from Stanton (km)</label>
-              <input type="number" placeholder="e.g., 20300000" />
-            </div>
-
-            <div className="display-label">Band at this Distance</div>
-            <div className="display-large text-success">Band 5</div>
+            <p className="text-muted">Enter your distance to Stanton to identify which Aaron Halo band you're in.</p>
+            <WhereAmI />
           </div>
         )}
 
         {activeTab === 'refinery' && (
-          <div className="panel">
+          <div className="panel panel-not-implemented">
+            <div className="not-implemented-stamp">Coming Soon</div>
             <h2>Refinery Finder</h2>
             <p className="text-muted">Find the best refinery based on your mined material and location.</p>
 
             <div className="form-group">
               <label>Material Mined</label>
-              <select>
+              <select disabled>
                 <option value="">Select material...</option>
                 <option value="quantanium">Quantanium</option>
                 <option value="agricium">Agricium</option>
@@ -85,7 +89,7 @@ function App() {
             </div>
 
             <div className="display-label">Recommended Refinery</div>
-            <div className="display-large">ARC-L1</div>
+            <div className="display-large">---</div>
           </div>
         )}
       </main>

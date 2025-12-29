@@ -120,30 +120,30 @@ describe('Route Analysis', () => {
 
 describe('Distance Formatting', () => {
   describe('formatDistance', () => {
-    it('formats millions correctly', () => {
-      // Values >= 10M use one decimal
-      expect(formatDistance(19_700_000)).toBe('19.7M km');
-      expect(formatDistance(20_000_000)).toBe('20.0M km');
-      expect(formatDistance(15_500_000)).toBe('15.5M km');
-      // Values < 10M use two decimals
-      expect(formatDistance(5_500_000)).toBe('5.50M km');
+    it('formats gigameters correctly', () => {
+      // Values >= 10 Gm use one decimal
+      expect(formatDistance(19_700_000)).toBe('19.7 Gm');
+      expect(formatDistance(20_000_000)).toBe('20.0 Gm');
+      expect(formatDistance(15_500_000)).toBe('15.5 Gm');
+      // Values < 10 Gm use two decimals
+      expect(formatDistance(5_500_000)).toBe('5.50 Gm');
     });
 
-    it('formats tens of millions with one decimal', () => {
-      expect(formatDistance(25_000_000)).toBe('25.0M km');
-      expect(formatDistance(30_500_000)).toBe('30.5M km');
+    it('formats tens of gigameters with one decimal', () => {
+      expect(formatDistance(25_000_000)).toBe('25.0 Gm');
+      expect(formatDistance(30_500_000)).toBe('30.5 Gm');
     });
 
-    it('formats thousands correctly', () => {
-      expect(formatDistance(500_000)).toBe('500K km');
-      expect(formatDistance(50_000)).toBe('50.0K km');
+    it('formats megameters correctly', () => {
+      expect(formatDistance(500_000)).toBe('500 Mm');
+      expect(formatDistance(50_000)).toBe('50.0 Mm');
     });
   });
 
   describe('formatDistanceCompact', () => {
     it('formats compactly for mobile', () => {
-      expect(formatDistanceCompact(19_700_000)).toBe('19.70M');
-      expect(formatDistanceCompact(20_320_000)).toBe('20.32M');
+      expect(formatDistanceCompact(19_700_000)).toBe('19.70 Gm');
+      expect(formatDistanceCompact(20_320_000)).toBe('20.32 Gm');
     });
   });
 
