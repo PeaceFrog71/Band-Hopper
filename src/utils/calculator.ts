@@ -80,10 +80,10 @@ export function analyzePosition(distanceFromStanton: number): PositionAnalysis {
   } else if (currentBand) {
     const distanceToPeak = Math.abs(distanceFromStanton - currentBand.peakDensityDistance);
     if (distanceToPeak < 10_000) {
-      positionDescription = `At ${currentBand.name} peak density`;
+      positionDescription = `At ${currentBand.name} center`;
     } else {
-      const direction = distanceFromStanton < currentBand.peakDensityDistance ? 'inner' : 'outer';
-      positionDescription = `In ${currentBand.name}, ${formatDistance(distanceToPeak)} from peak (${direction} edge)`;
+      const edge = distanceFromStanton < currentBand.peakDensityDistance ? 'inner' : 'outer';
+      positionDescription = `In ${currentBand.name}, near ${edge} edge`;
     }
   } else {
     // In halo but between bands
@@ -113,8 +113,6 @@ export interface RouteAnalysis {
     travelTimeFromStart?: number;
     formattedTravelTime?: string;
   }>;
-  totalTravelTime?: number;
-  formattedTotalTime?: string;
   recommendedBands: AaronHaloBand[];
 }
 
@@ -147,14 +145,6 @@ export function analyzeRoute(
     return result;
   });
 
-  // Calculate total travel time
-  let totalTravelTime: number | undefined;
-  let formattedTotalTime: string | undefined;
-  if (ship) {
-    totalTravelTime = calculateTravelTime(route.totalDistance, ship);
-    formattedTotalTime = formatTravelTime(totalTravelTime);
-  }
-
   // Recommend bands based on density (highest density bands)
   const recommendedBands = [...bandDetails]
     .sort((a, b) => b.band.relativeDensity - a.band.relativeDensity)
@@ -164,8 +154,6 @@ export function analyzeRoute(
   return {
     route,
     bandExits,
-    totalTravelTime,
-    formattedTotalTime,
     recommendedBands
   };
 }
@@ -222,16 +210,16 @@ export function formatDistance(distanceKm: number): string {
   const millions = distanceKm / 1_000_000;
 
   if (millions >= 10) {
-    return `${millions.toFixed(1)}M km`;
+    return `${millions.toFixed(1)} Gm`;
   } else if (millions >= 1) {
-    return `${millions.toFixed(2)}M km`;
+    return `${millions.toFixed(2)} Gm`;
   } else {
-    // Less than 1 million km, show in thousands
+    // Less than 1 million km, show in megameters (thousands of km)
     const thousands = distanceKm / 1_000;
     if (thousands >= 100) {
-      return `${thousands.toFixed(0)}K km`;
+      return `${thousands.toFixed(0)} Mm`;
     } else {
-      return `${thousands.toFixed(1)}K km`;
+      return `${thousands.toFixed(1)} Mm`;
     }
   }
 }
@@ -241,7 +229,7 @@ export function formatDistance(distanceKm: number): string {
  */
 export function formatDistanceCompact(distanceKm: number): string {
   const millions = distanceKm / 1_000_000;
-  return `${millions.toFixed(2)}M`;
+  return `${millions.toFixed(2)} Gm`;
 }
 
 /**
@@ -305,7 +293,7 @@ export function getRecommendedBands(
   return BANDS
     .map(band => {
       let score = band.relativeDensity;
-      let reasons: string[] = [];
+      const reasons: string[] = [];
 
       if (prioritizeDensity && band.relativeDensity >= 0.8) {
         score += 0.2;

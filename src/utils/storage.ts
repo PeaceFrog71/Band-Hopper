@@ -1,6 +1,6 @@
-// Aaron Halo Guide - Local Storage Management
+// Band Hopper - Local Storage Management
 
-const STORAGE_PREFIX = 'aaron-halo-guide_';
+const STORAGE_PREFIX = 'band-hopper_';
 
 /**
  * User preferences stored in localStorage

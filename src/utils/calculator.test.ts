@@ -12,6 +12,11 @@ import {
   getRecommendedBands
 } from './calculator';
 import { BANDS, HALO_INNER_EDGE, HALO_OUTER_EDGE } from '../types/bands';
+import {
+  calculateExitWidths,
+  getDestinationsByBandWidth,
+  getRoute
+} from '../types/routes';
 import { SHIPS } from '../types/ships';
 
 describe('Position Analysis', () => {
@@ -76,7 +81,6 @@ describe('Route Analysis', () => {
         expect(result.route).toBeDefined();
         expect(result.bandExits.length).toBe(10);
         expect(result.recommendedBands.length).toBeLessThanOrEqual(3);
-        expect(result.totalTravelTime).toBeUndefined();
       }
     });
 
@@ -85,8 +89,6 @@ describe('Route Analysis', () => {
       const result = analyzeRoute('arc-l1', 'cru-l4', prospector);
 
       if (result) {
-        expect(result.totalTravelTime).toBeDefined();
-        expect(result.formattedTotalTime).toBeDefined();
         expect(result.bandExits[0].travelTimeFromStart).toBeDefined();
       }
     });
@@ -118,30 +120,30 @@ describe('Route Analysis', () => {
 
 describe('Distance Formatting', () => {
   describe('formatDistance', () => {
-    it('formats millions correctly', () => {
-      // Values >= 10M use one decimal
-      expect(formatDistance(19_700_000)).toBe('19.7M km');
-      expect(formatDistance(20_000_000)).toBe('20.0M km');
-      expect(formatDistance(15_500_000)).toBe('15.5M km');
-      // Values < 10M use two decimals
-      expect(formatDistance(5_500_000)).toBe('5.50M km');
+    it('formats gigameters correctly', () => {
+      // Values >= 10 Gm use one decimal
+      expect(formatDistance(19_700_000)).toBe('19.7 Gm');
+      expect(formatDistance(20_000_000)).toBe('20.0 Gm');
+      expect(formatDistance(15_500_000)).toBe('15.5 Gm');
+      // Values < 10 Gm use two decimals
+      expect(formatDistance(5_500_000)).toBe('5.50 Gm');
     });
 
-    it('formats tens of millions with one decimal', () => {
-      expect(formatDistance(25_000_000)).toBe('25.0M km');
-      expect(formatDistance(30_500_000)).toBe('30.5M km');
+    it('formats tens of gigameters with one decimal', () => {
+      expect(formatDistance(25_000_000)).toBe('25.0 Gm');
+      expect(formatDistance(30_500_000)).toBe('30.5 Gm');
     });
 
-    it('formats thousands correctly', () => {
-      expect(formatDistance(500_000)).toBe('500K km');
-      expect(formatDistance(50_000)).toBe('50.0K km');
+    it('formats megameters correctly', () => {
+      expect(formatDistance(500_000)).toBe('500 Mm');
+      expect(formatDistance(50_000)).toBe('50.0 Mm');
     });
   });
 
   describe('formatDistanceCompact', () => {
     it('formats compactly for mobile', () => {
-      expect(formatDistanceCompact(19_700_000)).toBe('19.70M');
-      expect(formatDistanceCompact(20_320_000)).toBe('20.32M');
+      expect(formatDistanceCompact(19_700_000)).toBe('19.70 Gm');
+      expect(formatDistanceCompact(20_320_000)).toBe('20.32 Gm');
     });
   });
 
@@ -236,5 +238,97 @@ describe('Constants', () => {
     for (let i = 0; i < BANDS.length; i++) {
       expect(BANDS[i].id).toBe(i + 1);
     }
+  });
+});
+
+describe('Exit Width Calculations', () => {
+  describe('calculateExitWidths', () => {
+    it('calculates exit widths for all bands', () => {
+      const route = getRoute('arc-l1', 'crusader');
+      expect(route).not.toBeNull();
+
+      const withWidths = calculateExitWidths(route!.bandExits);
+
+      expect(withWidths.length).toBe(10);
+      withWidths.forEach(exit => {
+        expect(exit.exitWidth).toBeGreaterThan(0);
+      });
+    });
+
+    it('Band 1 only has gap to next band (no previous)', () => {
+      const route = getRoute('arc-l1', 'crusader');
+      const withWidths = calculateExitWidths(route!.bandExits);
+
+      const band1 = withWidths.find(e => e.bandId === 1)!;
+      expect(band1.gapToPreviousBand).toBeUndefined();
+      expect(band1.gapToNextBand).toBeDefined();
+      expect(band1.exitWidth).toBe(band1.gapToNextBand);
+    });
+
+    it('Band 10 only has gap to previous band (no next)', () => {
+      const route = getRoute('arc-l1', 'crusader');
+      const withWidths = calculateExitWidths(route!.bandExits);
+
+      const band10 = withWidths.find(e => e.bandId === 10)!;
+      expect(band10.gapToPreviousBand).toBeDefined();
+      expect(band10.gapToNextBand).toBeUndefined();
+      expect(band10.exitWidth).toBe(band10.gapToPreviousBand);
+    });
+
+    it('Middle bands use minimum of two gaps', () => {
+      const route = getRoute('arc-l1', 'crusader');
+      const withWidths = calculateExitWidths(route!.bandExits);
+
+      const band5 = withWidths.find(e => e.bandId === 5)!;
+      expect(band5.gapToPreviousBand).toBeDefined();
+      expect(band5.gapToNextBand).toBeDefined();
+      expect(band5.exitWidth).toBe(
+        Math.min(band5.gapToPreviousBand!, band5.gapToNextBand!)
+      );
+    });
+
+    it('matches expected CSV values for ARC-L1 to CRUSADER', () => {
+      // From CSV: ARC-L1 to CRUSADER has gaps:
+      // 12: 184003, 23: 163333, 34: 204129, 45: 178789, 56: 177111
+      // 67: 223335, 78: 255157, 89: 233356, 90: 144735
+      const route = getRoute('arc-l1', 'crusader');
+      const withWidths = calculateExitWidths(route!.bandExits);
+
+      // Band 2 gap to Band 1 should be ~184,003
+      const band2 = withWidths.find(e => e.bandId === 2)!;
+      expect(band2.gapToPreviousBand).toBeCloseTo(184_003, -3); // within 1000
+
+      // Band 5 gap to Band 4 should be ~178,789
+      const band5 = withWidths.find(e => e.bandId === 5)!;
+      expect(band5.gapToPreviousBand).toBeCloseTo(178_789, -3);
+    });
+  });
+
+  describe('getDestinationsByBandWidth', () => {
+    it('returns destinations sorted by width (widest first)', () => {
+      const results = getDestinationsByBandWidth('arc-l1', 5);
+
+      expect(results.length).toBeGreaterThan(0);
+
+      // Verify sorted by width descending
+      for (let i = 1; i < results.length; i++) {
+        expect(results[i - 1].exitWidth).toBeGreaterThanOrEqual(results[i].exitWidth);
+      }
+    });
+
+    it('returns empty array for invalid start location', () => {
+      const results = getDestinationsByBandWidth('invalid-location', 5);
+      expect(results.length).toBe(0);
+    });
+
+    it('includes exit distance and width for each destination', () => {
+      const results = getDestinationsByBandWidth('arc-l1', 5);
+
+      results.forEach(dest => {
+        expect(dest.destinationId).toBeDefined();
+        expect(dest.exitDistance).toBeGreaterThan(0);
+        expect(dest.exitWidth).toBeGreaterThan(0);
+      });
+    });
   });
 });

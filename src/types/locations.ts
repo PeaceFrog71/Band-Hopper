@@ -101,6 +101,15 @@ export const LOCATIONS: StantonLocation[] = [
     orbitalBody: 'Crusader',
     description: 'Refinery station at Crusader L5'
   },
+  {
+    id: 'cru-l3',
+    name: 'CRU-L3 Bold Vantage Station',
+    shortName: 'CRU-L3',
+    type: 'station',
+    distanceFromStanton: 20_000_000,
+    hasRefinery: false,
+    orbitalBody: 'Crusader'
+  },
 
   // Hurston Lagrange Points
   {
@@ -168,6 +177,15 @@ export const LOCATIONS: StantonLocation[] = [
     shortName: 'MIC-L2',
     type: 'station',
     distanceFromStanton: 41_000_000,
+    hasRefinery: false,
+    orbitalBody: 'microTech'
+  },
+  {
+    id: 'mic-l5',
+    name: 'MIC-L5 Modern Icarus Station',
+    shortName: 'MIC-L5',
+    type: 'station',
+    distanceFromStanton: 38_500_000,
     hasRefinery: false,
     orbitalBody: 'microTech'
   },

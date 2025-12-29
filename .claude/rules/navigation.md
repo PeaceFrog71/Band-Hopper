@@ -12,17 +12,14 @@ The Aaron Halo is an asteroid belt with 10 bands at fixed distances from the Sta
 - Outer edge: ~21,298,000 km
 - Each band has varying asteroid density
 
-### Navigation Methods
+### Navigation Method
 
-**1. Stanton Marker Method (Preferred)**
-- Use distance to Stanton system marker as reference
-- Works for any route crossing the belt
-- Most reliable and consistent
+**Destination Distance Method**
+- Use remaining distance to destination during quantum travel
+- Pre-calculated exit distances for all valid routes
+- Watch the distance countdown and exit QT at target distance
 
-**2. Destination Distance Method**
-- Use remaining distance to destination
-- Specific to each route
-- Pre-calculated for all valid routes
+**Note:** The Stanton marker method is NOT available in-game. Routing to Stanton shows "blocked by navpoint" and distance cannot be monitored during QT.
 
 ## Key Calculations
 
@@ -44,17 +41,14 @@ function getExitDistance(
   startId: string,
   destId: string,
   bandId: number
-): { stantonMethod: number; destMethod: number } | null {
+): number | null {
   const route = ROUTES.find(r =>
     r.startId === startId && r.destinationId === destId
   );
   if (!route) return null;
 
   const exit = route.bandExits.find(e => e.bandId === bandId);
-  return exit ? {
-    stantonMethod: exit.distanceFromStanton,
-    destMethod: exit.distanceToDestination
-  } : null;
+  return exit?.distanceToDestination ?? null;
 }
 ```
 

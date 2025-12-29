@@ -47,11 +47,11 @@ src/
 
 ### 1. Route Calculator
 User selects Start → Destination → Shows exit distances for each band
-- Two methods: Stanton marker distance OR remaining distance to destination
+- Uses destination distance method (remaining distance to destination)
 - All routes pre-calculated for instant lookup
 
 ### 2. "Where Am I?"
-User enters distance to Stanton marker → App shows current band position
+Reference tool: Enter a distance from Stanton to see which band it corresponds to
 
 ### 3. Smart Refinery Finder
 - Find closest refinery from current position
@@ -76,19 +76,16 @@ Interactive visualization of the 10 bands with density curve
 
 Data source: CaptSheppard's Aaron Halo Travel Routes (cstone.space)
 
-## Navigation Methods
-
-### Stanton Marker Method (Preferred)
-1. Plot route that crosses the Aaron Halo
-2. Start quantum travel
-3. Open MobiGlas starmap, select Stanton marker
-4. Monitor distance to marker
-5. Exit QT when reaching desired band distance
+## Navigation Method
 
 ### Destination Distance Method
-1. Use pre-calculated route data
-2. Monitor remaining distance to destination
-3. Exit QT at specified distance for target band
+1. Select your start location and destination in Band Hopper
+2. Note the exit distance for your target band
+3. Start quantum travel toward your destination
+4. Watch the remaining distance to destination
+5. Exit QT when it matches your target band's exit distance
+
+**Note:** The Stanton marker method (monitoring distance to Stanton star) is not available in-game. The destination cannot be selected during quantum travel, and routing to Stanton shows "blocked by navpoint".
 
 ## Version Control
 
