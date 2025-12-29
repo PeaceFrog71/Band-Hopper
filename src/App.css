@@ -197,7 +197,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 1rem;
   text-align: center;
   border-top: 1px solid var(--border);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 

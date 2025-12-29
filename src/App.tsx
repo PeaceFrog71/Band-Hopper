@@ -8,7 +8,7 @@ const version = __APP_VERSION__
 
 // Help text for each tab
 const helpText: Record<string, string> = {
-  route: 'Select your start and destination to calculate exit distances for each Aaron Halo band.',
+  route: 'Select your start, desired Halo band and target destination to calculate exit distances.',
   whereami: 'Enter your distance to Stanton to identify which Aaron Halo band you\'re in.',
   refinery: 'Find the best refinery based on your mined material and location.'
 }
@@ -80,7 +80,7 @@ function App() {
             <h2>Route Planner</h2>
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
           </div>
-          <p className="text-muted">Select your start and destination to calculate exit distances for each Aaron Halo band.</p>
+          <p className="text-muted">Select your start, desired Halo band and target destination to calculate exit distances.</p>
           <RoutePlanner
             startId={startId}
             destinationId={destinationId}
