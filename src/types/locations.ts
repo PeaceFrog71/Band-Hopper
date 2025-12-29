@@ -268,3 +268,65 @@ export function getLocationsByOrbitalBody(): Map<string, StantonLocation[]> {
 
   return grouped;
 }
+
+/**
+ * Planet order for display (alphabetical)
+ */
+const PLANET_ORDER = ['ArcCorp', 'Crusader', 'Hurston', 'microTech'] as const;
+
+/**
+ * Group for dropdown display - planet name and its associated locations
+ */
+export interface LocationGroup {
+  planet: string;
+  locations: StantonLocation[];
+}
+
+/**
+ * Get locations grouped by planet for dropdown display
+ * Planets ordered alphabetically, L-points sorted by number (L1, L2, L3, etc.)
+ * Planet itself is included as first option if available
+ */
+export function getGroupedLocationsForDropdown(locationIds: string[]): LocationGroup[] {
+  const locationSet = new Set(locationIds);
+  const groups: LocationGroup[] = [];
+
+  for (const planetId of PLANET_ORDER) {
+    // Get the planet location itself
+    const planetLocation = LOCATIONS.find(loc => loc.id === planetId.toLowerCase());
+    const planetName = planetLocation?.name || planetId;
+
+    // Get L-points for this planet
+    const lPointLocations = LOCATIONS
+      .filter(loc =>
+        loc.orbitalBody === planetId &&
+        locationSet.has(loc.id)
+      )
+      .sort((a, b) => {
+        // Sort by L-point number (extract number from shortName like "ARC-L1")
+        const aMatch = a.shortName.match(/L(\d)/);
+        const bMatch = b.shortName.match(/L(\d)/);
+        if (aMatch && bMatch) {
+          return parseInt(aMatch[1]) - parseInt(bMatch[1]);
+        }
+        return a.shortName.localeCompare(b.shortName);
+      });
+
+    // Build locations array: planet first (if available), then L-points
+    const groupLocations: StantonLocation[] = [];
+
+    if (planetLocation && locationSet.has(planetLocation.id)) {
+      groupLocations.push(planetLocation);
+    }
+    groupLocations.push(...lPointLocations);
+
+    if (groupLocations.length > 0) {
+      groups.push({
+        planet: planetName,
+        locations: groupLocations
+      });
+    }
+  }
+
+  return groups;
+}
