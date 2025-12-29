@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import { getLocationById, getGroupedLocationsForDropdown } from '../types/locations';
 import { BANDS } from '../types/bands';
 import {
@@ -201,11 +201,13 @@ export function RoutePlanner({
             >
               <option value="">Select start...</option>
               {groupedStarts.map(group => (
-                group.locations.map(loc => (
-                  <option key={loc.id} value={loc.id}>
-                    {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
-                  </option>
-                ))
+                <Fragment key={group.planet}>
+                  {group.locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                    </option>
+                  ))}
+                </Fragment>
               ))}
             </select>
           </div>
@@ -221,11 +223,13 @@ export function RoutePlanner({
               >
                 <option value="">Select destination...</option>
                 {groupedDestinations.map(group => (
-                  group.locations.map(loc => (
-                    <option key={loc.id} value={loc.id}>
-                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
-                    </option>
-                  ))
+                  <Fragment key={group.planet}>
+                    {group.locations.map(loc => (
+                      <option key={loc.id} value={loc.id}>
+                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                      </option>
+                    ))}
+                  </Fragment>
                 ))}
               </select>
             </div>

@@ -303,9 +303,9 @@ export function getGroupedLocationsForDropdown(locationIds: string[]): LocationG
         locationSet.has(loc.id)
       )
       .sort((a, b) => {
-        // Sort by L-point number (extract number from shortName like "ARC-L1")
-        const aMatch = a.shortName.match(/L(\d)/);
-        const bMatch = b.shortName.match(/L(\d)/);
+        // Sort by L-point number (extract number from shortName like "ARC-L1" or "ARC-L10")
+        const aMatch = a.shortName.match(/L(\d+)/);
+        const bMatch = b.shortName.match(/L(\d+)/);
         if (aMatch && bMatch) {
           return parseInt(aMatch[1]) - parseInt(bMatch[1]);
         }
