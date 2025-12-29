@@ -39,7 +39,9 @@ export interface PreCalculatedRoute {
  * at each band's peak density point.
  *
  * Note: distanceFromStanton values are the band's peak density distance.
- * distanceFromStart is calculated as totalDistance - distanceToDestination.
+ * distanceFromStart is a pre-calculated value for how far has been traveled from
+ * the start; the implied total route distance at any band is
+ * distanceFromStart + distanceToDestination.
  *
  * Only routes involving ARC-L1 or ARC-L2 are currently verified from source charts.
  */
