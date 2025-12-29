@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './App.css'
 import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
+import { WhereAmI } from './components/WhereAmI'
 
 const version = '1.1.2'
 
@@ -56,15 +57,8 @@ function App() {
         {activeTab === 'whereami' && (
           <div className="panel">
             <h2>Where Am I?</h2>
-            <p className="text-muted">Reference tool: Enter a distance from Stanton to see which Aaron Halo band it corresponds to.</p>
-
-            <div className="form-group">
-              <label>Distance from Stanton (km)</label>
-              <input type="number" placeholder="e.g., 20300000" />
-            </div>
-
-            <div className="display-label">Band at this Distance</div>
-            <div className="display-large text-success">Band 5</div>
+            <p className="text-muted">Enter your distance to Stanton to identify which Aaron Halo band you're in.</p>
+            <WhereAmI />
           </div>
         )}
 

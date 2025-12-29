@@ -80,10 +80,10 @@ export function analyzePosition(distanceFromStanton: number): PositionAnalysis {
   } else if (currentBand) {
     const distanceToPeak = Math.abs(distanceFromStanton - currentBand.peakDensityDistance);
     if (distanceToPeak < 10_000) {
-      positionDescription = `At ${currentBand.name} peak density`;
+      positionDescription = `At ${currentBand.name} center`;
     } else {
-      const direction = distanceFromStanton < currentBand.peakDensityDistance ? 'inner' : 'outer';
-      positionDescription = `In ${currentBand.name}, ${formatDistance(distanceToPeak)} from peak (${direction} edge)`;
+      const edge = distanceFromStanton < currentBand.peakDensityDistance ? 'inner' : 'outer';
+      positionDescription = `In ${currentBand.name}, near ${edge} edge`;
     }
   } else {
     // In halo but between bands
