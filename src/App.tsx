@@ -72,13 +72,14 @@ function App() {
         )}
 
         {activeTab === 'refinery' && (
-          <div className="panel">
+          <div className="panel panel-not-implemented">
+            <div className="not-implemented-stamp">Coming Soon</div>
             <h2>Refinery Finder</h2>
             <p className="text-muted">Find the best refinery based on your mined material and location.</p>
 
             <div className="form-group">
               <label>Material Mined</label>
-              <select>
+              <select disabled>
                 <option value="">Select material...</option>
                 <option value="quantanium">Quantanium</option>
                 <option value="agricium">Agricium</option>
@@ -88,7 +89,7 @@ function App() {
             </div>
 
             <div className="display-label">Recommended Refinery</div>
-            <div className="display-large">ARC-L1</div>
+            <div className="display-large">---</div>
           </div>
         )}
       </main>

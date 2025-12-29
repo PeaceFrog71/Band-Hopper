@@ -292,3 +292,40 @@ h1, h2, h3, h4, h5, h6 {
 .flex-col { flex-direction: column; }
 .gap-1 { gap: 0.5rem; }
 .gap-2 { gap: 1rem; }
+
+/* Not Implemented Stamp */
+.panel-not-implemented {
+  position: relative;
+  overflow: hidden;
+  opacity: 0.7;
+}
+
+.not-implemented-stamp {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--danger);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 0.5rem 2rem;
+  border: 4px solid var(--danger);
+  border-radius: 8px;
+  background: rgba(10, 14, 39, 0.9);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+}
+
+@media (max-width: 480px) {
+  .not-implemented-stamp {
+    font-size: 1.5rem;
+    padding: 0.4rem 1rem;
+    border-width: 3px;
+  }
+}
