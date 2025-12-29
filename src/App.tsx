@@ -23,7 +23,24 @@ function App() {
           <h1>Band Hopper</h1>
           <span className="subtitle">Aaron Halo Mining Navigator</span>
           <span className="version">v{version}</span>
+          <a
+            href="https://forms.gle/xbCK6DF3iYUHW6Hn6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="feedback-link"
+          >
+            Bug Report / Features Request / Feedback
+          </a>
         </div>
+        <a
+          href="https://ko-fi.com/peacefroggaming"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="kofi-link"
+        >
+          <img src="/rieger-icon.png" alt="" />
+          <span>Support on Ko-fi</span>
+        </a>
       </header>
 
       <main className="app-content">
@@ -93,6 +110,14 @@ function App() {
           Data source: <a href="https://cstone.space/resources/knowledge-base/36" target="_blank" rel="noopener noreferrer">CaptSheppard's Aaron Halo Travel Routes</a>
         </p>
         <p>Made by <a href="https://peacefroggaming.com" target="_blank" rel="noopener noreferrer">PeaceFrog Gaming</a></p>
+        <a
+          href="https://ko-fi.com/peacefroggaming"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="kofi-link-mobile"
+        >
+          Support on Ko-fi
+        </a>
       </footer>
     </div>
   )
