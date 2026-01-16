@@ -1,5 +1,5 @@
 import { useState, useMemo, Fragment } from 'react';
-import { getLocationById, getGroupedLocationsForDropdown } from '../types/locations';
+import { getLocationById, getGroupedLocationsForDropdown, type StantonLocation } from '../types/locations';
 import { BANDS } from '../types/bands';
 import {
   getAvailableStartLocations,
@@ -9,7 +9,39 @@ import {
   calculateExitWidths
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
+import { RouteSummary } from './RouteSummary';
 import './RoutePlanner.css';
+
+// Helper to format location name for dropdowns (with note suffix if applicable)
+function formatLocationName(loc: StantonLocation, indent = true): string {
+  const prefix = indent && loc.type !== 'planet' ? '└ ' : '';
+  const suffix = loc.note ? ' *Not on Map (HUD Targeting ONLY)' : '';
+  return `${prefix}${loc.shortName}${suffix}`;
+}
+
+// Reusable component for location notes/tips
+function LocationTip({ startLocation, destLocation }: { startLocation: StantonLocation | null; destLocation: StantonLocation | null }) {
+  if (!startLocation?.note && !destLocation?.note) return null;
+
+  return (
+    <div className="location-tip">
+      <span className="tip-icon">ℹ</span>
+      <span>
+        {startLocation?.note && (
+          <>
+            <strong>{startLocation.shortName}:</strong> {startLocation.note}
+            {destLocation?.note && <br />}
+          </>
+        )}
+        {destLocation?.note && (
+          <>
+            <strong>{destLocation.shortName}:</strong> {destLocation.note}
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
 
 type PlannerMode = 'destination' | 'band';
 type BandSortBy = 'number' | 'density';
@@ -19,13 +51,15 @@ interface RoutePlannerProps {
   destinationId: string;
   onStartChange: (id: string) => void;
   onDestinationChange: (id: string) => void;
+  onSwapRoute: () => void;
 }
 
 export function RoutePlanner({
   startId,
   destinationId,
   onStartChange,
-  onDestinationChange
+  onDestinationChange,
+  onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
   const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
@@ -91,6 +125,21 @@ export function RoutePlanner({
     }
     return BANDS;
   }, [bandSortBy]);
+
+  // Check if route can be swapped (reverse route exists)
+  const canSwap = useMemo(() => {
+    if (!startId || !destinationId) return false;
+    const availableStarts = getAvailableStartLocations();
+    if (!availableStarts.includes(destinationId)) return false;
+    const validDests = getAvailableDestinations(destinationId);
+    return validDests.includes(startId);
+  }, [startId, destinationId]);
+
+  // Handle swap route - preserve band selection
+  const handleSwap = () => {
+    if (!canSwap) return;
+    onSwapRoute();
+  };
 
   // Handle start change
   const handleStartChange = (newStartId: string) => {
@@ -204,7 +253,7 @@ export function RoutePlanner({
                 <Fragment key={group.planet}>
                   {group.locations.map(loc => (
                     <option key={loc.id} value={loc.id}>
-                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                      {formatLocationName(loc)}
                     </option>
                   ))}
                 </Fragment>
@@ -226,7 +275,7 @@ export function RoutePlanner({
                   <Fragment key={group.planet}>
                     {group.locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
-                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                        {formatLocationName(loc)}
                       </option>
                     ))}
                   </Fragment>
@@ -243,12 +292,12 @@ export function RoutePlanner({
           {/* Result Card at Top (when band selected) */}
           {selectedDestBandData && (
             <div className="dest-result-section">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"
@@ -266,6 +315,8 @@ export function RoutePlanner({
                   {destTableCollapsed ? 'Tap to change band' : 'Tap to collapse'}
                 </div>
               </div>
+
+              <LocationTip startLocation={startLocation} destLocation={destLocation} />
 
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
@@ -339,12 +390,12 @@ export function RoutePlanner({
           {/* Result Display (at top when collapsed) */}
           {selectedBandDestData && destLocation && selectedBand && startLocation && (
             <div className="band-result">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"
@@ -362,6 +413,8 @@ export function RoutePlanner({
                   {bandModeCollapsed ? 'Tap to change selection' : 'Tap to collapse'}
                 </div>
               </div>
+
+              <LocationTip startLocation={startLocation} destLocation={destLocation} />
 
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
@@ -432,7 +485,7 @@ export function RoutePlanner({
                       onClick={() => handleBandDestinationSelect(dest.destinationId)}
                     >
                       <span className="dest-name">
-                        {dest.location?.shortName || dest.destinationId}
+                        {dest.location ? formatLocationName(dest.location, false) : dest.destinationId}
                       </span>
                       <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin
