@@ -464,7 +464,7 @@ export function RoutePlanner({
                       onClick={() => handleBandDestinationSelect(dest.destinationId)}
                     >
                       <span className="dest-name">
-                        {dest.location?.shortName || dest.destinationId}{dest.location?.note ? ' *Not on Map (HUD Only)' : ''}
+                        {dest.location?.shortName || dest.destinationId}{dest.location?.note ? ' *Not on Map (HUD Targeting ONLY)' : ''}
                       </span>
                       <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin
