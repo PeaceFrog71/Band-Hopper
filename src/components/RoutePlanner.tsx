@@ -9,6 +9,7 @@ import {
   calculateExitWidths
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
+import { RouteSummary } from './RouteSummary';
 import './RoutePlanner.css';
 
 type PlannerMode = 'destination' | 'band';
@@ -19,13 +20,15 @@ interface RoutePlannerProps {
   destinationId: string;
   onStartChange: (id: string) => void;
   onDestinationChange: (id: string) => void;
+  onSwapRoute: () => void;
 }
 
 export function RoutePlanner({
   startId,
   destinationId,
   onStartChange,
-  onDestinationChange
+  onDestinationChange,
+  onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
   const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
@@ -91,6 +94,21 @@ export function RoutePlanner({
     }
     return BANDS;
   }, [bandSortBy]);
+
+  // Check if route can be swapped (reverse route exists)
+  const canSwap = useMemo(() => {
+    if (!startId || !destinationId) return false;
+    const availableStarts = getAvailableStartLocations();
+    if (!availableStarts.includes(destinationId)) return false;
+    const validDests = getAvailableDestinations(destinationId);
+    return validDests.includes(startId);
+  }, [startId, destinationId]);
+
+  // Handle swap route - preserve band selection
+  const handleSwap = () => {
+    if (!canSwap) return;
+    onSwapRoute();
+  };
 
   // Handle start change
   const handleStartChange = (newStartId: string) => {
@@ -243,12 +261,12 @@ export function RoutePlanner({
           {/* Result Card at Top (when band selected) */}
           {selectedDestBandData && (
             <div className="dest-result-section">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"
@@ -339,12 +357,12 @@ export function RoutePlanner({
           {/* Result Display (at top when collapsed) */}
           {selectedBandDestData && destLocation && selectedBand && startLocation && (
             <div className="band-result">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"

@@ -21,6 +21,13 @@ function App() {
   const [startId, setStartId] = useState<string>('')
   const [destinationId, setDestinationId] = useState<string>('')
 
+  // Swap start and destination
+  const handleSwapRoute = () => {
+    const tempStart = startId
+    setStartId(destinationId)
+    setDestinationId(tempStart)
+  }
+
   // Close help modal on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -97,6 +104,7 @@ function App() {
             destinationId={destinationId}
             onStartChange={setStartId}
             onDestinationChange={setDestinationId}
+            onSwapRoute={handleSwapRoute}
           />
         </div>
 
