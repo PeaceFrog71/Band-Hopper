@@ -1,5 +1,5 @@
 import { useState, useMemo, Fragment } from 'react';
-import { getLocationById, getGroupedLocationsForDropdown } from '../types/locations';
+import { getLocationById, getGroupedLocationsForDropdown, type StantonLocation } from '../types/locations';
 import { BANDS } from '../types/bands';
 import {
   getAvailableStartLocations,
@@ -11,6 +11,37 @@ import {
 import { formatDistance } from '../utils/calculator';
 import { RouteSummary } from './RouteSummary';
 import './RoutePlanner.css';
+
+// Helper to format location name for dropdowns (with note suffix if applicable)
+function formatLocationName(loc: StantonLocation, indent = true): string {
+  const prefix = indent && loc.type !== 'planet' ? '└ ' : '';
+  const suffix = loc.note ? ' *Not on Map (HUD Targeting ONLY)' : '';
+  return `${prefix}${loc.shortName}${suffix}`;
+}
+
+// Reusable component for location notes/tips
+function LocationTip({ startLocation, destLocation }: { startLocation: StantonLocation | null; destLocation: StantonLocation | null }) {
+  if (!startLocation?.note && !destLocation?.note) return null;
+
+  return (
+    <div className="location-tip">
+      <span className="tip-icon">ℹ</span>
+      <span>
+        {startLocation?.note && (
+          <>
+            <strong>{startLocation.shortName}:</strong> {startLocation.note}
+            {destLocation?.note && <br />}
+          </>
+        )}
+        {destLocation?.note && (
+          <>
+            <strong>{destLocation.shortName}:</strong> {destLocation.note}
+          </>
+        )}
+      </span>
+    </div>
+  );
+}
 
 type PlannerMode = 'destination' | 'band';
 type BandSortBy = 'number' | 'density';
@@ -222,7 +253,7 @@ export function RoutePlanner({
                 <Fragment key={group.planet}>
                   {group.locations.map(loc => (
                     <option key={loc.id} value={loc.id}>
-                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                      {formatLocationName(loc)}
                     </option>
                   ))}
                 </Fragment>
@@ -244,7 +275,7 @@ export function RoutePlanner({
                   <Fragment key={group.planet}>
                     {group.locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
-                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                        {formatLocationName(loc)}
                       </option>
                     ))}
                   </Fragment>
@@ -284,6 +315,8 @@ export function RoutePlanner({
                   {destTableCollapsed ? 'Tap to change band' : 'Tap to collapse'}
                 </div>
               </div>
+
+              <LocationTip startLocation={startLocation} destLocation={destLocation} />
 
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
@@ -381,6 +414,8 @@ export function RoutePlanner({
                 </div>
               </div>
 
+              <LocationTip startLocation={startLocation} destLocation={destLocation} />
+
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
                 <ol>
@@ -450,7 +485,7 @@ export function RoutePlanner({
                       onClick={() => handleBandDestinationSelect(dest.destinationId)}
                     >
                       <span className="dest-name">
-                        {dest.location?.shortName || dest.destinationId}
+                        {dest.location ? formatLocationName(dest.location, false) : dest.destinationId}
                       </span>
                       <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin

@@ -11,6 +11,7 @@ export interface StantonLocation {
   hasRefinery: boolean;          // Whether this location has refinery services
   orbitalBody?: string;          // Parent body (e.g., 'ArcCorp', 'Hurston')
   description?: string;
+  note?: string;                 // Special note to display when this location is selected
 }
 
 /**
@@ -108,7 +109,8 @@ export const LOCATIONS: StantonLocation[] = [
     type: 'station',
     distanceFromStanton: 20_000_000,
     hasRefinery: false,
-    orbitalBody: 'Crusader'
+    orbitalBody: 'Crusader',
+    note: 'Target via HUD - Not selectable on map'
   },
 
   // Hurston Lagrange Points
