@@ -222,7 +222,7 @@ export function RoutePlanner({
                 <Fragment key={group.planet}>
                   {group.locations.map(loc => (
                     <option key={loc.id} value={loc.id}>
-                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}{loc.note ? ' *Not on Map (HUD Targeting ONLY)' : ''}
                     </option>
                   ))}
                 </Fragment>
@@ -244,7 +244,7 @@ export function RoutePlanner({
                   <Fragment key={group.planet}>
                     {group.locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
-                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}
+                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}{loc.note ? ' *Not on Map (HUD Targeting ONLY)' : ''}
                       </option>
                     ))}
                   </Fragment>
@@ -284,6 +284,13 @@ export function RoutePlanner({
                   {destTableCollapsed ? 'Tap to change band' : 'Tap to collapse'}
                 </div>
               </div>
+
+              {(startLocation.note || destLocation.note) && (
+                <div className="location-tip">
+                  <span className="tip-icon">ℹ</span>
+                  <span><strong>{startLocation.note ? startLocation.shortName : destLocation.shortName}:</strong> {startLocation.note || destLocation.note}</span>
+                </div>
+              )}
 
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
@@ -381,6 +388,13 @@ export function RoutePlanner({
                 </div>
               </div>
 
+              {(startLocation.note || destLocation.note) && (
+                <div className="location-tip">
+                  <span className="tip-icon">ℹ</span>
+                  <span><strong>{startLocation.note ? startLocation.shortName : destLocation.shortName}:</strong> {startLocation.note || destLocation.note}</span>
+                </div>
+              )}
+
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
                 <ol>
@@ -450,7 +464,7 @@ export function RoutePlanner({
                       onClick={() => handleBandDestinationSelect(dest.destinationId)}
                     >
                       <span className="dest-name">
-                        {dest.location?.shortName || dest.destinationId}
+                        {dest.location?.shortName || dest.destinationId}{dest.location?.note ? ' *Not on Map (HUD Only)' : ''}
                       </span>
                       <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin

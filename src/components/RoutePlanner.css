@@ -305,6 +305,29 @@
   color: var(--accent-cyan);
 }
 
+/* Location Tip (for special notes like CRU-L3 HUD targeting) */
+.location-tip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(0, 217, 255, 0.1);
+  border: 1px solid var(--accent-blue);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.location-tip strong {
+  color: var(--accent-cyan);
+}
+
+.tip-icon {
+  color: var(--accent-blue);
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
 /* Empty States */
 .placeholder-message,
 .no-route {
