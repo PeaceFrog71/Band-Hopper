@@ -9,6 +9,7 @@ import {
   calculateExitWidths
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
+import { RouteSummary } from './RouteSummary';
 import './RoutePlanner.css';
 
 type PlannerMode = 'destination' | 'band';
@@ -260,22 +261,12 @@ export function RoutePlanner({
           {/* Result Card at Top (when band selected) */}
           {selectedDestBandData && (
             <div className="dest-result-section">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-                {canSwap && (
-                  <button
-                    className="swap-route-btn"
-                    onClick={handleSwap}
-                    title="Reverse course"
-                    aria-label="Reverse course"
-                  >
-                    ⇄
-                  </button>
-                )}
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"
@@ -366,22 +357,12 @@ export function RoutePlanner({
           {/* Result Display (at top when collapsed) */}
           {selectedBandDestData && destLocation && selectedBand && startLocation && (
             <div className="band-result">
-              <div className="route-summary">
-                <span className="route-label">Route:</span>
-                <span className="route-path">
-                  {startLocation.shortName} → {destLocation.shortName}
-                </span>
-                {canSwap && (
-                  <button
-                    className="swap-route-btn"
-                    onClick={handleSwap}
-                    title="Reverse course"
-                    aria-label="Reverse course"
-                  >
-                    ⇄
-                  </button>
-                )}
-              </div>
+              <RouteSummary
+                startLocation={startLocation}
+                destLocation={destLocation}
+                canSwap={canSwap}
+                onSwap={handleSwap}
+              />
 
               <div
                 className="exit-result clickable"
