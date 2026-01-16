@@ -50,6 +50,35 @@
   }
 }
 
+/* Swap Route Button (inline in route summary) */
+.swap-route-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.swap-route-btn:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  background: var(--bg-medium);
+}
+
+.swap-route-btn:active {
+  transform: scale(0.95);
+}
+
 /* Route Summary */
 .route-summary {
   display: flex;
