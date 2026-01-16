@@ -9,6 +9,7 @@ import {
   calculateExitWidths
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
+import { formatLocationName } from '../utils/formatters';
 import { RouteSummary } from './RouteSummary';
 import './RoutePlanner.css';
 
@@ -222,7 +223,7 @@ export function RoutePlanner({
                 <Fragment key={group.planet}>
                   {group.locations.map(loc => (
                     <option key={loc.id} value={loc.id}>
-                      {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}{loc.note ? ' *Not on Map (HUD Targeting ONLY)' : ''}
+                      {formatLocationName(loc, { showTreePrefix: true })}
                     </option>
                   ))}
                 </Fragment>
@@ -244,7 +245,7 @@ export function RoutePlanner({
                   <Fragment key={group.planet}>
                     {group.locations.map(loc => (
                       <option key={loc.id} value={loc.id}>
-                        {loc.type === 'planet' ? loc.shortName : `└ ${loc.shortName}`}{loc.note ? ' *Not on Map (HUD Targeting ONLY)' : ''}
+                        {formatLocationName(loc, { showTreePrefix: true })}
                       </option>
                     ))}
                   </Fragment>
@@ -464,7 +465,10 @@ export function RoutePlanner({
                       onClick={() => handleBandDestinationSelect(dest.destinationId)}
                     >
                       <span className="dest-name">
-                        {dest.location?.shortName || dest.destinationId}{dest.location?.note ? ' *Not on Map (HUD Only)' : ''}
+                        {formatLocationName(dest.location, { 
+                          fallbackText: dest.destinationId,
+                          noteText: ' *Not on Map (HUD Only)'
+                        })}
                       </span>
                       <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin

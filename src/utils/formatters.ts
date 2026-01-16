@@ -121,6 +121,45 @@ export function formatLocationId(id: string): string {
 }
 
 /**
+ * Format location name with optional tree prefix and note
+ * @param location - The location object or null/undefined
+ * @param options - Formatting options
+ * @returns Formatted location name string
+ */
+export function formatLocationName(
+  location: { shortName: string; type?: string; note?: string } | null | undefined,
+  options: {
+    showTreePrefix?: boolean;
+    fallbackText?: string;
+    noteText?: string;
+  } = {}
+): string {
+  const {
+    showTreePrefix = false,
+    fallbackText = '',
+    noteText = ' *Not on Map (HUD Targeting ONLY)'
+  } = options;
+
+  if (!location) {
+    return fallbackText;
+  }
+
+  let name = location.shortName;
+
+  // Add tree prefix for non-planet types
+  if (showTreePrefix && location.type && location.type !== 'planet') {
+    name = `└ ${name}`;
+  }
+
+  // Append note if present
+  if (location.note) {
+    name += noteText;
+  }
+
+  return name;
+}
+
+/**
  * Format band name for display
  */
 export function formatBandName(bandId: number): string {
