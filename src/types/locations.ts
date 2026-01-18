@@ -39,10 +39,11 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'arc-l2',
     name: 'ARC-L2 Lively Pathway Station',
     shortName: 'ARC-L2',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 31_000_000,
-    hasRefinery: false,
-    orbitalBody: 'ArcCorp'
+    hasRefinery: true,
+    orbitalBody: 'ArcCorp',
+    description: 'Refinery station at ArcCorp L2'
   },
   {
     id: 'arc-l3',
@@ -57,10 +58,11 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'arc-l4',
     name: 'ARC-L4 Faint Glen Station',
     shortName: 'ARC-L4',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 28_800_000,
-    hasRefinery: false,
-    orbitalBody: 'ArcCorp'
+    hasRefinery: true,
+    orbitalBody: 'ArcCorp',
+    description: 'Refinery station at ArcCorp L4'
   },
   {
     id: 'arc-l5',
@@ -96,11 +98,10 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'cru-l5',
     name: 'CRU-L5 Beautiful Glen Station',
     shortName: 'CRU-L5',
-    type: 'refinery',
+    type: 'station',
     distanceFromStanton: 18_200_000,
-    hasRefinery: true,
-    orbitalBody: 'Crusader',
-    description: 'Refinery station at Crusader L5'
+    hasRefinery: false,
+    orbitalBody: 'Crusader'
   },
   {
     id: 'cru-l3',
@@ -177,19 +178,21 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'mic-l2',
     name: 'MIC-L2 Long Forest Station',
     shortName: 'MIC-L2',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 41_000_000,
-    hasRefinery: false,
-    orbitalBody: 'microTech'
+    hasRefinery: true,
+    orbitalBody: 'microTech',
+    description: 'Refinery station at microTech L2'
   },
   {
     id: 'mic-l5',
     name: 'MIC-L5 Modern Icarus Station',
     shortName: 'MIC-L5',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 38_500_000,
-    hasRefinery: false,
-    orbitalBody: 'microTech'
+    hasRefinery: true,
+    orbitalBody: 'microTech',
+    description: 'Refinery station at microTech L5'
   },
 
   // Major Planets (for reference)

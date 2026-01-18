@@ -3,6 +3,7 @@ import './App.css'
 import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
 import { WhereAmI } from './components/WhereAmI'
+import { RefineryFinder } from './components/RefineryFinder'
 
 const version = __APP_VERSION__
 
@@ -20,6 +21,7 @@ function App() {
   // Lifted route state - persists across tab switches
   const [startId, setStartId] = useState<string>('')
   const [destinationId, setDestinationId] = useState<string>('')
+  const [selectedBandId, setSelectedBandId] = useState<number | null>(null)
 
   // Swap start and destination
   const handleSwapRoute = () => {
@@ -102,8 +104,10 @@ function App() {
           <RoutePlanner
             startId={startId}
             destinationId={destinationId}
+            selectedBandId={selectedBandId}
             onStartChange={setStartId}
             onDestinationChange={setDestinationId}
+            onSelectedBandChange={setSelectedBandId}
             onSwapRoute={handleSwapRoute}
           />
         </div>
@@ -117,27 +121,17 @@ function App() {
           <WhereAmI />
         </div>
 
-        <div className="panel panel-not-implemented" style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
-          <div className="not-implemented-stamp">Coming Soon</div>
+        <div className="panel" style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Refinery Finder</h2>
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
           </div>
           <p className="text-muted">Find the best refinery based on your mined material and location.</p>
-
-          <div className="form-group">
-            <label>Material Mined</label>
-            <select disabled>
-              <option value="">Select material...</option>
-              <option value="quantanium">Quantanium</option>
-              <option value="agricium">Agricium</option>
-              <option value="laranite">Laranite</option>
-              <option value="bexalite">Bexalite</option>
-            </select>
-          </div>
-
-          <div className="display-label">Recommended Refinery</div>
-          <div className="display-large">---</div>
+          <RefineryFinder
+            startId={startId}
+            destinationId={destinationId}
+            selectedBandId={selectedBandId}
+          />
         </div>
 
         {/* Help Modal - Mobile only */}

@@ -38,16 +38,32 @@ export {
 
 // Refinery Types and Data
 export {
-  type MaterialBonus,
   type Refinery,
   REFINERIES,
   getRefineryById,
   getRefineryByLocationId,
   getRefineryWithLocation,
+  getYieldBonus,
+  findBestRefineryByYield,
+  findClosestRefineryByPosition,
   findBestRefineryForMaterial,
   findClosestRefinery,
   findOptimalRefinery
 } from './refineries';
+
+// Polar Coordinate Types and Data
+export {
+  type PolarCoordinate,
+  type CartesianCoordinate,
+  LOCATION_COORDINATES,
+  polarToCartesian,
+  cartesianToPolar,
+  calculateDistance,
+  interpolatePositionOnRoute,
+  getLocationCoordinates,
+  formatPolarCoordinate,
+  formatPolarDistance
+} from './polarCoordinates';
 
 // Ship and QT Drive Types and Data
 export {

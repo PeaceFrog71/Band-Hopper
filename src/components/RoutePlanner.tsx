@@ -49,20 +49,23 @@ type BandSortBy = 'number' | 'density';
 interface RoutePlannerProps {
   startId: string;
   destinationId: string;
+  selectedBandId: number | null;
   onStartChange: (id: string) => void;
   onDestinationChange: (id: string) => void;
+  onSelectedBandChange: (bandId: number | null) => void;
   onSwapRoute: () => void;
 }
 
 export function RoutePlanner({
   startId,
   destinationId,
+  selectedBandId,
   onStartChange,
   onDestinationChange,
+  onSelectedBandChange,
   onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
-  const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
   const [bandSortBy, setBandSortBy] = useState<BandSortBy>('density');
   const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('density');
   const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
@@ -181,7 +184,7 @@ export function RoutePlanner({
     setMode(newMode);
     // Reset selections when switching modes
     onDestinationChange('');
-    setSelectedBandId(null);
+    onSelectedBandChange(null);
     setSelectedDestBandId(null);
     setDestTableCollapsed(false);
     setBandModeCollapsed(false);
@@ -194,7 +197,7 @@ export function RoutePlanner({
       // Clicking the same band again expands the selector
       setBandSelectorCollapsed(false);
     } else {
-      setSelectedBandId(bandId);
+      onSelectedBandChange(bandId);
       onDestinationChange('');
       setBandSelectorCollapsed(true);
     }

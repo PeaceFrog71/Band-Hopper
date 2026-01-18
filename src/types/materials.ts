@@ -148,6 +148,86 @@ export const MATERIALS: MinableMaterial[] = [
     rarity: 'common',
     baseValue: 2,
     isQuantanium: false
+  },
+  {
+    id: 'iron',
+    name: 'Iron',
+    category: 'ore',
+    rarity: 'common',
+    baseValue: 1,
+    isQuantanium: false
+  },
+  {
+    id: 'tin',
+    name: 'Tin',
+    category: 'ore',
+    rarity: 'common',
+    baseValue: 1,
+    isQuantanium: false
+  },
+  {
+    id: 'silicon',
+    name: 'Silicon',
+    category: 'ore',
+    rarity: 'common',
+    baseValue: 1,
+    isQuantanium: false
+  },
+  {
+    id: 'ice',
+    name: 'Ice',
+    category: 'gas',
+    rarity: 'common',
+    baseValue: 1,
+    isQuantanium: false
+  },
+  {
+    id: 'diamond',
+    name: 'Diamond',
+    category: 'gem',
+    rarity: 'rare',
+    baseValue: 20,
+    isQuantanium: false
+  },
+  {
+    id: 'torite',
+    name: 'Torite',
+    category: 'ore',
+    rarity: 'uncommon',
+    baseValue: 10,
+    isQuantanium: false
+  },
+  {
+    id: 'riccite',
+    name: 'Riccite',
+    category: 'ore',
+    rarity: 'rare',
+    baseValue: 25,
+    isQuantanium: false
+  },
+  {
+    id: 'stileron',
+    name: 'Stileron',
+    category: 'ore',
+    rarity: 'rare',
+    baseValue: 25,
+    isQuantanium: false
+  },
+  {
+    id: 'savrilium',
+    name: 'Savrilium',
+    category: 'ore',
+    rarity: 'rare',
+    baseValue: 25,
+    isQuantanium: false
+  },
+  {
+    id: 'lindinium',
+    name: 'Lindinium',
+    category: 'ore',
+    rarity: 'rare',
+    baseValue: 25,
+    isQuantanium: false
   }
 ];
 
