@@ -175,6 +175,7 @@ export function RoutePlanner({
       setDestTableCollapsed(false);
     } else {
       setSelectedDestBandId(bandId);
+      onSelectedBandChange(bandId); // Also update lifted state for RefineryFinder
       setDestTableCollapsed(true);
     }
   };

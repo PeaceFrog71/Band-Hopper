@@ -28,6 +28,7 @@ export function RefineryFinder({
   selectedBandId,
 }: RefineryFinderProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<string>('');
+  const [secondaryMaterial, setSecondaryMaterial] = useState<string>('');
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('optimal');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [manualR, setManualR] = useState<string>('');
@@ -74,6 +75,12 @@ export function RefineryFinder({
             )?.distanceGm ?? 0
           : 0,
         score: 0,
+        secondaryYieldPercent: secondaryMaterial
+          ? r.refinery.yieldBonuses[secondaryMaterial] || 0
+          : 0,
+        combinedYieldPercent: r.yieldPercent + (secondaryMaterial
+          ? r.refinery.yieldBonuses[secondaryMaterial] || 0
+          : 0),
       }));
       // Filter to only show refineries with positive yields (bonuses)
       // If no positive yields exist, show all but they'll be sorted by yield (least negative first)
@@ -90,6 +97,11 @@ export function RefineryFinder({
         yieldPercent: selectedMaterial
           ? r.refinery.yieldBonuses[selectedMaterial] || 0
           : 0,
+        secondaryYieldPercent: secondaryMaterial
+          ? r.refinery.yieldBonuses[secondaryMaterial] || 0
+          : 0,
+        combinedYieldPercent: (selectedMaterial ? r.refinery.yieldBonuses[selectedMaterial] || 0 : 0)
+          + (secondaryMaterial ? r.refinery.yieldBonuses[secondaryMaterial] || 0 : 0),
         score: 0,
       }));
     }
@@ -100,13 +112,15 @@ export function RefineryFinder({
       return findClosestRefineryByPosition(userPosition).map(r => ({
         ...r,
         yieldPercent: 0,
+        secondaryYieldPercent: 0,
+        combinedYieldPercent: 0,
         score: 0,
       }));
     }
 
     // Use the optimal scoring algorithm which balances distance and yield
-    return findOptimalRefinery(userPosition, selectedMaterial, distanceWeight);
-  }, [userPosition, selectionMode, selectedMaterial, distanceWeight]);
+    return findOptimalRefinery(userPosition, selectedMaterial, distanceWeight, secondaryMaterial || undefined);
+  }, [userPosition, selectionMode, selectedMaterial, secondaryMaterial, distanceWeight]);
 
   // Get position description
   const positionDescription = useMemo(() => {
@@ -183,25 +197,53 @@ export function RefineryFinder({
         </button>
       </div>
 
-      {/* Material Selector */}
-      <div className="form-group">
-        <label>Material Mined {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
-        <select
-          value={selectedMaterial}
-          onChange={(e) => setSelectedMaterial(e.target.value)}
-        >
-          <option value="">Select material...</option>
-          {materialGroups.map(group => (
-            <Fragment key={group.rarity}>
-              <option disabled className="option-group-header">── {group.rarity} ──</option>
-              {group.materials.map(mat => (
-                <option key={mat.id} value={mat.id}>
-                  {mat.name}
-                </option>
-              ))}
-            </Fragment>
-          ))}
-        </select>
+      {/* Material Selectors */}
+      <div className="material-selectors">
+        <div className="form-group">
+          <label>Primary Ore {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
+          <select
+            value={selectedMaterial}
+            onChange={(e) => {
+              const newPrimary = e.target.value;
+              setSelectedMaterial(newPrimary);
+              // Clear secondary if it matches the new primary
+              if (newPrimary === secondaryMaterial) {
+                setSecondaryMaterial('');
+              }
+            }}
+          >
+            <option value="">Select material...</option>
+            {materialGroups.map(group => (
+              <Fragment key={group.rarity}>
+                <option disabled className="option-group-header">── {group.rarity} ──</option>
+                {group.materials.map(mat => (
+                  <option key={mat.id} value={mat.id}>
+                    {mat.name}
+                  </option>
+                ))}
+              </Fragment>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Secondary Ore <span className="optional">(optional)</span></label>
+          <select
+            value={secondaryMaterial}
+            onChange={(e) => setSecondaryMaterial(e.target.value)}
+          >
+            <option value="">None</option>
+            {materialGroups.map(group => (
+              <Fragment key={group.rarity}>
+                <option disabled className="option-group-header">── {group.rarity} ──</option>
+                {group.materials.map(mat => (
+                  <option key={mat.id} value={mat.id} disabled={mat.id === selectedMaterial}>
+                    {mat.name}
+                  </option>
+                ))}
+              </Fragment>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Distance Weight Slider (Optimal mode only) */}
@@ -238,9 +280,25 @@ export function RefineryFinder({
             )}
             {selectedMaterial && (
               <div className={`result-yield ${topResult.yieldPercent > 0 ? 'positive' : topResult.yieldPercent < 0 ? 'negative' : ''}`}>
-                <span className="detail-label">Yield Bonus:</span>
+                <span className="detail-label">Primary:</span>
                 <span className="detail-value">
                   {topResult.yieldPercent > 0 ? '+' : ''}{topResult.yieldPercent}%
+                </span>
+              </div>
+            )}
+            {secondaryMaterial && (
+              <div className={`result-yield ${topResult.secondaryYieldPercent > 0 ? 'positive' : topResult.secondaryYieldPercent < 0 ? 'negative' : ''}`}>
+                <span className="detail-label">Secondary:</span>
+                <span className="detail-value">
+                  {topResult.secondaryYieldPercent > 0 ? '+' : ''}{topResult.secondaryYieldPercent}%
+                </span>
+              </div>
+            )}
+            {selectedMaterial && secondaryMaterial && (
+              <div className={`result-yield combined ${topResult.combinedYieldPercent > 0 ? 'positive' : topResult.combinedYieldPercent < 0 ? 'negative' : ''}`}>
+                <span className="detail-label">Combined:</span>
+                <span className="detail-value">
+                  {topResult.combinedYieldPercent > 0 ? '+' : ''}{topResult.combinedYieldPercent}%
                 </span>
               </div>
             )}
@@ -278,9 +336,14 @@ export function RefineryFinder({
                   {hasPosition && (
                     <span className="alt-distance">{formatPolarDistance(result.distanceGm)}</span>
                   )}
-                  {selectedMaterial && (
+                  {selectedMaterial && !secondaryMaterial && (
                     <span className={`alt-yield ${result.yieldPercent > 0 ? 'positive' : result.yieldPercent < 0 ? 'negative' : ''}`}>
                       {result.yieldPercent > 0 ? '+' : ''}{result.yieldPercent}%
+                    </span>
+                  )}
+                  {selectedMaterial && secondaryMaterial && (
+                    <span className={`alt-yield ${result.combinedYieldPercent > 0 ? 'positive' : result.combinedYieldPercent < 0 ? 'negative' : ''}`}>
+                      {result.combinedYieldPercent > 0 ? '+' : ''}{result.combinedYieldPercent}%
                     </span>
                   )}
                 </div>

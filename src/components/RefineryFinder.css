@@ -112,6 +112,30 @@
   color: var(--text-muted);
 }
 
+/* Material Selectors */
+.material-selectors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group label .optional {
+  color: var(--text-muted);
+  font-weight: normal;
+  font-size: 0.8em;
+}
+
+/* Combined yield styling */
+.result-yield.combined {
+  border-top: 1px solid var(--border);
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.result-yield.combined .detail-label {
+  font-weight: 600;
+}
+
 /* Weight Slider */
 .weight-slider {
   display: flex;
@@ -395,6 +419,10 @@
   }
 
   .coord-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .material-selectors {
     grid-template-columns: 1fr;
   }
 

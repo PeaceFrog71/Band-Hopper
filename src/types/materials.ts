@@ -53,7 +53,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'laranite',
     name: 'Laranite',
     category: 'ore',
-    rarity: 'rare',
+    rarity: 'uncommon',
     baseValue: 30,
     isQuantanium: false
   },
@@ -61,7 +61,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'agricium',
     name: 'Agricium',
     category: 'ore',
-    rarity: 'rare',
+    rarity: 'uncommon',
     baseValue: 27,
     isQuantanium: false
   },
@@ -79,7 +79,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'titanium',
     name: 'Titanium',
     category: 'ore',
-    rarity: 'uncommon',
+    rarity: 'common',
     baseValue: 9,
     isQuantanium: false
   },
@@ -97,7 +97,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'beryl',
     name: 'Beryl',
     category: 'gem',
-    rarity: 'common',
+    rarity: 'uncommon',
     baseValue: 4,
     isQuantanium: false
   },
@@ -105,7 +105,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'gold',
     name: 'Gold',
     category: 'ore',
-    rarity: 'common',
+    rarity: 'uncommon',
     baseValue: 6,
     isQuantanium: false
   },
@@ -182,18 +182,10 @@ export const MATERIALS: MinableMaterial[] = [
     isQuantanium: false
   },
   {
-    id: 'diamond',
-    name: 'Diamond',
-    category: 'gem',
-    rarity: 'rare',
-    baseValue: 20,
-    isQuantanium: false
-  },
-  {
     id: 'torite',
     name: 'Torite',
     category: 'ore',
-    rarity: 'uncommon',
+    rarity: 'common',
     baseValue: 10,
     isQuantanium: false
   },
@@ -201,7 +193,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'riccite',
     name: 'Riccite',
     category: 'ore',
-    rarity: 'rare',
+    rarity: 'very-rare',
     baseValue: 25,
     isQuantanium: false
   },
@@ -209,7 +201,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'stileron',
     name: 'Stileron',
     category: 'ore',
-    rarity: 'rare',
+    rarity: 'very-rare',
     baseValue: 25,
     isQuantanium: false
   },
@@ -217,7 +209,7 @@ export const MATERIALS: MinableMaterial[] = [
     id: 'savrilium',
     name: 'Savrilium',
     category: 'ore',
-    rarity: 'rare',
+    rarity: 'very-rare',
     baseValue: 25,
     isQuantanium: false
   },

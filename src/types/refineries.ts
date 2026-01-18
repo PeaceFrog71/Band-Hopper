@@ -295,19 +295,23 @@ export function findClosestRefineryByPosition(
  * Uses polar coordinates for accurate distance calculation
  *
  * @param userPosition - User's position in polar coordinates
- * @param materialId - Material being refined (or empty for distance-only)
+ * @param materialId - Primary material being refined (or empty for distance-only)
  * @param distanceWeight - How much to weight distance vs yield (0 = only yield, 1 = only distance)
+ * @param secondaryMaterialId - Optional secondary material to include in yield calculation
  */
 export function findOptimalRefinery(
   userPosition: PolarCoordinate,
   materialId: string,
-  distanceWeight: number = 0.5
+  distanceWeight: number = 0.5,
+  secondaryMaterialId?: string
 ): {
   refinery: Refinery;
   location: StantonLocation;
   score: number;
   distanceGm: number;
   yieldPercent: number;
+  secondaryYieldPercent: number;
+  combinedYieldPercent: number;
 }[] {
   const results: {
     refinery: Refinery;
@@ -315,6 +319,8 @@ export function findOptimalRefinery(
     score: number;
     distanceGm: number;
     yieldPercent: number;
+    secondaryYieldPercent: number;
+    combinedYieldPercent: number;
   }[] = [];
 
   // First pass: calculate distances
@@ -335,9 +341,13 @@ export function findOptimalRefinery(
 
     if (distanceGm > maxDistance) maxDistance = distanceGm;
 
-    const yieldPercent = refinery.yieldBonuses[materialId] || 0;
-    if (yieldPercent > maxYield) maxYield = yieldPercent;
-    if (yieldPercent < minYield) minYield = yieldPercent;
+    // Calculate combined yield for scoring
+    const primaryYield = refinery.yieldBonuses[materialId] || 0;
+    const secondaryYield = secondaryMaterialId ? (refinery.yieldBonuses[secondaryMaterialId] || 0) : 0;
+    const combinedYield = primaryYield + secondaryYield;
+
+    if (combinedYield > maxYield) maxYield = combinedYield;
+    if (combinedYield < minYield) minYield = combinedYield;
   }
 
   // Second pass: calculate scores
@@ -345,13 +355,15 @@ export function findOptimalRefinery(
 
   for (const { refinery, location, distanceGm } of distances) {
     const yieldPercent = refinery.yieldBonuses[materialId] || 0;
+    const secondaryYieldPercent = secondaryMaterialId ? (refinery.yieldBonuses[secondaryMaterialId] || 0) : 0;
+    const combinedYieldPercent = yieldPercent + secondaryYieldPercent;
 
     // Normalize distance (0 = closest, 1 = farthest)
     const normalizedDistance = maxDistance > 0 ? distanceGm / maxDistance : 0;
     const distanceScore = 1 - normalizedDistance; // Higher is better (closer)
 
-    // Normalize yield (-1 to 1 range, higher is better)
-    const normalizedYield = (yieldPercent - minYield) / yieldRange;
+    // Normalize yield (-1 to 1 range, higher is better) - uses combined yield for scoring
+    const normalizedYield = (combinedYieldPercent - minYield) / yieldRange;
     const yieldScore = normalizedYield;
 
     // Combined score (0-1 range, higher is better)
@@ -362,7 +374,9 @@ export function findOptimalRefinery(
       location,
       score,
       distanceGm,
-      yieldPercent
+      yieldPercent,
+      secondaryYieldPercent,
+      combinedYieldPercent
     });
   }
 
