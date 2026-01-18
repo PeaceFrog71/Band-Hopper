@@ -15,6 +15,18 @@ import './RefineryFinder.css';
 
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
 
+/**
+ * Format aUEC value impact for display
+ * Shows sign and comma-separated number
+ */
+function formatValueImpact(value: number): string {
+  const rounded = Math.round(value);
+  const formatted = Math.abs(rounded).toLocaleString();
+  if (rounded > 0) return `+${formatted}`;
+  if (rounded < 0) return `-${formatted}`;
+  return '0';
+}
+
 interface RefineryFinderProps {
   // From Route Planner state (lifted to App)
   startId: string;
@@ -283,6 +295,9 @@ export function RefineryFinder({
                 <span className="detail-label">Primary:</span>
                 <span className="detail-value">
                   {topResult.yieldPercent > 0 ? '+' : ''}{topResult.yieldPercent}%
+                  {'primaryValueImpact' in topResult && (
+                    <span className="value-impact"> ({formatValueImpact(topResult.primaryValueImpact as number)})</span>
+                  )}
                 </span>
               </div>
             )}
@@ -291,6 +306,9 @@ export function RefineryFinder({
                 <span className="detail-label">Secondary:</span>
                 <span className="detail-value">
                   {topResult.secondaryYieldPercent > 0 ? '+' : ''}{topResult.secondaryYieldPercent}%
+                  {'secondaryValueImpact' in topResult && (
+                    <span className="value-impact"> ({formatValueImpact(topResult.secondaryValueImpact as number)})</span>
+                  )}
                 </span>
               </div>
             )}
@@ -299,6 +317,9 @@ export function RefineryFinder({
                 <span className="detail-label">Combined:</span>
                 <span className="detail-value">
                   {topResult.combinedYieldPercent > 0 ? '+' : ''}{topResult.combinedYieldPercent}%
+                  {'combinedValueImpact' in topResult && (
+                    <span className="value-impact"> ({formatValueImpact(topResult.combinedValueImpact as number)} aUEC)</span>
+                  )}
                 </span>
               </div>
             )}

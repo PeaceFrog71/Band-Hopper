@@ -19,9 +19,6 @@ export interface StantonLocation {
  *
  * Includes all Lagrange points, refineries, and major destinations.
  * Distances are approximate and based on typical orbital positions.
- *
- * Note: Jump Point Gateway stations are excluded as they are too far
- * above/below the ecliptic plane to cross the Aaron Halo.
  */
 export const LOCATIONS: StantonLocation[] = [
   // ArcCorp Lagrange Points
@@ -231,6 +228,35 @@ export const LOCATIONS: StantonLocation[] = [
     distanceFromStanton: 38_850_000,
     hasRefinery: false,
     description: 'Ice world, home of New Babbage'
+  },
+
+  // Jump Point Gateway Stations
+  {
+    id: 'pyro-gateway',
+    name: 'Stanton-Pyro Jump Point Gateway',
+    shortName: 'Pyro Gateway',
+    type: 'refinery',
+    distanceFromStanton: 28_300_000,
+    hasRefinery: true,
+    description: 'Gateway station to Pyro system with refinery services'
+  },
+  {
+    id: 'terra-gateway',
+    name: 'Stanton-Terra Jump Point Gateway',
+    shortName: 'Terra Gateway',
+    type: 'refinery',
+    distanceFromStanton: 51_570_000,
+    hasRefinery: true,
+    description: 'Gateway station to Terra system with refinery services'
+  },
+  {
+    id: 'nyx-gateway',
+    name: 'Stanton-Nyx Jump Point Gateway',
+    shortName: 'Nyx Gateway',
+    type: 'refinery',
+    distanceFromStanton: 69_550_000,
+    hasRefinery: true,
+    description: 'Gateway station to Nyx system with refinery services'
   }
 ];
 

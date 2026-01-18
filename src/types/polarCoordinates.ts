@@ -51,6 +51,11 @@ export const LOCATION_COORDINATES: Record<string, PolarCoordinate> = {
   'mic-l1': { r: 39.09, theta: 58.86 },
   'mic-l2': { r: 47.79, theta: 58.86 },
   'mic-l5': { r: 43.45, theta: -1.13 },
+
+  // Jump Point Gateways
+  'pyro-gateway': { r: 28.3, theta: -83.25 },
+  'terra-gateway': { r: 51.57, theta: -5.88 },
+  'nyx-gateway': { r: 69.55, theta: 159.35 },
 };
 
 /**

@@ -6,6 +6,7 @@ import {
   getLocationCoordinates,
   calculateDistance
 } from './polarCoordinates';
+import { getMaterialById } from './materials';
 
 /**
  * Refinery with yield bonus data
@@ -182,6 +183,65 @@ export const REFINERIES: Refinery[] = [
       'iron': 8,
       'copper': 9,
     }
+  },
+
+  // Jump Point Gateway Refineries
+  {
+    id: 'pyro-gateway-refinery',
+    locationId: 'pyro-gateway',
+    name: 'Pyro Gateway',
+    operator: 'Gateway Services',
+    yieldBonuses: {
+      'bexalite': -6,
+      'gold': -6,
+      'laranite': -8,
+      'beryl': 7,
+      'hephaestanite': -2,
+      'tungsten': 2,
+      'titanium': -1,
+      'iron': 2,
+      'corundum': 7,
+    }
+  },
+  {
+    id: 'terra-gateway-refinery',
+    locationId: 'terra-gateway',
+    name: 'Terra Gateway',
+    operator: 'Gateway Services',
+    yieldBonuses: {
+      'gold': 1,
+      'laranite': 2,
+      'beryl': -6,
+      'agricium': 8,
+      'quartz': -3,
+      'corundum': 2,
+      'copper': 4,
+      'aluminium': 7,
+    }
+  },
+  {
+    id: 'nyx-gateway-refinery',
+    locationId: 'nyx-gateway',
+    name: 'Nyx Gateway',
+    operator: 'Gateway Services',
+    yieldBonuses: {
+      'quantanium': 3,
+      'taranite': -6,
+      'bexalite': -2,
+      'gold': -3,
+      'borase': 1,
+      'laranite': -2,
+      'beryl': 7,
+      'agricium': -8,
+      'hephaestanite': -4,
+      'tungsten': 4,
+      'titanium': 5,
+      'iron': 1,
+      'quartz': 11,
+      'corundum': -4,
+      'copper': -5,
+      'aluminium': -5,
+    }
   }
 ];
 
@@ -293,6 +353,7 @@ export function findClosestRefineryByPosition(
 /**
  * Find optimal refinery considering both distance and yield bonus
  * Uses polar coordinates for accurate distance calculation
+ * Value-weighted scoring uses 50/50 split assumption for primary/secondary
  *
  * @param userPosition - User's position in polar coordinates
  * @param materialId - Primary material being refined (or empty for distance-only)
@@ -312,7 +373,20 @@ export function findOptimalRefinery(
   yieldPercent: number;
   secondaryYieldPercent: number;
   combinedYieldPercent: number;
+  primaryValueImpact: number;      // aUEC/SCU impact from primary yield
+  secondaryValueImpact: number;    // aUEC/SCU impact from secondary yield
+  combinedValueImpact: number;     // Total aUEC/SCU impact (weighted 50/50)
 }[] {
+  // Get material base values for value-weighted scoring
+  const primaryMaterial = getMaterialById(materialId);
+  const secondaryMaterial = secondaryMaterialId ? getMaterialById(secondaryMaterialId) : null;
+  const primaryBaseValue = primaryMaterial?.baseValue || 0;
+  const secondaryBaseValue = secondaryMaterial?.baseValue || 0;
+
+  // 50/50 split assumption: each material contributes half of the load
+  const primaryWeight = secondaryMaterialId ? 0.5 : 1.0;
+  const secondaryWeight = secondaryMaterialId ? 0.5 : 0;
+
   const results: {
     refinery: Refinery;
     location: StantonLocation;
@@ -321,13 +395,16 @@ export function findOptimalRefinery(
     yieldPercent: number;
     secondaryYieldPercent: number;
     combinedYieldPercent: number;
+    primaryValueImpact: number;
+    secondaryValueImpact: number;
+    combinedValueImpact: number;
   }[] = [];
 
-  // First pass: calculate distances
+  // First pass: calculate distances and find value impact range
   const distances: { refinery: Refinery; location: StantonLocation; distanceGm: number }[] = [];
   let maxDistance = 0;
-  let maxYield = 0;
-  let minYield = 0;
+  let maxValueImpact = -Infinity;
+  let minValueImpact = Infinity;
 
   for (const refinery of REFINERIES) {
     const location = getLocationById(refinery.locationId);
@@ -341,33 +418,43 @@ export function findOptimalRefinery(
 
     if (distanceGm > maxDistance) maxDistance = distanceGm;
 
-    // Calculate combined yield for scoring
+    // Calculate value-weighted impact for scoring
     const primaryYield = refinery.yieldBonuses[materialId] || 0;
     const secondaryYield = secondaryMaterialId ? (refinery.yieldBonuses[secondaryMaterialId] || 0) : 0;
-    const combinedYield = primaryYield + secondaryYield;
 
-    if (combinedYield > maxYield) maxYield = combinedYield;
-    if (combinedYield < minYield) minYield = combinedYield;
+    // Value impact = (yield% / 100) * baseValue * weight
+    const primaryImpact = (primaryYield / 100) * primaryBaseValue * primaryWeight;
+    const secondaryImpact = (secondaryYield / 100) * secondaryBaseValue * secondaryWeight;
+    const combinedImpact = primaryImpact + secondaryImpact;
+
+    if (combinedImpact > maxValueImpact) maxValueImpact = combinedImpact;
+    if (combinedImpact < minValueImpact) minValueImpact = combinedImpact;
   }
 
-  // Second pass: calculate scores
-  const yieldRange = maxYield - minYield || 1; // Avoid division by zero
+  // Second pass: calculate scores using value-weighted impact
+  const valueRange = maxValueImpact - minValueImpact || 1; // Avoid division by zero
 
   for (const { refinery, location, distanceGm } of distances) {
     const yieldPercent = refinery.yieldBonuses[materialId] || 0;
     const secondaryYieldPercent = secondaryMaterialId ? (refinery.yieldBonuses[secondaryMaterialId] || 0) : 0;
     const combinedYieldPercent = yieldPercent + secondaryYieldPercent;
 
+    // Calculate aUEC/SCU value impacts
+    const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue;
+    const secondaryValueImpact = (secondaryYieldPercent / 100) * secondaryBaseValue;
+    // Combined uses 50/50 weighting
+    const combinedValueImpact = (primaryValueImpact * primaryWeight) + (secondaryValueImpact * secondaryWeight);
+
     // Normalize distance (0 = closest, 1 = farthest)
     const normalizedDistance = maxDistance > 0 ? distanceGm / maxDistance : 0;
     const distanceScore = 1 - normalizedDistance; // Higher is better (closer)
 
-    // Normalize yield (-1 to 1 range, higher is better) - uses combined yield for scoring
-    const normalizedYield = (combinedYieldPercent - minYield) / yieldRange;
-    const yieldScore = normalizedYield;
+    // Normalize value impact (0 to 1 range, higher is better)
+    const normalizedValue = (combinedValueImpact - minValueImpact) / valueRange;
+    const valueScore = normalizedValue;
 
     // Combined score (0-1 range, higher is better)
-    const score = (yieldScore * (1 - distanceWeight)) + (distanceScore * distanceWeight);
+    const score = (valueScore * (1 - distanceWeight)) + (distanceScore * distanceWeight);
 
     results.push({
       refinery,
@@ -376,7 +463,10 @@ export function findOptimalRefinery(
       distanceGm,
       yieldPercent,
       secondaryYieldPercent,
-      combinedYieldPercent
+      combinedYieldPercent,
+      primaryValueImpact,
+      secondaryValueImpact,
+      combinedValueImpact
     });
   }
 
