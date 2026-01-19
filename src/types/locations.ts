@@ -19,9 +19,6 @@ export interface StantonLocation {
  *
  * Includes all Lagrange points, refineries, and major destinations.
  * Distances are approximate and based on typical orbital positions.
- *
- * Note: Jump Point Gateway stations are excluded as they are too far
- * above/below the ecliptic plane to cross the Aaron Halo.
  */
 export const LOCATIONS: StantonLocation[] = [
   // ArcCorp Lagrange Points
@@ -39,10 +36,11 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'arc-l2',
     name: 'ARC-L2 Lively Pathway Station',
     shortName: 'ARC-L2',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 31_000_000,
-    hasRefinery: false,
-    orbitalBody: 'ArcCorp'
+    hasRefinery: true,
+    orbitalBody: 'ArcCorp',
+    description: 'Refinery station at ArcCorp L2'
   },
   {
     id: 'arc-l3',
@@ -57,10 +55,11 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'arc-l4',
     name: 'ARC-L4 Faint Glen Station',
     shortName: 'ARC-L4',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 28_800_000,
-    hasRefinery: false,
-    orbitalBody: 'ArcCorp'
+    hasRefinery: true,
+    orbitalBody: 'ArcCorp',
+    description: 'Refinery station at ArcCorp L4'
   },
   {
     id: 'arc-l5',
@@ -96,11 +95,10 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'cru-l5',
     name: 'CRU-L5 Beautiful Glen Station',
     shortName: 'CRU-L5',
-    type: 'refinery',
+    type: 'station',
     distanceFromStanton: 18_200_000,
-    hasRefinery: true,
-    orbitalBody: 'Crusader',
-    description: 'Refinery station at Crusader L5'
+    hasRefinery: false,
+    orbitalBody: 'Crusader'
   },
   {
     id: 'cru-l3',
@@ -177,19 +175,21 @@ export const LOCATIONS: StantonLocation[] = [
     id: 'mic-l2',
     name: 'MIC-L2 Long Forest Station',
     shortName: 'MIC-L2',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 41_000_000,
-    hasRefinery: false,
-    orbitalBody: 'microTech'
+    hasRefinery: true,
+    orbitalBody: 'microTech',
+    description: 'Refinery station at microTech L2'
   },
   {
     id: 'mic-l5',
     name: 'MIC-L5 Modern Icarus Station',
     shortName: 'MIC-L5',
-    type: 'station',
+    type: 'refinery',
     distanceFromStanton: 38_500_000,
-    hasRefinery: false,
-    orbitalBody: 'microTech'
+    hasRefinery: true,
+    orbitalBody: 'microTech',
+    description: 'Refinery station at microTech L5'
   },
 
   // Major Planets (for reference)
@@ -228,6 +228,35 @@ export const LOCATIONS: StantonLocation[] = [
     distanceFromStanton: 38_850_000,
     hasRefinery: false,
     description: 'Ice world, home of New Babbage'
+  },
+
+  // Jump Point Gateway Stations
+  {
+    id: 'pyro-gateway',
+    name: 'Stanton-Pyro Jump Point Gateway',
+    shortName: 'Pyro Gateway',
+    type: 'refinery',
+    distanceFromStanton: 28_300_000,
+    hasRefinery: true,
+    description: 'Gateway station to Pyro system with refinery services'
+  },
+  {
+    id: 'terra-gateway',
+    name: 'Stanton-Terra Jump Point Gateway',
+    shortName: 'Terra Gateway',
+    type: 'refinery',
+    distanceFromStanton: 51_570_000,
+    hasRefinery: true,
+    description: 'Gateway station to Terra system with refinery services'
+  },
+  {
+    id: 'nyx-gateway',
+    name: 'Stanton-Nyx Jump Point Gateway',
+    shortName: 'Nyx Gateway',
+    type: 'refinery',
+    distanceFromStanton: 69_550_000,
+    hasRefinery: true,
+    description: 'Gateway station to Nyx system with refinery services'
   }
 ];
 

@@ -26,12 +26,42 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
+/* Starfield Background Animation - very slow drift */
+@keyframes starfield-pan {
+  0% {
+    background-position: 45% 45%;
+  }
+  50% {
+    background-position: 55% 55%;
+  }
+  100% {
+    background-position: 45% 45%;
+  }
+}
+
 /* App Layout */
 .app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg-dark);
+  background-size: 120%;
+  background-position: center;
+  background-repeat: no-repeat;
+  animation: starfield-pan 300s linear infinite;
+}
+
+/* Tab-specific backgrounds */
+.app-bg-route {
+  background-image: url('./assets/starfield route.jpg');
+}
+
+.app-bg-whereami {
+  background-image: url('./assets/starfield where.jpg');
+}
+
+.app-bg-refinery {
+  background-image: url('./assets/starfield refine.jpg');
 }
 
 /* Header */
@@ -163,6 +193,9 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.75rem;
   border-radius: 4px;
   transition: all 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
