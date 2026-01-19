@@ -42,7 +42,7 @@ function App() {
   }, [showHelp])
 
   return (
-    <div className="app">
+    <div className={`app app-bg-${activeTab}`}>
       <header className="app-header">
         <a href="https://peacefroggaming.com" target="_blank" rel="noopener noreferrer" title="PeaceFrog Gaming">
           <img src={pfLogo} alt="PeaceFrog Gaming" className="header-logo" />
