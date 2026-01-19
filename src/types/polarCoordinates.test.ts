@@ -5,6 +5,8 @@ import { describe, it, expect } from 'vitest';
 import {
   calculateDistance,
   findClosestRefineryByPosition,
+  findBestRefineryByYield,
+  findOptimalRefinery,
   type PolarCoordinate
 } from './';
 
@@ -110,5 +112,98 @@ describe('calculateDistance', () => {
 
     // sqrt(10² + 10²) = sqrt(200) ≈ 14.14
     expect(distance).toBeCloseTo(Math.sqrt(200), 5);
+  });
+});
+
+describe('findBestRefineryByYield', () => {
+  it('returns refineries sorted by yield bonus (highest first)', () => {
+    const results = findBestRefineryByYield('quantanium');
+
+    // Should be sorted descending by yield
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].yieldPercent).toBeLessThanOrEqual(results[i - 1].yieldPercent);
+    }
+  });
+
+  it('returns 0 yield for materials with no bonus defined', () => {
+    const results = findBestRefineryByYield('nonexistent-material');
+
+    // All refineries should have 0 yield for unknown material
+    results.forEach(r => {
+      expect(r.yieldPercent).toBe(0);
+    });
+  });
+
+  it('includes location data for each refinery', () => {
+    const results = findBestRefineryByYield('gold');
+
+    results.forEach(r => {
+      expect(r.location).toBeDefined();
+      expect(r.location.id).toBe(r.refinery.locationId);
+    });
+  });
+
+  it('returns all refineries', () => {
+    const results = findBestRefineryByYield('quantanium');
+
+    // Should return all 12 refineries
+    expect(results.length).toBe(12);
+  });
+});
+
+describe('findOptimalRefinery', () => {
+  it('returns refineries sorted by score (highest first)', () => {
+    const position: PolarCoordinate = { r: 20, theta: 0 };
+    const results = findOptimalRefinery(position, 'quantanium');
+
+    // Should be sorted descending by score
+    for (let i = 1; i < results.length; i++) {
+      expect(results[i].score).toBeLessThanOrEqual(results[i - 1].score);
+    }
+  });
+
+  it('weights distance more when distanceWeight is high', () => {
+    const position: PolarCoordinate = { r: 12.85, theta: 0 }; // Near HUR-L1
+
+    // High distance weight (0.9) should favor closest refineries
+    const distanceResults = findOptimalRefinery(position, 'quantanium', 0.9);
+    // Low distance weight (0.1) should favor best yields
+    const yieldResults = findOptimalRefinery(position, 'quantanium', 0.1);
+
+    // With high distance weight, closest refinery should rank higher
+    // With low distance weight, best yield refinery should rank higher
+    // These should produce different top results
+    expect(distanceResults[0].distanceGm).toBeLessThanOrEqual(yieldResults[0].distanceGm);
+  });
+
+  it('calculates value impact based on material base value', () => {
+    const position: PolarCoordinate = { r: 20, theta: 0 };
+    const results = findOptimalRefinery(position, 'quantanium');
+
+    results.forEach(r => {
+      expect(r.primaryValueImpact).toBeDefined();
+      expect(typeof r.primaryValueImpact).toBe('number');
+    });
+  });
+
+  it('handles secondary material in calculations', () => {
+    const position: PolarCoordinate = { r: 20, theta: 0 };
+    const results = findOptimalRefinery(position, 'quantanium', 0.5, 'gold');
+
+    results.forEach(r => {
+      expect(r.secondaryYieldPercent).toBeDefined();
+      expect(r.combinedYieldPercent).toBe(r.yieldPercent + r.secondaryYieldPercent);
+    });
+  });
+
+  it('returns all refineries with distance and yield data', () => {
+    const position: PolarCoordinate = { r: 20, theta: 0 };
+    const results = findOptimalRefinery(position, 'quantanium');
+
+    expect(results.length).toBe(12); // 9 L-points + 3 gateways
+    results.forEach(r => {
+      expect(r.distanceGm).toBeGreaterThanOrEqual(0);
+      expect(r.location).toBeDefined();
+    });
   });
 });

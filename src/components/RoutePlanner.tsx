@@ -180,16 +180,34 @@ export function RoutePlanner({
     }
   };
 
-  // Handle mode change
+  // Handle mode change - preserve selections when switching
   const handleModeChange = (newMode: PlannerMode) => {
     setMode(newMode);
-    // Reset selections when switching modes
-    onDestinationChange('');
-    onSelectedBandChange(null);
-    setSelectedDestBandId(null);
-    setDestTableCollapsed(false);
-    setBandModeCollapsed(false);
-    setBandSelectorCollapsed(false);
+
+    // Preserve state when switching modes
+    if (newMode === 'destination') {
+      // Switching to destination mode: sync selectedDestBandId with lifted state
+      setSelectedDestBandId(selectedBandId);
+      // Collapse if we have a complete selection
+      if (startId && destinationId && selectedBandId !== null) {
+        setDestTableCollapsed(true);
+      } else {
+        setDestTableCollapsed(false);
+      }
+    } else {
+      // Switching to band mode: lifted state already has bandId
+      // Collapse if we have a complete selection
+      if (startId && selectedBandId !== null && destinationId) {
+        setBandModeCollapsed(true);
+        setBandSelectorCollapsed(true);
+      } else if (startId && selectedBandId !== null) {
+        setBandSelectorCollapsed(true);
+        setBandModeCollapsed(false);
+      } else {
+        setBandModeCollapsed(false);
+        setBandSelectorCollapsed(false);
+      }
+    }
   };
 
   // Handle band selection in band mode

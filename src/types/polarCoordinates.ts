@@ -123,6 +123,11 @@ export function interpolatePositionOnRoute(
   const dy = destCart.y - startCart.y;
   const length = Math.sqrt(dx * dx + dy * dy);
 
+  // Handle degenerate case where start and destination are the same point
+  if (length === 0) {
+    return { r: targetRadius, theta: start.theta };
+  }
+
   // Unit direction vector
   const ux = dx / length;
   const uy = dy / length;
@@ -150,6 +155,10 @@ export function interpolatePositionOnRoute(
     const midX = (startCart.x + destCart.x) / 2;
     const midY = (startCart.y + destCart.y) / 2;
     const midR = Math.sqrt(midX * midX + midY * midY);
+    if (midR === 0) {
+      // Midpoint is at origin - return arbitrary point on circle
+      return { r: targetRadius, theta: 0 };
+    }
     const scale = targetRadius / midR;
     return cartesianToPolar({ x: midX * scale, y: midY * scale });
   }
@@ -170,6 +179,15 @@ export function interpolatePositionOnRoute(
     // Both negative - route doesn't cross in direction of travel
     // Use the point on circle closest to destination
     const destR = Math.sqrt(destCart.x * destCart.x + destCart.y * destCart.y);
+    if (destR === 0) {
+      // Destination is at origin - use start direction instead
+      const startR = Math.sqrt(startCart.x * startCart.x + startCart.y * startCart.y);
+      if (startR === 0) {
+        return { r: targetRadius, theta: 0 };
+      }
+      const startScale = targetRadius / startR;
+      return cartesianToPolar({ x: startCart.x * startScale, y: startCart.y * startScale });
+    }
     const scale = targetRadius / destR;
     return cartesianToPolar({ x: destCart.x * scale, y: destCart.y * scale });
   }

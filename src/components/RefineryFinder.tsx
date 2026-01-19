@@ -15,6 +15,9 @@ import './RefineryFinder.css';
 
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
 
+// Default balance between distance and yield (0.5 = equal weight)
+const DEFAULT_DISTANCE_WEIGHT = 0.5;
+
 /**
  * Format aUEC value impact for display
  * Shows sign and comma-separated number
@@ -45,7 +48,7 @@ export function RefineryFinder({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [manualR, setManualR] = useState<string>('');
   const [manualTheta, setManualTheta] = useState<string>('');
-  const [distanceWeight, setDistanceWeight] = useState(0.5);
+  const [distanceWeight, setDistanceWeight] = useState(DEFAULT_DISTANCE_WEIGHT);
   const [showAlternatives, setShowAlternatives] = useState(false);
 
   // Calculate user position from route + band
@@ -79,13 +82,21 @@ export function RefineryFinder({
     if (selectionMode === 'best-yield') {
       // Best yield mode doesn't need position, just material
       if (!selectedMaterial) return [];
+
+      // Precompute distance lookup to avoid O(n²) complexity
+      const distanceByRefineryId: Record<string, number> = userPosition
+        ? findClosestRefineryByPosition(userPosition).reduce(
+            (acc, cur) => {
+              acc[cur.refinery.id] = cur.distanceGm;
+              return acc;
+            },
+            {} as Record<string, number>
+          )
+        : {};
+
       const results = findBestRefineryByYield(selectedMaterial).map(r => ({
         ...r,
-        distanceGm: userPosition
-          ? findClosestRefineryByPosition(userPosition).find(
-              c => c.refinery.id === r.refinery.id
-            )?.distanceGm ?? 0
-          : 0,
+        distanceGm: userPosition ? (distanceByRefineryId[r.refinery.id] ?? 0) : 0,
         score: 0,
         secondaryYieldPercent: secondaryMaterial
           ? r.refinery.yieldBonuses[secondaryMaterial] || 0
@@ -212,7 +223,7 @@ export function RefineryFinder({
       {/* Material Selectors */}
       <div className="material-selectors">
         <div className="form-group">
-          <label>Primary Ore {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
+          <label>Primary Material {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
           <select
             value={selectedMaterial}
             onChange={(e) => {
@@ -238,7 +249,7 @@ export function RefineryFinder({
           </select>
         </div>
         <div className="form-group">
-          <label>Secondary Ore <span className="optional">(optional)</span></label>
+          <label>Secondary Material <span className="optional">(optional)</span></label>
           <select
             value={secondaryMaterial}
             onChange={(e) => setSecondaryMaterial(e.target.value)}

@@ -350,20 +350,23 @@ export function findClosestRefineryByPosition(
   return results.sort((a, b) => a.distanceGm - b.distanceGm);
 }
 
+// Weight for dual material calculations (50/50 split assumption)
+const DUAL_MATERIAL_WEIGHT = 0.5;
+
 /**
  * Find optimal refinery considering both distance and yield bonus
  * Uses polar coordinates for accurate distance calculation
  * Value-weighted scoring uses 50/50 split assumption for primary/secondary
  *
  * @param userPosition - User's position in polar coordinates
- * @param materialId - Primary material being refined (or empty for distance-only)
+ * @param materialId - Primary material being refined
  * @param distanceWeight - How much to weight distance vs yield (0 = only yield, 1 = only distance)
  * @param secondaryMaterialId - Optional secondary material to include in yield calculation
  */
 export function findOptimalRefinery(
   userPosition: PolarCoordinate,
   materialId: string,
-  distanceWeight: number = 0.5,
+  distanceWeight: number = DUAL_MATERIAL_WEIGHT,
   secondaryMaterialId?: string
 ): {
   refinery: Refinery;
@@ -384,8 +387,8 @@ export function findOptimalRefinery(
   const secondaryBaseValue = secondaryMaterial?.baseValue || 0;
 
   // 50/50 split assumption: each material contributes half of the load
-  const primaryWeight = secondaryMaterialId ? 0.5 : 1.0;
-  const secondaryWeight = secondaryMaterialId ? 0.5 : 0;
+  const primaryWeight = secondaryMaterialId ? DUAL_MATERIAL_WEIGHT : 1.0;
+  const secondaryWeight = secondaryMaterialId ? DUAL_MATERIAL_WEIGHT : 0;
 
   const results: {
     refinery: Refinery;
