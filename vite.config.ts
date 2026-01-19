@@ -7,7 +7,8 @@ export default defineConfig({
   plugins: [react()],
   base: '/',
   server: {
-    port: 5174
+    port: 5174,
+    host: true
   },
   define: {
     __APP_VERSION__: JSON.stringify(version)

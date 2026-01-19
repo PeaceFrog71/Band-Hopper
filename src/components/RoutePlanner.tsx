@@ -49,20 +49,23 @@ type BandSortBy = 'number' | 'density';
 interface RoutePlannerProps {
   startId: string;
   destinationId: string;
+  selectedBandId: number | null;
   onStartChange: (id: string) => void;
   onDestinationChange: (id: string) => void;
+  onSelectedBandChange: (bandId: number | null) => void;
   onSwapRoute: () => void;
 }
 
 export function RoutePlanner({
   startId,
   destinationId,
+  selectedBandId,
   onStartChange,
   onDestinationChange,
+  onSelectedBandChange,
   onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
-  const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
   const [bandSortBy, setBandSortBy] = useState<BandSortBy>('density');
   const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('density');
   const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
@@ -172,20 +175,39 @@ export function RoutePlanner({
       setDestTableCollapsed(false);
     } else {
       setSelectedDestBandId(bandId);
+      onSelectedBandChange(bandId); // Also update lifted state for RefineryFinder
       setDestTableCollapsed(true);
     }
   };
 
-  // Handle mode change
+  // Handle mode change - preserve selections when switching
   const handleModeChange = (newMode: PlannerMode) => {
     setMode(newMode);
-    // Reset selections when switching modes
-    onDestinationChange('');
-    setSelectedBandId(null);
-    setSelectedDestBandId(null);
-    setDestTableCollapsed(false);
-    setBandModeCollapsed(false);
-    setBandSelectorCollapsed(false);
+
+    // Preserve state when switching modes
+    if (newMode === 'destination') {
+      // Switching to destination mode: sync selectedDestBandId with lifted state
+      setSelectedDestBandId(selectedBandId);
+      // Collapse if we have a complete selection
+      if (startId && destinationId && selectedBandId !== null) {
+        setDestTableCollapsed(true);
+      } else {
+        setDestTableCollapsed(false);
+      }
+    } else {
+      // Switching to band mode: lifted state already has bandId
+      // Collapse if we have a complete selection
+      if (startId && selectedBandId !== null && destinationId) {
+        setBandModeCollapsed(true);
+        setBandSelectorCollapsed(true);
+      } else if (startId && selectedBandId !== null) {
+        setBandSelectorCollapsed(true);
+        setBandModeCollapsed(false);
+      } else {
+        setBandModeCollapsed(false);
+        setBandSelectorCollapsed(false);
+      }
+    }
   };
 
   // Handle band selection in band mode
@@ -194,7 +216,7 @@ export function RoutePlanner({
       // Clicking the same band again expands the selector
       setBandSelectorCollapsed(false);
     } else {
-      setSelectedBandId(bandId);
+      onSelectedBandChange(bandId);
       onDestinationChange('');
       setBandSelectorCollapsed(true);
     }
