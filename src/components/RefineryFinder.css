@@ -127,8 +127,6 @@
 
 /* Combined yield styling */
 .result-yield.combined {
-  border-top: 1px solid var(--border);
-  padding-top: 0.5rem;
   margin-top: 0.25rem;
 }
 
@@ -218,6 +216,33 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-card.alternative-selected {
+  border-color: var(--accent-orange, #f59e0b);
+}
+
+.result-card.alternative-selected .result-header {
+  color: var(--accent-orange, #f59e0b);
+}
+
+.clear-selection {
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-selection:hover {
+  background: var(--text-muted);
+  color: var(--bg-dark);
 }
 
 .result-name {
@@ -351,6 +376,77 @@
 
 .alt-yield.negative {
   color: var(--danger);
+}
+
+.alt-value {
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 5rem;
+  text-align: right;
+}
+
+.alt-value.positive {
+  color: var(--success);
+}
+
+.alt-value.negative {
+  color: var(--danger);
+}
+
+.alt-value-header {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 5rem;
+  text-align: right;
+}
+
+/* Alternatives Header Row */
+.alternatives-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.25rem 0.75rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.25rem;
+}
+
+.alt-name-header {
+  flex: 1;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.alt-distance-header,
+.alt-yield-header {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 3rem;
+  text-align: right;
+}
+
+.alt-distance-header {
+  min-width: 4rem;
+}
+
+/* Clickable Alternative Items */
+.alternative-item.clickable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.alternative-item.clickable:hover {
+  background: var(--bg-light);
+  transform: translateX(2px);
+}
+
+.alternative-item.clickable:active {
+  transform: translateX(0);
 }
 
 /* Advanced Section */
