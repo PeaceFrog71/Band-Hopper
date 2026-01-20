@@ -322,105 +322,6 @@ export function RefineryFinder({
         </button>
       </div>
 
-      {/* Material Selectors */}
-      <div className="material-selectors">
-        <div className="form-group">
-          <label>Primary Material {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
-          <select
-            value={selectedMaterial}
-            onChange={(e) => {
-              const newPrimary = e.target.value;
-              setSelectedMaterial(newPrimary);
-              setSelectedAlternativeId(null); // Clear selection when material changes
-              // Clear secondary if it matches the new primary
-              if (newPrimary === secondaryMaterial) {
-                setSecondaryMaterial('');
-              }
-            }}
-          >
-            <option value="">Select material...</option>
-            {materialGroups.map(group => (
-              <Fragment key={group.rarity}>
-                <option disabled className="option-group-header">── {group.rarity} ──</option>
-                {group.materials.map(mat => (
-                  <option key={mat.id} value={mat.id}>
-                    {mat.name}
-                  </option>
-                ))}
-              </Fragment>
-            ))}
-          </select>
-        </div>
-        <div className="form-group">
-          <label>Secondary Material <span className="optional">(optional)</span></label>
-          <select
-            value={secondaryMaterial}
-            onChange={(e) => {
-              setSecondaryMaterial(e.target.value);
-              setSelectedAlternativeId(null); // Clear selection when material changes
-            }}
-          >
-            <option value="">None</option>
-            {materialGroups.map(group => (
-              <Fragment key={group.rarity}>
-                <option disabled className="option-group-header">── {group.rarity} ──</option>
-                {group.materials.map(mat => (
-                  <option key={mat.id} value={mat.id} disabled={mat.id === selectedMaterial}>
-                    {mat.name}
-                  </option>
-                ))}
-              </Fragment>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Distance Weight Slider (Optimal mode only) */}
-      {selectionMode === 'optimal' && (
-        <div className="weight-slider">
-          <label>Priority Balance</label>
-          <div className="slider-container">
-            <span className="slider-label">Yield</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={distanceWeight}
-              onChange={(e) => setDistanceWeight(parseFloat(e.target.value))}
-            />
-            <span className="slider-label">Distance</span>
-          </div>
-        </div>
-      )}
-
-      {/* Cargo Mix Slider (when secondary material selected) */}
-      {secondaryMaterial && (
-        <div className="weight-slider">
-          <label>Cargo Mix</label>
-          <div className="slider-container">
-            <span className="slider-label">Pri {Math.round(primaryCargoWeight * 100)}%</span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.05"
-              value={primaryMix}
-              onChange={(e) => setPrimaryMix(parseFloat(e.target.value))}
-            />
-            <span className="slider-label">Sec {Math.round(secondaryCargoWeight * 100)}%</span>
-          </div>
-        </div>
-      )}
-
-      {/* Laranite Warning */}
-      {selectedMaterial === 'laranite' && (
-        <div className="material-warning">
-          <span className="warning-icon">⚠</span>
-          <span><strong>WARNING:</strong> Laranite is for Losers!!!</span>
-        </div>
-      )}
-
       {/* Primary Result */}
       {displayedResult ? (
         <div className={`result-card primary ${isAlternativeSelected ? 'alternative-selected' : ''}`}>
@@ -491,6 +392,105 @@ export function RefineryFinder({
               ? 'Select a material to see recommendations'
               : 'No refineries found'}
           </div>
+        </div>
+      )}
+
+      {/* Priority Balance Slider (Optimal mode only) */}
+      {selectionMode === 'optimal' && (
+        <div className="weight-slider">
+          <label>Priority Balance</label>
+          <div className="slider-container">
+            <span className="slider-label">Yield</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={distanceWeight}
+              onChange={(e) => setDistanceWeight(parseFloat(e.target.value))}
+            />
+            <span className="slider-label">Distance</span>
+          </div>
+        </div>
+      )}
+
+      {/* Material Selectors */}
+      <div className="material-selectors">
+        <div className="form-group">
+          <label>Primary Material {needsMaterial && !selectedMaterial && <span className="required">*</span>}</label>
+          <select
+            value={selectedMaterial}
+            onChange={(e) => {
+              const newPrimary = e.target.value;
+              setSelectedMaterial(newPrimary);
+              setSelectedAlternativeId(null); // Clear selection when material changes
+              // Clear secondary if it matches the new primary
+              if (newPrimary === secondaryMaterial) {
+                setSecondaryMaterial('');
+              }
+            }}
+          >
+            <option value="">Select material...</option>
+            {materialGroups.map(group => (
+              <Fragment key={group.rarity}>
+                <option disabled className="option-group-header">── {group.rarity} ──</option>
+                {group.materials.map(mat => (
+                  <option key={mat.id} value={mat.id}>
+                    {mat.name}
+                  </option>
+                ))}
+              </Fragment>
+            ))}
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Secondary Material <span className="optional">(optional)</span></label>
+          <select
+            value={secondaryMaterial}
+            onChange={(e) => {
+              setSecondaryMaterial(e.target.value);
+              setSelectedAlternativeId(null); // Clear selection when material changes
+            }}
+          >
+            <option value="">None</option>
+            {materialGroups.map(group => (
+              <Fragment key={group.rarity}>
+                <option disabled className="option-group-header">── {group.rarity} ──</option>
+                {group.materials.map(mat => (
+                  <option key={mat.id} value={mat.id} disabled={mat.id === selectedMaterial}>
+                    {mat.name}
+                  </option>
+                ))}
+              </Fragment>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Cargo Mix Slider (when secondary material selected) */}
+      {secondaryMaterial && (
+        <div className="weight-slider">
+          <label>Cargo Mix</label>
+          <div className="slider-container">
+            <span className="slider-label">Pri {Math.round(primaryCargoWeight * 100)}%</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={primaryMix}
+              onChange={(e) => setPrimaryMix(parseFloat(e.target.value))}
+            />
+            <span className="slider-label">Sec {Math.round(secondaryCargoWeight * 100)}%</span>
+          </div>
+        </div>
+      )}
+
+      {/* Laranite Warning */}
+      {selectedMaterial === 'laranite' && (
+        <div className="material-warning">
+          <span className="warning-icon">⚠</span>
+          <span><strong>WARNING:</strong> Laranite is for Losers!!!</span>
         </div>
       )}
 
