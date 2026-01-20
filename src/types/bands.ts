@@ -7,7 +7,8 @@ export interface AaronHaloBand {
   innerDistance: number;         // km from Stanton marker (inner edge)
   outerDistance: number;         // km from Stanton marker (outer edge)
   peakDensityDistance: number;   // km - most asteroids (best mining)
-  relativeDensity: number;       // 0-1 scale (1 = highest density)
+  relativeDensity: number;       // 0-1 scale - peak asteroid concentration (Band 5 = 1.0)
+  miningOpportunity: number;     // 0-1 scale - total rocks for sustained mining (density × width)
   description?: string;          // Optional notes about this band
 }
 
@@ -27,7 +28,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 19_673_000,
     outerDistance: 19_715_000,
     peakDensityDistance: 19_702_000,
-    relativeDensity: 0.5,
+    relativeDensity: 0.01,
+    miningOpportunity: 0.00,
     description: 'Inner edge of the Aaron Halo'
   },
   {
@@ -36,7 +38,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 19_815_000,
     outerDistance: 19_914_000,
     peakDensityDistance: 19_887_000,
-    relativeDensity: 0.65,
+    relativeDensity: 0.24,
+    miningOpportunity: 0.13,
     description: 'Moderate density'
   },
   {
@@ -45,7 +48,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 19_914_000,
     outerDistance: 19_995_000,
     peakDensityDistance: 19_995_000,
-    relativeDensity: 0.7,
+    relativeDensity: 0.35,
+    miningOpportunity: 0.16,
     description: 'Good density, often grouped with Band 2'
   },
   {
@@ -54,7 +58,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 20_071_000,
     outerDistance: 20_179_000,
     peakDensityDistance: 20_188_000,
-    relativeDensity: 0.55,
+    relativeDensity: 0.23,
+    miningOpportunity: 0.14,
     description: 'Lower density transition zone'
   },
   {
@@ -63,8 +68,9 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 20_230_000,
     outerDistance: 20_407_000,
     peakDensityDistance: 20_320_000,
-    relativeDensity: 0.9,
-    description: 'High density - popular mining band'
+    relativeDensity: 1.00,
+    miningOpportunity: 1.00,
+    description: 'Highest density - peak asteroid concentration'
   },
   {
     id: 6,
@@ -72,7 +78,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 20_407_000,
     outerDistance: 20_540_000,
     peakDensityDistance: 20_471_000,
-    relativeDensity: 0.75,
+    relativeDensity: 0.33,
+    miningOpportunity: 0.25,
     description: 'Good density, often grouped with Band 5'
   },
   {
@@ -81,8 +88,9 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 20_540_000,
     outerDistance: 20_881_000,
     peakDensityDistance: 20_962_000,
-    relativeDensity: 1.0,
-    description: 'Highest density - peak asteroid concentration'
+    relativeDensity: 0.36,
+    miningOpportunity: 0.70,
+    description: 'Wide band - best for sustained mining'
   },
   {
     id: 8,
@@ -90,8 +98,9 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 20_881_000,
     outerDistance: 21_046_000,
     peakDensityDistance: 20_968_000,
-    relativeDensity: 0.85,
-    description: 'High density'
+    relativeDensity: 0.26,
+    miningOpportunity: 0.24,
+    description: 'Moderate density'
   },
   {
     id: 9,
@@ -99,8 +108,9 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 21_046_000,
     outerDistance: 21_132_000,
     peakDensityDistance: 21_062_000,
-    relativeDensity: 0.6,
-    description: 'Moderate density'
+    relativeDensity: 0.25,
+    miningOpportunity: 0.12,
+    description: 'Lower density'
   },
   {
     id: 10,
@@ -108,7 +118,8 @@ export const BANDS: AaronHaloBand[] = [
     innerDistance: 21_132_000,
     outerDistance: 21_298_000,
     peakDensityDistance: 21_207_000,
-    relativeDensity: 0.55,
+    relativeDensity: 0.33,
+    miningOpportunity: 0.31,
     description: 'Outer edge of the Aaron Halo'
   }
 ];

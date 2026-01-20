@@ -685,3 +685,133 @@
     font-size: 1.75rem;
   }
 }
+
+/* ===== Info Icons ===== */
+.info-icon {
+  font-size: 0.7rem;
+  opacity: 0.5;
+  margin-left: 4px;
+  cursor: help;
+}
+
+.info-icon:hover {
+  opacity: 1;
+}
+
+/* Sort Info Icon */
+.sort-info-icon {
+  font-size: 0.85rem;
+  opacity: 0.6;
+  margin-left: 8px;
+  cursor: help;
+  color: var(--text-muted);
+}
+
+.sort-info-icon:hover {
+  opacity: 1;
+  color: var(--accent-cyan);
+}
+
+/* Color-coded Labels */
+.density-label {
+  color: #00ff88;  /* Bright green */
+}
+
+.opportunity-label {
+  color: #ff00cc;  /* Bright pink */
+}
+
+.sort-btn.active .density-label,
+.sort-btn.active .opportunity-label {
+  color: var(--bg-dark);  /* Dark when button is active */
+}
+
+/* Legend D / M colors */
+.legend-d {
+  color: #00ff88;  /* Bright green */
+  font-weight: 600;
+}
+
+.legend-m {
+  color: #ff00cc;  /* Bright pink */
+  font-weight: 600;
+}
+
+/* ===== Dual Bars (Density & Mining Opportunity) ===== */
+.dual-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.bar-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  opacity: 0.7;
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.density-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #008844, #00ff88);  /* Green */
+  border-radius: 2px;
+  min-width: 3%;
+}
+
+.opportunity-bar {
+  height: 4px;
+  background: linear-gradient(90deg, #cc00aa, #ff00cc);  /* Magenta */
+  border-radius: 2px;
+  min-width: 3%;
+}
+
+/* Band Selector Dual Bars */
+.band-select-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.band-select-bars .bar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.band-select-bars .bar-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  opacity: 0.7;
+  width: 16px;
+  flex-shrink: 0;
+}
+
+.band-select-bars .density-bar,
+.band-select-bars .opportunity-bar {
+  height: 3px;
+  border-radius: 2px;
+  min-width: 3%;
+}
+
+/* Adjust band column width for dual bars */
+.band-header .band-col-density,
+.band-row .band-col-density {
+  min-width: 100px;
+}
+
+@media (min-width: 600px) {
+  .band-header,
+  .band-row {
+    grid-template-columns: 80px 1fr 120px;
+  }
+}
