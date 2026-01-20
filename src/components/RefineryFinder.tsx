@@ -116,13 +116,13 @@ export function RefineryFinder({
           : 0;
         const combinedYieldPercent = r.yieldPercent + secondaryYieldPercent;
 
-        // Calculate value-weighted impact using cargo composition from slider
-        // Value impact = (yield% / 100) * baseValue * cargoWeight
-        const primaryValueImpact = (r.yieldPercent / 100) * primaryBaseValue * primaryCargoWeight;
+        // Calculate value impacts (individual = raw per-material, combined = weighted by cargo mix)
+        const primaryValueImpact = (r.yieldPercent / 100) * primaryBaseValue;
         const secondaryValueImpact = secondaryMaterial
-          ? (secondaryYieldPercent / 100) * secondaryBaseValue * secondaryCargoWeight
+          ? (secondaryYieldPercent / 100) * secondaryBaseValue
           : 0;
-        const combinedValueImpact = primaryValueImpact + secondaryValueImpact;
+        // Combined uses cargo weighting for sorting/comparison
+        const combinedValueImpact = (primaryValueImpact * primaryCargoWeight) + (secondaryValueImpact * secondaryCargoWeight);
 
         return {
           ...r,
@@ -162,10 +162,12 @@ export function RefineryFinder({
         const secondaryYieldPercent = secondaryMaterial
           ? r.refinery.yieldBonuses[secondaryMaterial] || 0
           : 0;
-        const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue * primaryCargoWeight;
+        // Individual impacts = raw per-material, combined = weighted by cargo mix
+        const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue;
         const secondaryValueImpact = secondaryMaterial
-          ? (secondaryYieldPercent / 100) * secondaryBaseValue * secondaryCargoWeight
+          ? (secondaryYieldPercent / 100) * secondaryBaseValue
           : 0;
+        const combinedValueImpact = (primaryValueImpact * primaryCargoWeight) + (secondaryValueImpact * secondaryCargoWeight);
 
         return {
           ...r,
@@ -174,7 +176,7 @@ export function RefineryFinder({
           combinedYieldPercent: yieldPercent + secondaryYieldPercent,
           primaryValueImpact,
           secondaryValueImpact,
-          combinedValueImpact: primaryValueImpact + secondaryValueImpact,
+          combinedValueImpact,
           score: 0,
         };
       });
@@ -306,6 +308,7 @@ export function RefineryFinder({
             onChange={(e) => {
               const newPrimary = e.target.value;
               setSelectedMaterial(newPrimary);
+              setSelectedAlternativeId(null); // Clear selection when material changes
               // Clear secondary if it matches the new primary
               if (newPrimary === secondaryMaterial) {
                 setSecondaryMaterial('');
@@ -329,7 +332,10 @@ export function RefineryFinder({
           <label>Secondary Material <span className="optional">(optional)</span></label>
           <select
             value={secondaryMaterial}
-            onChange={(e) => setSecondaryMaterial(e.target.value)}
+            onChange={(e) => {
+              setSecondaryMaterial(e.target.value);
+              setSelectedAlternativeId(null); // Clear selection when material changes
+            }}
           >
             <option value="">None</option>
             {materialGroups.map(group => (
@@ -479,7 +485,6 @@ export function RefineryFinder({
               {/* Column Headers */}
               {selectedMaterial && (
                 <div className="alternatives-header">
-                  <span className="alt-rank-header"></span>
                   <span className="alt-name-header">Station</span>
                   {hasPosition && <span className="alt-distance-header">Dist</span>}
                   <span className="alt-yield-header">Pri</span>

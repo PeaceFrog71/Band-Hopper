@@ -380,7 +380,7 @@ function getDistanceScore(distanceGm: number): number {
  * @param distanceWeight - How much to weight distance vs yield (0 = only yield, 1 = only distance)
  * @param secondaryMaterialId - Optional secondary material to include in yield calculation
  * @param primaryCargoWeight - Weight of primary material in cargo (default 0.30)
- * @param secondaryCargoWeight - Weight of secondary material in cargo (default 0.50)
+ * @param secondaryCargoWeight - Weight of secondary material in cargo (default 0.70)
  */
 export function findOptimalRefinery(
   userPosition: PolarCoordinate,
@@ -399,7 +399,7 @@ export function findOptimalRefinery(
   combinedYieldPercent: number;
   primaryValueImpact: number;      // aUEC/SCU impact from primary yield
   secondaryValueImpact: number;    // aUEC/SCU impact from secondary yield
-  combinedValueImpact: number;     // Total aUEC/SCU impact (weighted 30/50 cargo mix)
+  combinedValueImpact: number;     // Total aUEC/SCU impact (weighted 30/70 cargo mix)
 }[] {
   // Get material base values for value-weighted scoring
   const primaryMaterial = getMaterialById(materialId);
@@ -463,7 +463,7 @@ export function findOptimalRefinery(
     // Calculate aUEC/SCU value impacts
     const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue;
     const secondaryValueImpact = (secondaryYieldPercent / 100) * secondaryBaseValue;
-    // Combined uses 30/50 cargo weighting (30% primary, 50% secondary)
+    // Combined uses cargo weighting from parameters (default 30% primary, 70% secondary)
     const combinedValueImpact = (primaryValueImpact * primaryWeight) + (secondaryValueImpact * secondaryWeight);
 
     // Distance score using absolute thresholds (not relative to other refineries)
