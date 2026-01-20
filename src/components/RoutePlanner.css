@@ -802,15 +802,15 @@
 
 /* Color-coded Labels - Muted when inactive, bright when active */
 .number-label {
-  color: #666666;  /* Muted grey */
+  color: #b3b3b3;  /* Muted light grey with improved contrast */
 }
 
 .density-label {
-  color: #336644;  /* Dark muted green */
+  color: #66b97a;  /* Muted light green with improved contrast */
 }
 
 .opportunity-label {
-  color: #663366;  /* Dark muted pink */
+  color: #c279c2;  /* Muted light pink/purple with improved contrast */
 }
 
 .sort-btn.active .number-label {
