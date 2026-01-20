@@ -1,6 +1,7 @@
 import { useState, useMemo, Fragment } from 'react';
 import {
   getMaterialsByValue,
+  getMaterialById,
   type PolarCoordinate,
   getLocationCoordinates,
   interpolatePositionOnRoute,
@@ -11,23 +12,27 @@ import {
   BANDS,
   getLocationById,
 } from '../types';
+
+// Default cargo mix: 30% primary, 70% secondary (no inert assumption)
+const DEFAULT_PRIMARY_MIX = 0.30;
 import './RefineryFinder.css';
 
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
+type PositionSource = 'route-planner' | 'where-am-i';
 
 // Default balance between distance and yield (0.5 = equal weight)
 const DEFAULT_DISTANCE_WEIGHT = 0.5;
 
 /**
  * Format aUEC value impact for display
- * Shows sign and comma-separated number
+ * Shows sign, comma-separated number, and /SCU unit
  */
 function formatValueImpact(value: number): string {
   const rounded = Math.round(value);
   const formatted = Math.abs(rounded).toLocaleString();
-  if (rounded > 0) return `+${formatted}`;
-  if (rounded < 0) return `-${formatted}`;
-  return '0';
+  if (rounded > 0) return `+${formatted}/SCU`;
+  if (rounded < 0) return `-${formatted}/SCU`;
+  return '0/SCU';
 }
 
 interface RefineryFinderProps {
@@ -35,34 +40,44 @@ interface RefineryFinderProps {
   startId: string;
   destinationId: string;
   selectedBandId: number | null;
+  // From Where Am I state (lifted to App)
+  whereAmIDistance: string;
+  whereAmIAngle: string;
 }
 
 export function RefineryFinder({
   startId,
   destinationId,
   selectedBandId,
+  whereAmIDistance,
+  whereAmIAngle,
 }: RefineryFinderProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<string>('');
   const [secondaryMaterial, setSecondaryMaterial] = useState<string>('');
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('optimal');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [manualR, setManualR] = useState<string>('');
-  const [manualTheta, setManualTheta] = useState<string>('');
+  const [positionSource, setPositionSource] = useState<PositionSource>('route-planner');
   const [distanceWeight, setDistanceWeight] = useState(DEFAULT_DISTANCE_WEIGHT);
+  const [primaryMix, setPrimaryMix] = useState(DEFAULT_PRIMARY_MIX);
   const [showAlternatives, setShowAlternatives] = useState(false);
+  const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null);
 
-  // Calculate user position from route + band
+  // Calculate actual cargo weights from slider (100% scale, no inert)
+  const primaryCargoWeight = primaryMix;
+  const secondaryCargoWeight = 1 - primaryMix;
+
+  // Calculate user position based on selected source
   const userPosition = useMemo<PolarCoordinate | null>(() => {
-    // Check for manual coordinates first
-    if (showAdvanced && manualR && manualTheta) {
-      const r = parseFloat(manualR);
-      const theta = parseFloat(manualTheta);
-      if (!isNaN(r) && !isNaN(theta)) {
+    if (positionSource === 'where-am-i') {
+      // Use Where Am I coordinates
+      const r = parseFloat(whereAmIDistance);
+      const theta = parseFloat(whereAmIAngle);
+      if (!isNaN(r) && !isNaN(theta) && r > 0) {
         return { r, theta };
       }
+      return null;
     }
 
-    // Otherwise calculate from route
+    // Route Planner source - calculate from route
     if (!startId || !destinationId || selectedBandId === null) return null;
 
     const startCoords = getLocationCoordinates(startId);
@@ -75,7 +90,7 @@ export function RefineryFinder({
     const targetRadius = band.peakDensityDistance / 1_000_000;
 
     return interpolatePositionOnRoute(startCoords, destCoords, targetRadius);
-  }, [startId, destinationId, selectedBandId, showAdvanced, manualR, manualTheta]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
 
   // Get refinery recommendations based on mode
   const refineryResults = useMemo(() => {
@@ -94,20 +109,44 @@ export function RefineryFinder({
           )
         : {};
 
-      const results = findBestRefineryByYield(selectedMaterial).map(r => ({
-        ...r,
-        distanceGm: userPosition ? (distanceByRefineryId[r.refinery.id] ?? 0) : 0,
-        score: 0,
-        secondaryYieldPercent: secondaryMaterial
+      // Get material base values for value-weighted scoring
+      const primaryMaterialData = getMaterialById(selectedMaterial);
+      const secondaryMaterialData = secondaryMaterial ? getMaterialById(secondaryMaterial) : null;
+      const primaryBaseValue = primaryMaterialData?.baseValue || 0;
+      const secondaryBaseValue = secondaryMaterialData?.baseValue || 0;
+
+      const results = findBestRefineryByYield(selectedMaterial).map(r => {
+        const secondaryYieldPercent = secondaryMaterial
           ? r.refinery.yieldBonuses[secondaryMaterial] || 0
-          : 0,
-        combinedYieldPercent: r.yieldPercent + (secondaryMaterial
-          ? r.refinery.yieldBonuses[secondaryMaterial] || 0
-          : 0),
-      }));
-      // Filter to only show refineries with positive yields (bonuses)
-      // If no positive yields exist, show all but they'll be sorted by yield (least negative first)
-      const positiveResults = results.filter(r => r.yieldPercent > 0);
+          : 0;
+        const combinedYieldPercent = r.yieldPercent + secondaryYieldPercent;
+
+        // Calculate value impacts (individual = raw per-material, combined = weighted by cargo mix)
+        const primaryValueImpact = (r.yieldPercent / 100) * primaryBaseValue;
+        const secondaryValueImpact = secondaryMaterial
+          ? (secondaryYieldPercent / 100) * secondaryBaseValue
+          : 0;
+        // Combined uses cargo weighting for sorting/comparison
+        const combinedValueImpact = (primaryValueImpact * primaryCargoWeight) + (secondaryValueImpact * secondaryCargoWeight);
+
+        return {
+          ...r,
+          distanceGm: userPosition ? (distanceByRefineryId[r.refinery.id] ?? 0) : 0,
+          score: 0,
+          secondaryYieldPercent,
+          combinedYieldPercent,
+          primaryValueImpact,
+          secondaryValueImpact,
+          combinedValueImpact,
+        };
+      });
+
+      // Sort by value-weighted impact (considers both yield % AND material prices)
+      results.sort((a, b) => b.combinedValueImpact - a.combinedValueImpact);
+
+      // Filter to only show refineries with positive value impact
+      // If no positive impacts exist, show all sorted by value (least negative first)
+      const positiveResults = results.filter(r => r.combinedValueImpact > 0);
       return positiveResults.length > 0 ? positiveResults : results;
     }
 
@@ -115,18 +154,37 @@ export function RefineryFinder({
 
     if (selectionMode === 'closest') {
       // Pure distance mode - closest refinery regardless of yield
-      return findClosestRefineryByPosition(userPosition).map(r => ({
-        ...r,
-        yieldPercent: selectedMaterial
+      // Still calculate value impacts for display
+      const primaryMaterialData = selectedMaterial ? getMaterialById(selectedMaterial) : null;
+      const secondaryMaterialData = secondaryMaterial ? getMaterialById(secondaryMaterial) : null;
+      const primaryBaseValue = primaryMaterialData?.baseValue || 0;
+      const secondaryBaseValue = secondaryMaterialData?.baseValue || 0;
+
+      return findClosestRefineryByPosition(userPosition).map(r => {
+        const yieldPercent = selectedMaterial
           ? r.refinery.yieldBonuses[selectedMaterial] || 0
-          : 0,
-        secondaryYieldPercent: secondaryMaterial
+          : 0;
+        const secondaryYieldPercent = secondaryMaterial
           ? r.refinery.yieldBonuses[secondaryMaterial] || 0
-          : 0,
-        combinedYieldPercent: (selectedMaterial ? r.refinery.yieldBonuses[selectedMaterial] || 0 : 0)
-          + (secondaryMaterial ? r.refinery.yieldBonuses[secondaryMaterial] || 0 : 0),
-        score: 0,
-      }));
+          : 0;
+        // Individual impacts = raw per-material, combined = weighted by cargo mix
+        const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue;
+        const secondaryValueImpact = secondaryMaterial
+          ? (secondaryYieldPercent / 100) * secondaryBaseValue
+          : 0;
+        const combinedValueImpact = (primaryValueImpact * primaryCargoWeight) + (secondaryValueImpact * secondaryCargoWeight);
+
+        return {
+          ...r,
+          yieldPercent,
+          secondaryYieldPercent,
+          combinedYieldPercent: yieldPercent + secondaryYieldPercent,
+          primaryValueImpact,
+          secondaryValueImpact,
+          combinedValueImpact,
+          score: 0,
+        };
+      });
     }
 
     // Optimal mode
@@ -142,17 +200,28 @@ export function RefineryFinder({
     }
 
     // Use the optimal scoring algorithm which balances distance and yield
-    return findOptimalRefinery(userPosition, selectedMaterial, distanceWeight, secondaryMaterial || undefined);
-  }, [userPosition, selectionMode, selectedMaterial, secondaryMaterial, distanceWeight]);
+    return findOptimalRefinery(
+      userPosition,
+      selectedMaterial,
+      distanceWeight,
+      secondaryMaterial || undefined,
+      primaryCargoWeight,
+      secondaryCargoWeight
+    );
+  }, [userPosition, selectionMode, selectedMaterial, secondaryMaterial, distanceWeight, primaryCargoWeight, secondaryCargoWeight]);
 
   // Get position description
   const positionDescription = useMemo(() => {
-    if (showAdvanced && manualR && manualTheta) {
-      return `Manual: r=${manualR} Gm, θ=${manualTheta}°`;
+    if (positionSource === 'where-am-i') {
+      if (whereAmIDistance && whereAmIAngle) {
+        return `From Where Am I: ${whereAmIDistance} Gm, ${whereAmIAngle}°`;
+      }
+      return 'Enter coordinates in Where Am I tab';
     }
 
+    // Route Planner source
     if (!startId || !destinationId || selectedBandId === null) {
-      return 'Select a route in Route Planner to calculate position';
+      return 'Select a route in Route Planner tab';
     }
 
     const startLoc = getLocationById(startId);
@@ -164,7 +233,7 @@ export function RefineryFinder({
     }
 
     return `${startLoc.shortName} → ${destLoc.shortName}, ${band.name}`;
-  }, [startId, destinationId, selectedBandId, showAdvanced, manualR, manualTheta]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
 
   // Group materials by rarity for dropdown (alphabetized within each group)
   const materialGroups = useMemo(() => {
@@ -180,47 +249,170 @@ export function RefineryFinder({
     return groups.filter(g => g.materials.length > 0);
   }, []);
 
-  const topResult = refineryResults[0];
-  const alternatives = refineryResults.slice(1, 5);
+  // Determine which result to display (selected alternative or top recommendation)
+  const recommendedResult = refineryResults[0];
+  const selectedResult = selectedAlternativeId
+    ? refineryResults.find(r => r.refinery.id === selectedAlternativeId)
+    : null;
+  const displayedResult = selectedResult || recommendedResult;
+  const isAlternativeSelected = !!selectedResult;
+
+  // Alternatives exclude the currently displayed result
+  const alternatives = refineryResults
+    .filter(r => r.refinery.id !== displayedResult?.refinery.id)
+    .slice(0, 4);
+
   const hasPosition = !!userPosition;
   const needsMaterial = selectionMode === 'best-yield' || selectionMode === 'optimal';
 
+  // Clear selected alternative when mode/materials change
+  const handleModeChange = (mode: SelectionMode) => {
+    setSelectionMode(mode);
+    setSelectedAlternativeId(null);
+  };
+
   return (
     <div className="refinery-finder">
+      {/* Position Source Selector */}
+      <div className="position-source">
+        <label className="position-source-label">Position From:</label>
+        <div className="source-toggle">
+          <button
+            className={`source-btn ${positionSource === 'route-planner' ? 'active' : ''}`}
+            onClick={() => setPositionSource('route-planner')}
+          >
+            Route Planner
+          </button>
+          <button
+            className={`source-btn ${positionSource === 'where-am-i' ? 'active' : ''}`}
+            onClick={() => setPositionSource('where-am-i')}
+          >
+            Where Am I?
+          </button>
+        </div>
+      </div>
+
       {/* Position Display */}
       <div className="position-display">
         <div className="position-label">Your Position</div>
         <div className={`position-value ${hasPosition ? '' : 'no-position'}`}>
           {positionDescription}
         </div>
-        {userPosition && (
-          <div className="position-coords">
-            r = {userPosition.r.toFixed(2)} Gm, θ = {userPosition.theta.toFixed(1)}°
-          </div>
-        )}
       </div>
 
       {/* Mode Toggle */}
       <div className="mode-toggle">
         <button
           className={`mode-btn ${selectionMode === 'closest' ? 'active' : ''}`}
-          onClick={() => setSelectionMode('closest')}
+          onClick={() => handleModeChange('closest')}
         >
           Closest
         </button>
         <button
           className={`mode-btn ${selectionMode === 'best-yield' ? 'active' : ''}`}
-          onClick={() => setSelectionMode('best-yield')}
+          onClick={() => handleModeChange('best-yield')}
         >
           Best Yield
         </button>
         <button
           className={`mode-btn ${selectionMode === 'optimal' ? 'active' : ''}`}
-          onClick={() => setSelectionMode('optimal')}
+          onClick={() => handleModeChange('optimal')}
         >
           Optimal
         </button>
       </div>
+
+      {/* Primary Result */}
+      {displayedResult ? (
+        <div className={`result-card primary ${isAlternativeSelected ? 'alternative-selected' : ''}`}>
+          <div className="result-header">
+            {isAlternativeSelected ? 'Alternative Refinery Selected' : 'Recommended Refinery'}
+            {isAlternativeSelected && (
+              <button
+                className="clear-selection"
+                onClick={() => setSelectedAlternativeId(null)}
+                title="Clear selection"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          <div className="result-name">{displayedResult.location.shortName}</div>
+          <div className="result-station">{displayedResult.refinery.name}</div>
+          <div className="result-details">
+            {hasPosition && (
+              <div className="result-distance">
+                <span className="detail-label">Distance:</span>
+                <span className="detail-value">{formatPolarDistance(displayedResult.distanceGm)}</span>
+              </div>
+            )}
+            {selectedMaterial && (
+              <div className={`result-yield ${displayedResult.yieldPercent > 0 ? 'positive' : displayedResult.yieldPercent < 0 ? 'negative' : ''}`}>
+                <span className="detail-label">Primary:</span>
+                <span className="detail-value">
+                  {displayedResult.yieldPercent > 0 ? '+' : ''}{displayedResult.yieldPercent}%
+                  {'primaryValueImpact' in displayedResult && (
+                    <span className="value-impact"> ({formatValueImpact(displayedResult.primaryValueImpact as number)})</span>
+                  )}
+                </span>
+              </div>
+            )}
+            {secondaryMaterial && (
+              <div className={`result-yield ${displayedResult.secondaryYieldPercent > 0 ? 'positive' : displayedResult.secondaryYieldPercent < 0 ? 'negative' : ''}`}>
+                <span className="detail-label">Secondary:</span>
+                <span className="detail-value">
+                  {displayedResult.secondaryYieldPercent > 0 ? '+' : ''}{displayedResult.secondaryYieldPercent}%
+                  {'secondaryValueImpact' in displayedResult && (
+                    <span className="value-impact"> ({formatValueImpact(displayedResult.secondaryValueImpact as number)})</span>
+                  )}
+                </span>
+              </div>
+            )}
+            {selectedMaterial && secondaryMaterial && (
+              <div className={`result-yield combined ${displayedResult.combinedYieldPercent > 0 ? 'positive' : displayedResult.combinedYieldPercent < 0 ? 'negative' : ''}`}>
+                <span className="detail-label">Combined:</span>
+                <span className="detail-value">
+                  {displayedResult.combinedYieldPercent > 0 ? '+' : ''}{displayedResult.combinedYieldPercent}%
+                  {'combinedValueImpact' in displayedResult && (
+                    <span className="value-impact"> ({formatValueImpact(displayedResult.combinedValueImpact as number)})</span>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="result-card empty">
+          <div className="result-header">Recommended Refinery</div>
+          <div className="result-name">---</div>
+          <div className="result-hint">
+            {!hasPosition && selectionMode !== 'best-yield'
+              ? 'Select a route in Route Planner first'
+              : needsMaterial && !selectedMaterial
+              ? 'Select a material to see recommendations'
+              : 'No refineries found'}
+          </div>
+        </div>
+      )}
+
+      {/* Priority Balance Slider (Optimal mode only) */}
+      {selectionMode === 'optimal' && (
+        <div className="weight-slider">
+          <label>Priority Balance</label>
+          <div className="slider-container">
+            <span className="slider-label">Yield</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={distanceWeight}
+              onChange={(e) => setDistanceWeight(parseFloat(e.target.value))}
+            />
+            <span className="slider-label">Distance</span>
+          </div>
+        </div>
+      )}
 
       {/* Material Selectors */}
       <div className="material-selectors">
@@ -231,6 +423,7 @@ export function RefineryFinder({
             onChange={(e) => {
               const newPrimary = e.target.value;
               setSelectedMaterial(newPrimary);
+              setSelectedAlternativeId(null); // Clear selection when material changes
               // Clear secondary if it matches the new primary
               if (newPrimary === secondaryMaterial) {
                 setSecondaryMaterial('');
@@ -254,7 +447,10 @@ export function RefineryFinder({
           <label>Secondary Material <span className="optional">(optional)</span></label>
           <select
             value={secondaryMaterial}
-            onChange={(e) => setSecondaryMaterial(e.target.value)}
+            onChange={(e) => {
+              setSecondaryMaterial(e.target.value);
+              setSelectedAlternativeId(null); // Clear selection when material changes
+            }}
           >
             <option value="">None</option>
             {materialGroups.map(group => (
@@ -271,21 +467,21 @@ export function RefineryFinder({
         </div>
       </div>
 
-      {/* Distance Weight Slider (Optimal mode only) */}
-      {selectionMode === 'optimal' && (
+      {/* Cargo Mix Slider (when secondary material selected) */}
+      {secondaryMaterial && (
         <div className="weight-slider">
-          <label>Priority Balance</label>
+          <label>Cargo Mix</label>
           <div className="slider-container">
-            <span className="slider-label">Yield</span>
+            <span className="slider-label">Pri {Math.round(primaryCargoWeight * 100)}%</span>
             <input
               type="range"
               min="0"
               max="1"
-              step="0.1"
-              value={distanceWeight}
-              onChange={(e) => setDistanceWeight(parseFloat(e.target.value))}
+              step="0.05"
+              value={primaryMix}
+              onChange={(e) => setPrimaryMix(parseFloat(e.target.value))}
             />
-            <span className="slider-label">Distance</span>
+            <span className="slider-label">Sec {Math.round(secondaryCargoWeight * 100)}%</span>
           </div>
         </div>
       )}
@@ -295,68 +491,6 @@ export function RefineryFinder({
         <div className="material-warning">
           <span className="warning-icon">⚠</span>
           <span><strong>WARNING:</strong> Laranite is for Losers!!!</span>
-        </div>
-      )}
-
-      {/* Primary Result */}
-      {topResult ? (
-        <div className="result-card primary">
-          <div className="result-header">Recommended Refinery</div>
-          <div className="result-name">{topResult.location.shortName}</div>
-          <div className="result-station">{topResult.refinery.name}</div>
-          <div className="result-details">
-            {hasPosition && (
-              <div className="result-distance">
-                <span className="detail-label">Distance:</span>
-                <span className="detail-value">{formatPolarDistance(topResult.distanceGm)}</span>
-              </div>
-            )}
-            {selectedMaterial && (
-              <div className={`result-yield ${topResult.yieldPercent > 0 ? 'positive' : topResult.yieldPercent < 0 ? 'negative' : ''}`}>
-                <span className="detail-label">Primary:</span>
-                <span className="detail-value">
-                  {topResult.yieldPercent > 0 ? '+' : ''}{topResult.yieldPercent}%
-                  {'primaryValueImpact' in topResult && (
-                    <span className="value-impact"> ({formatValueImpact(topResult.primaryValueImpact as number)})</span>
-                  )}
-                </span>
-              </div>
-            )}
-            {secondaryMaterial && (
-              <div className={`result-yield ${topResult.secondaryYieldPercent > 0 ? 'positive' : topResult.secondaryYieldPercent < 0 ? 'negative' : ''}`}>
-                <span className="detail-label">Secondary:</span>
-                <span className="detail-value">
-                  {topResult.secondaryYieldPercent > 0 ? '+' : ''}{topResult.secondaryYieldPercent}%
-                  {'secondaryValueImpact' in topResult && (
-                    <span className="value-impact"> ({formatValueImpact(topResult.secondaryValueImpact as number)})</span>
-                  )}
-                </span>
-              </div>
-            )}
-            {selectedMaterial && secondaryMaterial && (
-              <div className={`result-yield combined ${topResult.combinedYieldPercent > 0 ? 'positive' : topResult.combinedYieldPercent < 0 ? 'negative' : ''}`}>
-                <span className="detail-label">Combined:</span>
-                <span className="detail-value">
-                  {topResult.combinedYieldPercent > 0 ? '+' : ''}{topResult.combinedYieldPercent}%
-                  {'combinedValueImpact' in topResult && (
-                    <span className="value-impact"> ({formatValueImpact(topResult.combinedValueImpact as number)} aUEC)</span>
-                  )}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="result-card empty">
-          <div className="result-header">Recommended Refinery</div>
-          <div className="result-name">---</div>
-          <div className="result-hint">
-            {!hasPosition && selectionMode !== 'best-yield'
-              ? 'Select a route in Route Planner first'
-              : needsMaterial && !selectedMaterial
-              ? 'Select a material to see recommendations'
-              : 'No refineries found'}
-          </div>
         </div>
       )}
 
@@ -371,21 +505,40 @@ export function RefineryFinder({
           </button>
           {showAlternatives && (
             <div className="alternatives-list">
-              {alternatives.map((result, idx) => (
-                <div key={result.refinery.id} className="alternative-item">
-                  <span className="alt-rank">{idx + 2}.</span>
+              {/* Column Headers */}
+              {selectedMaterial && (
+                <div className="alternatives-header">
+                  <span className="alt-name-header">Station</span>
+                  {hasPosition && <span className="alt-distance-header">Dist</span>}
+                  <span className="alt-yield-header">Pri</span>
+                  {secondaryMaterial && <span className="alt-yield-header">Sec</span>}
+                  {secondaryMaterial && <span className="alt-value-header">/SCU</span>}
+                </div>
+              )}
+              {alternatives.map((result) => (
+                <div
+                  key={result.refinery.id}
+                  className="alternative-item clickable"
+                  onClick={() => setSelectedAlternativeId(result.refinery.id)}
+                  title="Click to select this refinery"
+                >
                   <span className="alt-name">{result.location.shortName}</span>
                   {hasPosition && (
                     <span className="alt-distance">{formatPolarDistance(result.distanceGm)}</span>
                   )}
-                  {selectedMaterial && !secondaryMaterial && (
+                  {selectedMaterial && (
                     <span className={`alt-yield ${result.yieldPercent > 0 ? 'positive' : result.yieldPercent < 0 ? 'negative' : ''}`}>
                       {result.yieldPercent > 0 ? '+' : ''}{result.yieldPercent}%
                     </span>
                   )}
-                  {selectedMaterial && secondaryMaterial && (
-                    <span className={`alt-yield ${result.combinedYieldPercent > 0 ? 'positive' : result.combinedYieldPercent < 0 ? 'negative' : ''}`}>
-                      {result.combinedYieldPercent > 0 ? '+' : ''}{result.combinedYieldPercent}%
+                  {secondaryMaterial && (
+                    <span className={`alt-yield ${result.secondaryYieldPercent > 0 ? 'positive' : result.secondaryYieldPercent < 0 ? 'negative' : ''}`}>
+                      {result.secondaryYieldPercent > 0 ? '+' : ''}{result.secondaryYieldPercent}%
+                    </span>
+                  )}
+                  {secondaryMaterial && 'combinedValueImpact' in result && (
+                    <span className={`alt-value ${(result.combinedValueImpact as number) > 0 ? 'positive' : (result.combinedValueImpact as number) < 0 ? 'negative' : ''}`}>
+                      {formatValueImpact(result.combinedValueImpact as number)}
                     </span>
                   )}
                 </div>
@@ -395,55 +548,6 @@ export function RefineryFinder({
         </div>
       )}
 
-      {/* Advanced Toggle */}
-      <div className="advanced-section">
-        <button
-          className="advanced-toggle"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          {showAdvanced ? '▼' : '▶'} Advanced (Manual Coordinates)
-        </button>
-        {showAdvanced && (
-          <div className="advanced-inputs">
-            <p className="advanced-hint">
-              Enter your ship's coordinates from the in-game map to override the calculated position.
-            </p>
-            <div className="coord-inputs">
-              <div className="form-group">
-                <label>r (Gm)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="e.g., 20.32"
-                  value={manualR}
-                  onChange={(e) => setManualR(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>θ (degrees)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  placeholder="e.g., -45"
-                  value={manualTheta}
-                  onChange={(e) => setManualTheta(e.target.value)}
-                />
-              </div>
-            </div>
-            {manualR && manualTheta && (
-              <button
-                className="clear-coords-btn"
-                onClick={() => {
-                  setManualR('');
-                  setManualTheta('');
-                }}
-              >
-                Clear Manual Coordinates
-              </button>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
