@@ -378,6 +378,8 @@
 .alternatives-list {
   background: var(--bg-medium);
   padding: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .alternative-item {
@@ -386,6 +388,8 @@
   gap: 0.75rem;
   padding: 0.5rem 0.75rem;
   border-radius: 4px;
+  white-space: nowrap;
+  min-width: max-content;
 }
 
 .alternative-item:hover {
@@ -456,6 +460,8 @@
   padding: 0.25rem 0.75rem 0.5rem;
   border-bottom: 1px solid var(--border);
   margin-bottom: 0.25rem;
+  white-space: nowrap;
+  min-width: max-content;
 }
 
 .alt-name-header {

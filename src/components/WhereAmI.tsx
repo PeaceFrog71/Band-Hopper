@@ -48,14 +48,6 @@ export function WhereAmI({
         <div className="form-group">
           <label htmlFor="distance-input">
             Distance (Gm)
-            <button
-              className="help-icon"
-              onClick={() => onShowHelpChange(true)}
-              type="button"
-              aria-label="How to find your coordinates"
-            >
-              ?
-            </button>
           </label>
           <div className="input-with-unit">
             <input

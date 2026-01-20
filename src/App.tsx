@@ -103,7 +103,14 @@ function App() {
         <div className="panel" style={{ display: activeTab === 'route' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Route Planner</h2>
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
+            <button
+              className="help-icon-header"
+              onClick={() => setShowHelp(true)}
+              type="button"
+              aria-label="Help"
+            >
+              ?
+            </button>
           </div>
           <p className="text-muted">Select your start, desired Halo band and target destination to calculate exit distances.</p>
           <RoutePlanner
@@ -120,7 +127,14 @@ function App() {
         <div className="panel" style={{ display: activeTab === 'whereami' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Where Am I?</h2>
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
+            <button
+              className="help-icon-header"
+              onClick={() => setShowWhereAmIHelp(true)}
+              type="button"
+              aria-label="How to find your coordinates"
+            >
+              ?
+            </button>
           </div>
           <p className="text-muted">Enter your coordinates from the star map to identify your position.</p>
           <WhereAmI
@@ -136,7 +150,14 @@ function App() {
         <div className="panel" style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Refinery Finder</h2>
-            <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
+            <button
+              className="help-icon-header"
+              onClick={() => setShowHelp(true)}
+              type="button"
+              aria-label="Help"
+            >
+              ?
+            </button>
           </div>
           <p className="text-muted">Find the best refinery based on your mined material and location.</p>
           <RefineryFinder
