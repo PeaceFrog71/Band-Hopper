@@ -520,7 +520,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Help Modal */
 .help-modal-overlay {
-  display: none;
+  display: flex;
   position: fixed;
   top: 0;
   left: 0;
@@ -571,15 +571,11 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-/* Mobile: Show help button and modal */
+/* Mobile: Show help button */
 @media (max-width: 480px) {
   .help-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-
-  .help-modal-overlay {
-    display: flex;
   }
 }
