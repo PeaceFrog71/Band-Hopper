@@ -158,10 +158,6 @@
   outline: none;
 }
 
-.sort-btn:focus {
-  outline: 2px solid var(--accent-cyan);
-  outline-offset: 2px;
-}
 
 .sort-btn:hover {
   background: var(--bg-light);

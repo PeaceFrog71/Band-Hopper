@@ -66,8 +66,8 @@ export function RoutePlanner({
   onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
-  const [bandSortBy, setBandSortBy] = useState<BandSortBy>('density');
-  const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('density');
+  const [bandSortBy, setBandSortBy] = useState<BandSortBy>('number');
+  const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('number');
   const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
   const [destTableCollapsed, setDestTableCollapsed] = useState(false);
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
