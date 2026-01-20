@@ -18,6 +18,7 @@ const DEFAULT_PRIMARY_MIX = 0.30;
 import './RefineryFinder.css';
 
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
+type PositionSource = 'route-planner' | 'where-am-i';
 
 // Default balance between distance and yield (0.5 = equal weight)
 const DEFAULT_DISTANCE_WEIGHT = 0.5;
@@ -39,19 +40,22 @@ interface RefineryFinderProps {
   startId: string;
   destinationId: string;
   selectedBandId: number | null;
+  // From Where Am I state (lifted to App)
+  whereAmIDistance: string;
+  whereAmIAngle: string;
 }
 
 export function RefineryFinder({
   startId,
   destinationId,
   selectedBandId,
+  whereAmIDistance,
+  whereAmIAngle,
 }: RefineryFinderProps) {
   const [selectedMaterial, setSelectedMaterial] = useState<string>('');
   const [secondaryMaterial, setSecondaryMaterial] = useState<string>('');
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('optimal');
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [manualR, setManualR] = useState<string>('');
-  const [manualTheta, setManualTheta] = useState<string>('');
+  const [positionSource, setPositionSource] = useState<PositionSource>('route-planner');
   const [distanceWeight, setDistanceWeight] = useState(DEFAULT_DISTANCE_WEIGHT);
   const [primaryMix, setPrimaryMix] = useState(DEFAULT_PRIMARY_MIX);
   const [showAlternatives, setShowAlternatives] = useState(false);
@@ -61,18 +65,19 @@ export function RefineryFinder({
   const primaryCargoWeight = primaryMix;
   const secondaryCargoWeight = 1 - primaryMix;
 
-  // Calculate user position from route + band
+  // Calculate user position based on selected source
   const userPosition = useMemo<PolarCoordinate | null>(() => {
-    // Check for manual coordinates first
-    if (showAdvanced && manualR && manualTheta) {
-      const r = parseFloat(manualR);
-      const theta = parseFloat(manualTheta);
-      if (!isNaN(r) && !isNaN(theta)) {
+    if (positionSource === 'where-am-i') {
+      // Use Where Am I coordinates
+      const r = parseFloat(whereAmIDistance);
+      const theta = parseFloat(whereAmIAngle);
+      if (!isNaN(r) && !isNaN(theta) && r > 0) {
         return { r, theta };
       }
+      return null;
     }
 
-    // Otherwise calculate from route
+    // Route Planner source - calculate from route
     if (!startId || !destinationId || selectedBandId === null) return null;
 
     const startCoords = getLocationCoordinates(startId);
@@ -85,7 +90,7 @@ export function RefineryFinder({
     const targetRadius = band.peakDensityDistance / 1_000_000;
 
     return interpolatePositionOnRoute(startCoords, destCoords, targetRadius);
-  }, [startId, destinationId, selectedBandId, showAdvanced, manualR, manualTheta]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
 
   // Get refinery recommendations based on mode
   const refineryResults = useMemo(() => {
@@ -207,12 +212,16 @@ export function RefineryFinder({
 
   // Get position description
   const positionDescription = useMemo(() => {
-    if (showAdvanced && manualR && manualTheta) {
-      return `Manual: r=${manualR} Gm, θ=${manualTheta}°`;
+    if (positionSource === 'where-am-i') {
+      if (whereAmIDistance && whereAmIAngle) {
+        return `From Where Am I: ${whereAmIDistance} Gm, ${whereAmIAngle}°`;
+      }
+      return 'Enter coordinates in Where Am I tab';
     }
 
+    // Route Planner source
     if (!startId || !destinationId || selectedBandId === null) {
-      return 'Select a route in Route Planner to calculate position';
+      return 'Select a route in Route Planner tab';
     }
 
     const startLoc = getLocationById(startId);
@@ -224,7 +233,7 @@ export function RefineryFinder({
     }
 
     return `${startLoc.shortName} → ${destLoc.shortName}, ${band.name}`;
-  }, [startId, destinationId, selectedBandId, showAdvanced, manualR, manualTheta]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
 
   // Group materials by rarity for dropdown (alphabetized within each group)
   const materialGroups = useMemo(() => {
@@ -264,17 +273,31 @@ export function RefineryFinder({
 
   return (
     <div className="refinery-finder">
+      {/* Position Source Selector */}
+      <div className="position-source">
+        <label className="position-source-label">Position From:</label>
+        <div className="source-toggle">
+          <button
+            className={`source-btn ${positionSource === 'route-planner' ? 'active' : ''}`}
+            onClick={() => setPositionSource('route-planner')}
+          >
+            Route Planner
+          </button>
+          <button
+            className={`source-btn ${positionSource === 'where-am-i' ? 'active' : ''}`}
+            onClick={() => setPositionSource('where-am-i')}
+          >
+            Where Am I?
+          </button>
+        </div>
+      </div>
+
       {/* Position Display */}
       <div className="position-display">
         <div className="position-label">Your Position</div>
         <div className={`position-value ${hasPosition ? '' : 'no-position'}`}>
           {positionDescription}
         </div>
-        {userPosition && (
-          <div className="position-coords">
-            r = {userPosition.r.toFixed(2)} Gm, θ = {userPosition.theta.toFixed(1)}°
-          </div>
-        )}
       </div>
 
       {/* Mode Toggle */}
@@ -525,55 +548,6 @@ export function RefineryFinder({
         </div>
       )}
 
-      {/* Advanced Toggle */}
-      <div className="advanced-section">
-        <button
-          className="advanced-toggle"
-          onClick={() => setShowAdvanced(!showAdvanced)}
-        >
-          {showAdvanced ? '▼' : '▶'} Advanced (Manual Coordinates)
-        </button>
-        {showAdvanced && (
-          <div className="advanced-inputs">
-            <p className="advanced-hint">
-              Enter your ship's coordinates from the in-game map to override the calculated position.
-            </p>
-            <div className="coord-inputs">
-              <div className="form-group">
-                <label>r (Gm)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="e.g., 20.32"
-                  value={manualR}
-                  onChange={(e) => setManualR(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>θ (degrees)</label>
-                <input
-                  type="number"
-                  step="0.1"
-                  placeholder="e.g., -45"
-                  value={manualTheta}
-                  onChange={(e) => setManualTheta(e.target.value)}
-                />
-              </div>
-            </div>
-            {manualR && manualTheta && (
-              <button
-                className="clear-coords-btn"
-                onClick={() => {
-                  setManualR('');
-                  setManualTheta('');
-                }}
-              >
-                Clear Manual Coordinates
-              </button>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

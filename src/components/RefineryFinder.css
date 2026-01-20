@@ -6,6 +6,51 @@
   gap: 1rem;
 }
 
+/* Position Source Selector */
+.position-source {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.position-source-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.source-toggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-dark);
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.source-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.source-btn:hover {
+  background: var(--bg-medium);
+  color: var(--text-primary);
+}
+
+.source-btn.active {
+  background: var(--accent-cyan);
+  color: var(--bg-dark);
+  font-weight: 600;
+}
+
 /* Position Display */
 .position-display {
   background: var(--bg-dark);
@@ -58,6 +103,7 @@
   border: none;
   border-radius: 6px;
   color: var(--text-secondary);
+  font-family: var(--font-body);
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -449,64 +495,6 @@
   transform: translateX(0);
 }
 
-/* Advanced Section */
-.advanced-section {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.advanced-toggle {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background: var(--bg-dark);
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.advanced-toggle:hover {
-  background: var(--bg-medium);
-  color: var(--text-secondary);
-}
-
-.advanced-inputs {
-  background: var(--bg-medium);
-  padding: 1rem;
-}
-
-.advanced-hint {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 1rem;
-}
-
-.coord-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.clear-coords-btn {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.clear-coords-btn:hover {
-  border-color: var(--warning);
-  color: var(--warning);
-}
-
 /* Material Warning */
 .material-warning {
   display: flex;
@@ -541,10 +529,6 @@
 
   .detail-value {
     font-size: 1rem;
-  }
-
-  .coord-inputs {
-    grid-template-columns: 1fr;
   }
 
   .material-selectors {

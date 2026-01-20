@@ -10,7 +10,7 @@ const version = __APP_VERSION__
 // Help text for each tab
 const helpText: Record<string, string> = {
   route: 'Select your start, desired Halo band and target destination to calculate exit distances.',
-  whereami: 'Enter your distance to Stanton to identify which Aaron Halo band you\'re in.',
+  whereami: 'Enter your coordinates from the star map to identify your position in the Aaron Halo.',
   refinery: 'Find the best refinery based on your mined material and location.'
 }
 
@@ -22,6 +22,11 @@ function App() {
   const [startId, setStartId] = useState<string>('')
   const [destinationId, setDestinationId] = useState<string>('')
   const [selectedBandId, setSelectedBandId] = useState<number | null>(null)
+
+  // Lifted Where Am I state - used by both WhereAmI and RefineryFinder
+  const [whereAmIDistance, setWhereAmIDistance] = useState<string>('')
+  const [whereAmIAngle, setWhereAmIAngle] = useState<string>('')
+  const [showWhereAmIHelp, setShowWhereAmIHelp] = useState(false)
 
   // Swap start and destination
   const handleSwapRoute = () => {
@@ -117,8 +122,15 @@ function App() {
             <h2>Where Am I?</h2>
             <button className="help-btn" onClick={() => setShowHelp(true)} aria-label="Help">?</button>
           </div>
-          <p className="text-muted">Enter your distance to Stanton to identify which Aaron Halo band you're in.</p>
-          <WhereAmI />
+          <p className="text-muted">Enter your coordinates from the star map to identify your position.</p>
+          <WhereAmI
+            distanceGm={whereAmIDistance}
+            angleTheta={whereAmIAngle}
+            showHelp={showWhereAmIHelp}
+            onDistanceChange={setWhereAmIDistance}
+            onAngleChange={setWhereAmIAngle}
+            onShowHelpChange={setShowWhereAmIHelp}
+          />
         </div>
 
         <div className="panel" style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
@@ -131,6 +143,8 @@ function App() {
             startId={startId}
             destinationId={destinationId}
             selectedBandId={selectedBandId}
+            whereAmIDistance={whereAmIDistance}
+            whereAmIAngle={whereAmIAngle}
           />
         </div>
 

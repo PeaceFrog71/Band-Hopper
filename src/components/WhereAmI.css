@@ -166,6 +166,72 @@
   color: var(--accent-cyan);
 }
 
+/* Coordinate Inputs - side by side */
+.coordinate-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Larger help modal for screenshot */
+.help-modal-large {
+  max-width: 600px;
+}
+
+.help-screenshot {
+  margin: 1rem 0;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: zoom-in;
+  position: relative;
+}
+
+.help-screenshot img {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.3s ease, transform-origin 0.3s ease;
+}
+
+/* Hover to zoom into bottom where coordinates are */
+.help-screenshot:hover img {
+  transform: scale(2.5);
+  transform-origin: 15% 100%; /* Bottom, slightly right to include distance label */
+}
+
+.help-screenshot::after {
+  content: '🔍 Hover to zoom';
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--text-secondary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.help-screenshot:hover::after {
+  opacity: 0;
+}
+
+.help-note {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background: var(--bg-medium);
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.help-note strong {
+  color: var(--accent-cyan);
+}
+
 /* Input with unit */
 .input-with-unit {
   display: flex;
@@ -324,10 +390,18 @@
 
 /* Mobile adjustments */
 @media (max-width: 599px) {
+  .coordinate-inputs {
+    grid-template-columns: 1fr;
+  }
+
   .help-modal {
     padding: 1.5rem;
     width: 95%;
     max-height: 90vh;
+  }
+
+  .help-modal-large {
+    max-width: 95%;
   }
 
   .help-modal h2 {
