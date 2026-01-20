@@ -537,8 +537,19 @@ export function RoutePlanner({
                     </button>
                     <span
                       className="sort-info-icon"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Show sort information"
                       onClick={() => setShowSortInfo(!showSortInfo)}
-                    >ⓘ</span>
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setShowSortInfo(!showSortInfo);
+                        }
+                      }}
+                    >
+                      ⓘ
+                    </span>
                     {showSortInfo && (
                       <div className="sort-info-popup">
                         <div className="sort-info-content">
