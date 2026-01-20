@@ -388,7 +388,16 @@ export function RoutePlanner({
                   </button>
                   <span
                     className="sort-info-icon"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Show sort information"
                     onClick={() => setShowSortInfo(!showSortInfo)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setShowSortInfo(!showSortInfo);
+                      }
+                    }}
                   >ⓘ</span>
                   {showSortInfo && (
                     <div
@@ -400,9 +409,9 @@ export function RoutePlanner({
                         onClick={(e) => e.stopPropagation()}
                       >
                         <div className="sort-info-content">
-                          <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by the bands number 1-10.</div>
-                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration (%max D).</div>
-                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Percentage of max density times band volume (%max D/m³).</div>
+                          <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
+                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
+                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
                         </div>
                         <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
                       </div>
@@ -562,8 +571,8 @@ export function RoutePlanner({
                       <div className="sort-info-popup">
                         <div className="sort-info-content">
                           <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
-                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration (%max D).</div>
-                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Percentage of max density times band volume (%max D/m³).</div>
+                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
+                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
                         </div>
                         <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
                       </div>

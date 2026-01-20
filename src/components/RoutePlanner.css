@@ -159,8 +159,8 @@
 }
 
 .sort-btn:focus {
-  outline: none;
-  box-shadow: none;
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
 }
 
 .sort-btn:hover {
@@ -717,6 +717,14 @@
 .sort-info-icon:hover {
   opacity: 1;
   color: var(--accent-cyan);
+}
+
+.sort-info-icon:focus {
+  opacity: 1;
+  color: var(--accent-cyan);
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 /* Sort Info Popup */
