@@ -70,7 +70,7 @@ export const BANDS: AaronHaloBand[] = [
     peakDensityDistance: 20_320_000,
     relativeDensity: 1.00,
     miningOpportunity: 1.00,
-    description: 'Highest density - peak asteroid concentration'
+    description: 'Peak density and best overall mining opportunity'
   },
   {
     id: 6,
@@ -90,7 +90,7 @@ export const BANDS: AaronHaloBand[] = [
     peakDensityDistance: 20_962_000,
     relativeDensity: 0.36,
     miningOpportunity: 0.70,
-    description: 'Wide band - best for sustained mining'
+    description: 'Widest band with excellent mining density'
   },
   {
     id: 8,

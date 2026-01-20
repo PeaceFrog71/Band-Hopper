@@ -400,14 +400,9 @@ export function RoutePlanner({
                     }}
                   >ⓘ</span>
                   {showSortInfo && (
-                    <div
-                      className="sort-info-overlay"
-                      onClick={() => setShowSortInfo(false)}
-                    >
-                      <div
-                        className="sort-info-popup"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                    <>
+                      <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                      <div className="sort-info-popup">
                         <div className="sort-info-content">
                           <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
                           <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
@@ -415,7 +410,7 @@ export function RoutePlanner({
                         </div>
                         <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
                       </div>
-                    </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -568,14 +563,17 @@ export function RoutePlanner({
                       ⓘ
                     </span>
                     {showSortInfo && (
-                      <div className="sort-info-popup">
-                        <div className="sort-info-content">
-                          <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
-                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
-                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                      <>
+                        <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                        <div className="sort-info-popup">
+                          <div className="sort-info-content">
+                            <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
+                            <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
+                            <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                          </div>
+                          <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
                         </div>
-                        <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
-                      </div>
+                      </>
                     )}
                   </div>
                 )}
