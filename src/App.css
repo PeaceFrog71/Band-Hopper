@@ -491,6 +491,33 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--bg-dark);
 }
 
+/* Help Icon - Header style (Where Am I?) */
+.help-icon-header {
+  background: transparent;
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: bold;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.help-icon-header:hover {
+  background: var(--accent-cyan);
+  color: var(--bg-dark);
+  box-shadow: 0 0 8px rgba(0, 217, 255, 0.5);
+}
+
 /* Help Modal */
 .help-modal-overlay {
   display: none;

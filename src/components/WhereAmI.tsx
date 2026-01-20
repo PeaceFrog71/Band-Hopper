@@ -1,28 +1,40 @@
 // Where Am I Component
 // Helps users identify their position in the Aaron Halo
 
-import { useState } from 'react';
+import { useMemo } from 'react';
 import { analyzePosition } from '../utils/calculator';
 import './WhereAmI.css';
 
-export function WhereAmI() {
-  const [distanceGm, setDistanceGm] = useState<string>('');
-  const [result, setResult] = useState<ReturnType<typeof analyzePosition> | null>(null);
-  const [showHelp, setShowHelp] = useState(false);
+// Import the help screenshot
+import helpScreenshot from '../../ref data/Where Am I Help Screen.png';
 
-  const handleDistanceChange = (value: string) => {
-    setDistanceGm(value);
+interface WhereAmIProps {
+  distanceGm: string;
+  angleTheta: string;
+  showHelp: boolean;
+  onDistanceChange: (value: string) => void;
+  onAngleChange: (value: string) => void;
+  onShowHelpChange: (show: boolean) => void;
+}
 
-    const gm = parseFloat(value);
+export function WhereAmI({
+  distanceGm,
+  angleTheta,
+  showHelp,
+  onDistanceChange,
+  onAngleChange,
+  onShowHelpChange,
+}: WhereAmIProps) {
+  // Analyze position based on distance
+  const result = useMemo(() => {
+    const gm = parseFloat(distanceGm);
     if (!isNaN(gm) && gm > 0) {
       // Convert Gm to km (1 Gm = 1,000,000 km)
       const km = gm * 1_000_000;
-      const analysis = analyzePosition(km);
-      setResult(analysis);
-    } else {
-      setResult(null);
+      return analyzePosition(km);
     }
-  };
+    return null;
+  }, [distanceGm]);
 
   const formatDensity = (density: number): string => {
     return `${Math.round(density * 100)}%`;
@@ -31,51 +43,66 @@ export function WhereAmI() {
   return (
     <div className="where-am-i">
 
-      {/* Input */}
-      <div className="form-group">
-        <label htmlFor="distance-input">
-          Distance to Stanton (Gm)
-          <button
-            className="help-icon"
-            onClick={() => setShowHelp(true)}
-            type="button"
-            aria-label="How to find your distance"
-          >
-            ?
-          </button>
-        </label>
-        <div className="input-with-unit">
-          <input
-            id="distance-input"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="e.g., 20.32"
-            value={distanceGm}
-            onChange={(e) => handleDistanceChange(e.target.value)}
-          />
-          <span className="unit">Gm</span>
-        </div>
-        <div className="input-hint">
-          Aaron Halo bands are between ~19.7 and ~21.3 Gm from Stanton
+      {/* Coordinate Inputs */}
+      <div className="coordinate-inputs">
+        <div className="form-group">
+          <label htmlFor="distance-input">
+            Distance (Gm)
+          </label>
+          <div className="input-with-unit">
+            <input
+              id="distance-input"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="e.g., 20.32"
+              value={distanceGm}
+              onChange={(e) => onDistanceChange(e.target.value)}
+            />
+            <span className="unit">Gm</span>
+          </div>
         </div>
 
+        <div className="form-group">
+          <label htmlFor="angle-input">
+            Angle (°)
+          </label>
+          <div className="input-with-unit">
+            <input
+              id="angle-input"
+              type="number"
+              step="0.1"
+              placeholder="e.g., -49.99"
+              value={angleTheta}
+              onChange={(e) => onAngleChange(e.target.value)}
+            />
+            <span className="unit">°</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="input-hint">
+        Aaron Halo bands are between ~19.7 and ~21.3 Gm from Stanton
       </div>
 
       {/* Help Modal */}
       {showHelp && (
-        <div className="help-overlay" onClick={() => setShowHelp(false)}>
-          <div className="help-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="close-button" onClick={() => setShowHelp(false)}>×</button>
-            <h2>How to Find Your Distance</h2>
+        <div className="help-overlay" onClick={() => onShowHelpChange(false)}>
+          <div className="help-modal help-modal-large" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={() => onShowHelpChange(false)}>×</button>
+            <h2>How to Find Your Coordinates</h2>
             <div className="help-section">
               <ol className="help-steps">
                 <li>Open the Star Map (<kbd>F2</kbd>)</li>
-                <li>Scroll out to see the full system</li>
-                <li>Click on <strong>Stanton</strong> (the star)</li>
-                <li>Click <strong>Set Route</strong></li>
-                <li>Your distance to Stanton appears in the route panel (in Gm)</li>
+                <li>Your coordinates are shown at the bottom of the screen</li>
               </ol>
+              <div className="help-screenshot">
+                <img src={helpScreenshot} alt="Screenshot showing coordinate location in Star Citizen" />
+              </div>
+              <p className="help-note">
+                You'll see three values at the bottom. Use the <strong>second angle</strong> (e.g., -49.99°)
+                and the <strong>distance</strong> (e.g., 31.81 Gm). The first angle (usually close to 0°) can be ignored.
+              </p>
             </div>
           </div>
         </div>
@@ -151,7 +178,7 @@ export function WhereAmI() {
       {/* Empty state */}
       {!result && distanceGm === '' && (
         <div className="empty-state">
-          Enter your distance to Stanton to identify your position
+          Enter your coordinates to identify your position in the Aaron Halo
         </div>
       )}
     </div>
