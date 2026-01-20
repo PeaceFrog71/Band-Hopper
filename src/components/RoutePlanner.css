@@ -155,6 +155,12 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s ease;
+  outline: none;
+}
+
+.sort-btn:focus {
+  outline: none;
+  box-shadow: none;
 }
 
 .sort-btn:hover {
@@ -162,9 +168,9 @@
 }
 
 .sort-btn.active {
-  background: var(--accent-blue);
-  border-color: var(--accent-blue);
-  color: var(--bg-dark);
+  background: var(--bg-medium);
+  border-color: var(--border);
+  color: inherit;
 }
 
 .band-header {
@@ -410,6 +416,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  outline: none;
 }
 
 .sort-btn:hover {
@@ -418,7 +425,7 @@
 
 .sort-btn.active {
   background: var(--bg-medium);
-  color: var(--accent-cyan);
+  color: inherit;
 }
 
 /* Band Selector Grid */
@@ -712,18 +719,99 @@
   color: var(--accent-cyan);
 }
 
-/* Color-coded Labels */
+/* Sort Info Popup */
+.sort-info-popup {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  z-index: 100;
+  min-width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+
+/* Bright colors in popup */
+.sort-info-popup .number-label {
+  color: #ffffff;
+}
+
+.sort-info-popup .density-label {
+  color: #00ff88;
+}
+
+.sort-info-popup .opportunity-label {
+  color: #ff00cc;
+}
+
+.sort-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sort-info-row {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.sort-info-row .number-label,
+.sort-info-row .density-label,
+.sort-info-row .opportunity-label {
+  font-weight: 600;
+}
+
+.sort-info-close {
+  width: 100%;
+  padding: 8px;
+  background: var(--bg-medium);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-info-close:hover {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+/* Make sort-toggle relative for popup positioning */
+.sort-toggle,
+.band-sort-toggle {
+  position: relative;
+}
+
+/* Color-coded Labels - Muted when inactive, bright when active */
+.number-label {
+  color: #666666;  /* Muted grey */
+}
+
 .density-label {
-  color: #00ff88;  /* Bright green */
+  color: #336644;  /* Dark muted green */
 }
 
 .opportunity-label {
-  color: #ff00cc;  /* Bright pink */
+  color: #663366;  /* Dark muted pink */
 }
 
-.sort-btn.active .density-label,
+.sort-btn.active .number-label {
+  color: #ffffff;  /* Bright white when selected */
+}
+
+.sort-btn.active .density-label {
+  color: #00ff88;  /* Bright green when selected */
+}
+
 .sort-btn.active .opportunity-label {
-  color: var(--bg-dark);  /* Dark when button is active */
+  color: #ff00cc;  /* Bright pink when selected */
 }
 
 /* Legend D / M colors */
