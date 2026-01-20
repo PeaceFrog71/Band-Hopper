@@ -44,7 +44,7 @@ function LocationTip({ startLocation, destLocation }: { startLocation: StantonLo
 }
 
 type PlannerMode = 'destination' | 'band';
-type BandSortBy = 'number' | 'density';
+type BandSortBy = 'number' | 'density' | 'opportunity';
 
 interface RoutePlannerProps {
   startId: string;
@@ -66,12 +66,13 @@ export function RoutePlanner({
   onSwapRoute
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
-  const [bandSortBy, setBandSortBy] = useState<BandSortBy>('density');
-  const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('density');
+  const [bandSortBy, setBandSortBy] = useState<BandSortBy>('number');
+  const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('number');
   const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
   const [destTableCollapsed, setDestTableCollapsed] = useState(false);
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
   const [bandSelectorCollapsed, setBandSelectorCollapsed] = useState(false);
+  const [showSortInfo, setShowSortInfo] = useState(false);
 
   // Get available start locations grouped by planet
   const groupedStarts = useMemo(() => {
@@ -100,10 +101,15 @@ export function RoutePlanner({
       const widthData = withWidths.find(w => w.bandId === band.id);
       return { band, exit, exitWidth: widthData?.exitWidth ?? 0 };
     });
-    if (destModeSortBy === 'density') {
-      return details.sort((a, b) => b.band.relativeDensity - a.band.relativeDensity);
+    switch (destModeSortBy) {
+      case 'density':
+        return details.sort((a, b) => b.band.relativeDensity - a.band.relativeDensity);
+      case 'opportunity':
+        return details.sort((a, b) => b.band.miningOpportunity - a.band.miningOpportunity);
+      case 'number':
+      default:
+        return details.sort((a, b) => a.band.id - b.band.id);
     }
-    return details.sort((a, b) => a.band.id - b.band.id);
   }, [routeData, destModeSortBy]);
 
   // Get selected band data for destination mode result display
@@ -123,10 +129,15 @@ export function RoutePlanner({
 
   // Get sorted bands for selector
   const sortedBands = useMemo(() => {
-    if (bandSortBy === 'density') {
-      return [...BANDS].sort((a, b) => b.relativeDensity - a.relativeDensity);
+    switch (bandSortBy) {
+      case 'density':
+        return [...BANDS].sort((a, b) => b.relativeDensity - a.relativeDensity);
+      case 'opportunity':
+        return [...BANDS].sort((a, b) => b.miningOpportunity - a.miningOpportunity);
+      case 'number':
+      default:
+        return BANDS;
     }
-    return BANDS;
   }, [bandSortBy]);
 
   // Check if route can be swapped (reverse route exists)
@@ -358,23 +369,61 @@ export function RoutePlanner({
                 <div className="sort-toggle">
                   <span className="sort-label">Sort:</span>
                   <button
-                    className={`sort-btn ${destModeSortBy === 'density' ? 'active' : ''}`}
-                    onClick={() => setDestModeSortBy('density')}
-                  >
-                    Density
-                  </button>
-                  <button
                     className={`sort-btn ${destModeSortBy === 'number' ? 'active' : ''}`}
                     onClick={() => setDestModeSortBy('number')}
                   >
-                    Band #
+                    <span className="number-label">Band #</span>
                   </button>
+                  <button
+                    className={`sort-btn ${destModeSortBy === 'density' ? 'active' : ''}`}
+                    onClick={() => setDestModeSortBy('density')}
+                  >
+                    <span className="density-label">Density</span>
+                  </button>
+                  <button
+                    className={`sort-btn ${destModeSortBy === 'opportunity' ? 'active' : ''}`}
+                    onClick={() => setDestModeSortBy('opportunity')}
+                  >
+                    <span className="opportunity-label">Mining Opp.</span>
+                  </button>
+                  <span
+                    className="sort-info-icon"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Show sort information"
+                    onClick={() => setShowSortInfo(!showSortInfo)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setShowSortInfo(!showSortInfo);
+                      }
+                    }}
+                  >ⓘ</span>
+                  {showSortInfo && (
+                    <>
+                      <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                      <div className="sort-info-popup">
+                        <div className="sort-info-content">
+                          <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
+                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
+                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                        </div>
+                        <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="band-header">
                 <span className="band-col-name">Band</span>
                 <span className="band-col-dest">Exit at Distance</span>
-                <span className="band-col-density">Density</span>
+                <span className="band-col-density">
+                  {destModeSortBy === 'opportunity' ? (
+                    <><span className="legend-m">MO</span> / <span className="legend-d">D</span></>
+                  ) : (
+                    <><span className="legend-d">D</span> / <span className="legend-m">MO</span></>
+                  )}
+                </span>
               </div>
               {sortedBandDetails.map(({ band, exit }) => (
                 <div
@@ -385,7 +434,31 @@ export function RoutePlanner({
                   <span className="band-col-name">{band.name}</span>
                   <span className="band-col-dest">{formatDistance(exit.distanceToDestination)}</span>
                   <span className="band-col-density">
-                    <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                    <div className="dual-bars">
+                      {destModeSortBy === 'opportunity' ? (
+                        <>
+                          <div className="bar-row">
+                            <span className="bar-label">MO</span>
+                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                          </div>
+                          <div className="bar-row">
+                            <span className="bar-label">D</span>
+                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bar-row">
+                            <span className="bar-label">D</span>
+                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                          </div>
+                          <div className="bar-row">
+                            <span className="bar-label">MO</span>
+                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                          </div>
+                        </>
+                      )}
+                    </div>
                   </span>
                 </div>
               ))}
@@ -457,17 +530,51 @@ export function RoutePlanner({
                 {!bandSelectorCollapsed && (
                   <div className="band-sort-toggle">
                     <button
-                      className={`sort-btn ${bandSortBy === 'density' ? 'active' : ''}`}
-                      onClick={() => setBandSortBy('density')}
-                    >
-                      By Density
-                    </button>
-                    <button
                       className={`sort-btn ${bandSortBy === 'number' ? 'active' : ''}`}
                       onClick={() => setBandSortBy('number')}
                     >
-                      By Number
+                      <span className="number-label">Band #</span>
                     </button>
+                    <button
+                      className={`sort-btn ${bandSortBy === 'density' ? 'active' : ''}`}
+                      onClick={() => setBandSortBy('density')}
+                    >
+                      <span className="density-label">Density</span>
+                    </button>
+                    <button
+                      className={`sort-btn ${bandSortBy === 'opportunity' ? 'active' : ''}`}
+                      onClick={() => setBandSortBy('opportunity')}
+                    >
+                      <span className="opportunity-label">Mining Opp.</span>
+                    </button>
+                    <span
+                      className="sort-info-icon"
+                      role="button"
+                      tabIndex={0}
+                      aria-label="Show sort information"
+                      onClick={() => setShowSortInfo(!showSortInfo)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setShowSortInfo(!showSortInfo);
+                        }
+                      }}
+                    >
+                      ⓘ
+                    </span>
+                    {showSortInfo && (
+                      <>
+                        <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                        <div className="sort-info-popup">
+                          <div className="sort-info-content">
+                            <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
+                            <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
+                            <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                          </div>
+                          <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -480,7 +587,31 @@ export function RoutePlanner({
                     onClick={() => handleBandSelect(band.id)}
                   >
                     <span className="band-select-name">{band.name}</span>
-                    <span className="band-select-density">{Math.round(band.relativeDensity * 100)}%</span>
+                    <div className="band-select-bars">
+                      {bandSortBy === 'opportunity' ? (
+                        <>
+                          <div className="bar-row">
+                            <span className="bar-label">MO</span>
+                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                          </div>
+                          <div className="bar-row">
+                            <span className="bar-label">D</span>
+                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="bar-row">
+                            <span className="bar-label">D</span>
+                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                          </div>
+                          <div className="bar-row">
+                            <span className="bar-label">MO</span>
+                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                          </div>
+                        </>
+                      )}
+                    </div>
                     {bandSelectorCollapsed && selectedBandId === band.id && (
                       <span className="band-select-hint">Tap to change</span>
                     )}

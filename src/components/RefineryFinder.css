@@ -411,6 +411,28 @@
   color: var(--warning);
 }
 
+/* Material Warning */
+.material-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 170, 0, 0.15);
+  border: 1px solid var(--warning);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--warning);
+}
+
+.material-warning strong {
+  color: var(--warning);
+}
+
+.warning-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
 /* Mobile Responsive */
 @media (max-width: 480px) {
   .result-name {
