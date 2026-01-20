@@ -166,14 +166,16 @@ export function RefineryFinder({
     return `${startLoc.shortName} → ${destLoc.shortName}, ${band.name}`;
   }, [startId, destinationId, selectedBandId, showAdvanced, manualR, manualTheta]);
 
-  // Group materials by rarity for dropdown
+  // Group materials by rarity for dropdown (alphabetized within each group)
   const materialGroups = useMemo(() => {
-    const sorted = getMaterialsByValue();
-    const groups: { rarity: string; materials: typeof sorted }[] = [
-      { rarity: 'Very Rare', materials: sorted.filter(m => m.rarity === 'very-rare') },
-      { rarity: 'Rare', materials: sorted.filter(m => m.rarity === 'rare') },
-      { rarity: 'Uncommon', materials: sorted.filter(m => m.rarity === 'uncommon') },
-      { rarity: 'Common', materials: sorted.filter(m => m.rarity === 'common') },
+    const materials = getMaterialsByValue();
+    const sortAlpha = (arr: typeof materials) =>
+      [...arr].sort((a, b) => a.name.localeCompare(b.name));
+    const groups: { rarity: string; materials: typeof materials }[] = [
+      { rarity: 'Very Rare', materials: sortAlpha(materials.filter(m => m.rarity === 'very-rare')) },
+      { rarity: 'Rare', materials: sortAlpha(materials.filter(m => m.rarity === 'rare')) },
+      { rarity: 'Uncommon', materials: sortAlpha(materials.filter(m => m.rarity === 'uncommon')) },
+      { rarity: 'Common', materials: sortAlpha(materials.filter(m => m.rarity === 'common')) },
     ];
     return groups.filter(g => g.materials.length > 0);
   }, []);
@@ -285,6 +287,14 @@ export function RefineryFinder({
             />
             <span className="slider-label">Distance</span>
           </div>
+        </div>
+      )}
+
+      {/* Laranite Warning */}
+      {selectedMaterial === 'laranite' && (
+        <div className="material-warning">
+          <span className="warning-icon">⚠</span>
+          <span><strong>WARNING:</strong> Laranite is for Losers!!!</span>
         </div>
       )}
 
