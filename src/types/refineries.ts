@@ -350,24 +350,45 @@ export function findClosestRefineryByPosition(
   return results.sort((a, b) => a.distanceGm - b.distanceGm);
 }
 
-// Weight for dual material calculations (50/50 split assumption)
-const DUAL_MATERIAL_WEIGHT = 0.5;
+// Cargo composition weights for value calculations
+// Default: 30% primary (high-value target), 70% secondary (bulk)
+const PRIMARY_CARGO_WEIGHT = 0.30;
+const SECONDARY_CARGO_WEIGHT = 0.70;
+
+// Default distance weight for optimal mode (0.5 = equal weight to distance vs yield)
+const DEFAULT_DISTANCE_WEIGHT = 0.5;
+
+/**
+ * Calculate distance score using step-based thresholds
+ * Closer refineries get higher scores with clear comfort zones
+ */
+function getDistanceScore(distanceGm: number): number {
+  if (distanceGm < 15) return 1.0;   // Excellent - very close
+  if (distanceGm < 30) return 0.85;  // Good - comfortable range
+  if (distanceGm < 45) return 0.6;   // Acceptable - moderate travel
+  if (distanceGm < 60) return 0.35;  // Far - significant travel time
+  return 0.15;                        // Very far - only if yield is exceptional
+}
 
 /**
  * Find optimal refinery considering both distance and yield bonus
  * Uses polar coordinates for accurate distance calculation
- * Value-weighted scoring uses 50/50 split assumption for primary/secondary
+ * Value-weighted scoring uses configurable cargo split
  *
  * @param userPosition - User's position in polar coordinates
  * @param materialId - Primary material being refined
  * @param distanceWeight - How much to weight distance vs yield (0 = only yield, 1 = only distance)
  * @param secondaryMaterialId - Optional secondary material to include in yield calculation
+ * @param primaryCargoWeight - Weight of primary material in cargo (default 0.30)
+ * @param secondaryCargoWeight - Weight of secondary material in cargo (default 0.50)
  */
 export function findOptimalRefinery(
   userPosition: PolarCoordinate,
   materialId: string,
-  distanceWeight: number = DUAL_MATERIAL_WEIGHT,
-  secondaryMaterialId?: string
+  distanceWeight: number = DEFAULT_DISTANCE_WEIGHT,
+  secondaryMaterialId?: string,
+  primaryCargoWeight: number = PRIMARY_CARGO_WEIGHT,
+  secondaryCargoWeight: number = SECONDARY_CARGO_WEIGHT
 ): {
   refinery: Refinery;
   location: StantonLocation;
@@ -378,7 +399,7 @@ export function findOptimalRefinery(
   combinedYieldPercent: number;
   primaryValueImpact: number;      // aUEC/SCU impact from primary yield
   secondaryValueImpact: number;    // aUEC/SCU impact from secondary yield
-  combinedValueImpact: number;     // Total aUEC/SCU impact (weighted 50/50)
+  combinedValueImpact: number;     // Total aUEC/SCU impact (weighted 30/50 cargo mix)
 }[] {
   // Get material base values for value-weighted scoring
   const primaryMaterial = getMaterialById(materialId);
@@ -386,9 +407,9 @@ export function findOptimalRefinery(
   const primaryBaseValue = primaryMaterial?.baseValue || 0;
   const secondaryBaseValue = secondaryMaterial?.baseValue || 0;
 
-  // 50/50 split assumption: each material contributes half of the load
-  const primaryWeight = secondaryMaterialId ? DUAL_MATERIAL_WEIGHT : 1.0;
-  const secondaryWeight = secondaryMaterialId ? DUAL_MATERIAL_WEIGHT : 0;
+  // Use passed cargo weights, or 100% primary if no secondary material
+  const primaryWeight = secondaryMaterialId ? primaryCargoWeight : 1.0;
+  const secondaryWeight = secondaryMaterialId ? secondaryCargoWeight : 0;
 
   const results: {
     refinery: Refinery;
@@ -405,7 +426,6 @@ export function findOptimalRefinery(
 
   // First pass: calculate distances and find value impact range
   const distances: { refinery: Refinery; location: StantonLocation; distanceGm: number }[] = [];
-  let maxDistance = 0;
   let maxValueImpact = -Infinity;
   let minValueImpact = Infinity;
 
@@ -418,8 +438,6 @@ export function findOptimalRefinery(
 
     const distanceGm = calculateDistance(userPosition, refineryCoords);
     distances.push({ refinery, location, distanceGm });
-
-    if (distanceGm > maxDistance) maxDistance = distanceGm;
 
     // Calculate value-weighted impact for scoring
     const primaryYield = refinery.yieldBonuses[materialId] || 0;
@@ -445,12 +463,11 @@ export function findOptimalRefinery(
     // Calculate aUEC/SCU value impacts
     const primaryValueImpact = (yieldPercent / 100) * primaryBaseValue;
     const secondaryValueImpact = (secondaryYieldPercent / 100) * secondaryBaseValue;
-    // Combined uses 50/50 weighting
+    // Combined uses 30/50 cargo weighting (30% primary, 50% secondary)
     const combinedValueImpact = (primaryValueImpact * primaryWeight) + (secondaryValueImpact * secondaryWeight);
 
-    // Normalize distance (0 = closest, 1 = farthest)
-    const normalizedDistance = maxDistance > 0 ? distanceGm / maxDistance : 0;
-    const distanceScore = 1 - normalizedDistance; // Higher is better (closer)
+    // Distance score using absolute thresholds (not relative to other refineries)
+    const distanceScore = getDistanceScore(distanceGm);
 
     // Normalize value impact (0 to 1 range, higher is better)
     const normalizedValue = (combinedValueImpact - minValueImpact) / valueRange;
