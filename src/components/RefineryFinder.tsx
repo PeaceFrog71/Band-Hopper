@@ -18,7 +18,7 @@ const DEFAULT_PRIMARY_MIX = 0.30;
 import './RefineryFinder.css';
 
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
-type PositionSource = 'route-planner' | 'where-am-i';
+type PositionSource = 'route-planner' | 'where-am-i' | 'manual';
 
 // Default balance between distance and yield (0.5 = equal weight)
 const DEFAULT_DISTANCE_WEIGHT = 0.5;
@@ -60,6 +60,8 @@ export function RefineryFinder({
   const [primaryMix, setPrimaryMix] = useState(DEFAULT_PRIMARY_MIX);
   const [showAlternatives, setShowAlternatives] = useState(false);
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null);
+  const [manualDistance, setManualDistance] = useState<string>('');
+  const [manualAngle, setManualAngle] = useState<string>('');
 
   // Calculate actual cargo weights from slider (100% scale, no inert)
   const primaryCargoWeight = primaryMix;
@@ -67,6 +69,16 @@ export function RefineryFinder({
 
   // Calculate user position based on selected source
   const userPosition = useMemo<PolarCoordinate | null>(() => {
+    if (positionSource === 'manual') {
+      // Use manual input coordinates
+      const r = parseFloat(manualDistance);
+      const theta = parseFloat(manualAngle);
+      if (!isNaN(r) && !isNaN(theta) && r > 0) {
+        return { r, theta };
+      }
+      return null;
+    }
+
     if (positionSource === 'where-am-i') {
       // Use Where Am I coordinates
       const r = parseFloat(whereAmIDistance);
@@ -90,7 +102,7 @@ export function RefineryFinder({
     const targetRadius = band.peakDensityDistance / 1_000_000;
 
     return interpolatePositionOnRoute(startCoords, destCoords, targetRadius);
-  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle, manualDistance, manualAngle]);
 
   // Get refinery recommendations based on mode
   const refineryResults = useMemo(() => {
@@ -212,6 +224,13 @@ export function RefineryFinder({
 
   // Get position description
   const positionDescription = useMemo(() => {
+    if (positionSource === 'manual') {
+      if (manualDistance && manualAngle) {
+        return `${manualDistance} Gm, ${manualAngle}°`;
+      }
+      return 'Enter your position below';
+    }
+
     if (positionSource === 'where-am-i') {
       if (whereAmIDistance && whereAmIAngle) {
         return `From Where Am I: ${whereAmIDistance} Gm, ${whereAmIAngle}°`;
@@ -233,7 +252,7 @@ export function RefineryFinder({
     }
 
     return `${startLoc.shortName} → ${destLoc.shortName}, ${band.name}`;
-  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle]);
+  }, [positionSource, startId, destinationId, selectedBandId, whereAmIDistance, whereAmIAngle, manualDistance, manualAngle]);
 
   // Group materials by rarity for dropdown (alphabetized within each group)
   const materialGroups = useMemo(() => {
@@ -289,16 +308,55 @@ export function RefineryFinder({
           >
             Where Am I?
           </button>
+          <button
+            className={`source-btn ${positionSource === 'manual' ? 'active' : ''}`}
+            onClick={() => setPositionSource('manual')}
+          >
+            Manual
+          </button>
         </div>
       </div>
 
-      {/* Position Display */}
-      <div className="position-display">
-        <div className="position-label">Your Position</div>
-        <div className={`position-value ${hasPosition ? '' : 'no-position'}`}>
-          {positionDescription}
+      {/* Manual Position Input (shown when manual source selected) */}
+      {positionSource === 'manual' && (
+        <div className="manual-position-inputs">
+          <div className="manual-input-group">
+            <label htmlFor="manual-distance">Distance (Gm)</label>
+            <input
+              id="manual-distance"
+              type="number"
+              inputMode="decimal"
+              placeholder="e.g. 20.32"
+              value={manualDistance}
+              onChange={(e) => setManualDistance(e.target.value)}
+              min="0"
+              step="0.01"
+            />
+          </div>
+          <div className="manual-input-group">
+            <label htmlFor="manual-angle">Angle (°)</label>
+            <input
+              id="manual-angle"
+              type="number"
+              inputMode="decimal"
+              placeholder="e.g. -50"
+              value={manualAngle}
+              onChange={(e) => setManualAngle(e.target.value)}
+              step="0.1"
+            />
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Position Display (hidden for manual entry since inputs are above) */}
+      {positionSource !== 'manual' && (
+        <div className="position-display">
+          <div className="position-label">Your Position</div>
+          <div className={`position-value ${hasPosition ? '' : 'no-position'}`}>
+            {positionDescription}
+          </div>
+        </div>
+      )}
 
       {/* Mode Toggle */}
       <div className="mode-toggle">
@@ -512,7 +570,7 @@ export function RefineryFinder({
                   {hasPosition && <span className="alt-distance-header">Dist</span>}
                   <span className="alt-yield-header">Pri</span>
                   {secondaryMaterial && <span className="alt-yield-header">Sec</span>}
-                  {secondaryMaterial && <span className="alt-value-header">/SCU</span>}
+                  <span className="alt-value-header">/SCU</span>
                 </div>
               )}
               {alternatives.map((result) => (
@@ -536,7 +594,7 @@ export function RefineryFinder({
                       {result.secondaryYieldPercent > 0 ? '+' : ''}{result.secondaryYieldPercent}%
                     </span>
                   )}
-                  {secondaryMaterial && 'combinedValueImpact' in result && (
+                  {'combinedValueImpact' in result && (
                     <span className={`alt-value ${(result.combinedValueImpact as number) > 0 ? 'positive' : (result.combinedValueImpact as number) < 0 ? 'negative' : ''}`}>
                       {formatValueImpact(result.combinedValueImpact as number)}
                     </span>
