@@ -12,8 +12,11 @@ dist
 dist-ssr
 *.local
 
-# Claude Code local settings
-.claude/settings.local.json
+# Claude Code settings
+.claude/
+
+# Reference data (not for repo)
+ref data/
 
 # Editor directories and files
 .vscode/*
