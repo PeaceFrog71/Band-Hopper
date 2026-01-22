@@ -17,6 +17,9 @@ import {
 const DEFAULT_PRIMARY_MIX = 0.30;
 import './RefineryFinder.css';
 
+// Import the help screenshot (same as WhereAmI)
+import helpScreenshot from '../../ref data/Where Am I Help Screen.png';
+
 type SelectionMode = 'closest' | 'best-yield' | 'optimal';
 type PositionSource = 'route-planner' | 'where-am-i' | 'manual';
 
@@ -62,6 +65,7 @@ export function RefineryFinder({
   const [selectedAlternativeId, setSelectedAlternativeId] = useState<string | null>(null);
   const [manualDistance, setManualDistance] = useState<string>('');
   const [manualAngle, setManualAngle] = useState<string>('');
+  const [showHelp, setShowHelp] = useState(false);
 
   // Calculate actual cargo weights from slider (100% scale, no inert)
   const primaryCargoWeight = primaryMix;
@@ -235,7 +239,7 @@ export function RefineryFinder({
       if (whereAmIDistance && whereAmIAngle) {
         return `From Where Am I: ${whereAmIDistance} Gm, ${whereAmIAngle}°`;
       }
-      return 'Enter coordinates in Where Am I tab';
+      return 'Enter coordinates in "Where Am I?" tab';
     }
 
     // Route Planner source
@@ -320,6 +324,16 @@ export function RefineryFinder({
       {/* Manual Position Input (shown when manual source selected) */}
       {positionSource === 'manual' && (
         <div className="manual-position-inputs">
+          <div className="manual-header">
+            <span>Enter Coordinates</span>
+            <button
+              className="help-icon"
+              onClick={() => setShowHelp(true)}
+              title="How to find your coordinates"
+            >
+              ?
+            </button>
+          </div>
           <div className="manual-input-group">
             <label htmlFor="manual-distance">Distance (Gm)</label>
             <input
@@ -603,6 +617,29 @@ export function RefineryFinder({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Help Modal */}
+      {showHelp && (
+        <div className="help-overlay" onClick={() => setShowHelp(false)}>
+          <div className="help-modal help-modal-large" onClick={(e) => e.stopPropagation()}>
+            <button className="close-button" onClick={() => setShowHelp(false)}>×</button>
+            <h2>How to Find Your Coordinates</h2>
+            <div className="help-section">
+              <ol className="help-steps">
+                <li>Open the Star Map (<kbd>F2</kbd>)</li>
+                <li>Your coordinates are shown at the bottom of the screen</li>
+              </ol>
+              <div className="help-screenshot">
+                <img src={helpScreenshot} alt="Screenshot showing coordinate location in Star Citizen" />
+              </div>
+              <p className="help-note">
+                You'll see three values at the bottom. Use the <strong>second angle</strong> (e.g., -49.99°)
+                and the <strong>distance</strong> (e.g., 31.81 Gm). The first angle (usually close to 0°) can be ignored.
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

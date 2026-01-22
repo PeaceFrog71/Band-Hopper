@@ -316,6 +316,20 @@
   color: var(--accent-cyan);
 }
 
+.instruction-tip {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.instruction-tip strong {
+  color: var(--accent-gold);
+  font-style: normal;
+}
+
 /* Location Tip (for special notes like CRU-L3 HUD targeting) */
 .location-tip {
   display: flex;
