@@ -212,7 +212,7 @@ export function formatDistance(distanceKm: number): string {
   if (millions >= 10) {
     return `${millions.toFixed(1)} Gm`;
   } else if (millions >= 1) {
-    return `${millions.toFixed(2)} Gm`;
+    return `${millions.toFixed(1)} Gm`;
   } else {
     // Less than 1 million km, show in megameters (thousands of km)
     const thousands = distanceKm / 1_000;
@@ -229,7 +229,7 @@ export function formatDistance(distanceKm: number): string {
  */
 export function formatDistanceCompact(distanceKm: number): string {
   const millions = distanceKm / 1_000_000;
-  return `${millions.toFixed(2)} Gm`;
+  return `${millions.toFixed(1)} Gm`;
 }
 
 /**

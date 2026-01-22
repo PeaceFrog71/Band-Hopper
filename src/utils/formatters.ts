@@ -77,7 +77,7 @@ export function formatDistanceDisplay(distanceKm: number): string {
   if (millions >= 10) {
     return `${millions.toFixed(1)} Gm`;
   } else if (millions >= 1) {
-    return `${millions.toFixed(2)} Gm`;
+    return `${millions.toFixed(1)} Gm`;
   } else {
     const thousands = distanceKm / 1_000;
     if (thousands >= 100) {
@@ -100,7 +100,7 @@ export function formatDistanceLarge(distanceKm: number): {
 
   if (millions >= 1) {
     return {
-      value: millions.toFixed(2),
+      value: millions.toFixed(1),
       unit: 'Gm'
     };
   }
