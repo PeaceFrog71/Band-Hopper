@@ -358,6 +358,9 @@ export function RoutePlanner({
                   <li>Watch the remaining distance to your destination</li>
                   <li>Exit QT at <strong>{formatDistance(selectedDestBandData.exit.distanceToDestination)}</strong></li>
                 </ol>
+                <p className="instruction-tip">
+                  <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then restart QT. The slower acceleration makes timing your exit easier.
+                </p>
               </div>
             </div>
           )}
@@ -518,6 +521,9 @@ export function RoutePlanner({
                   <li>Watch the remaining distance to your destination</li>
                   <li>Exit QT at <strong>{formatDistance(selectedBandDestData.exitDistance)}</strong></li>
                 </ol>
+                <p className="instruction-tip">
+                  <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then restart QT. The slower acceleration makes timing your exit easier.
+                </p>
               </div>
             </div>
           )}
