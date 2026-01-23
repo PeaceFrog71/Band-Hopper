@@ -1,12 +1,38 @@
 // Where Am I Component
 // Helps users identify their position in the Aaron Halo
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { analyzePosition } from '../utils/calculator';
+import { MapModal } from './MapModal';
 import './WhereAmI.css';
 
 // Import the help screenshot
 import helpScreenshot from '../../ref data/Where Am I Help Screen.png';
+
+// Solar system icon SVG for map button (matches RoutePlanner)
+function SolarSystemIcon() {
+  return (
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      {/* Orbits - concentric rings */}
+      <circle cx="16" cy="16" r="6" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <circle cx="16" cy="16" r="10.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.2" fill="none" />
+      {/* Sun (center) */}
+      <circle cx="16" cy="16" r="3" fill="currentColor" />
+      {/* Planets on orbits */}
+      <circle cx="22" cy="16" r="1.8" fill="currentColor" />
+      <circle cx="8" cy="23" r="2" fill="currentColor" />
+      <circle cx="16" cy="1.5" r="1.5" fill="currentColor" />
+    </svg>
+  );
+}
 
 interface WhereAmIProps {
   distanceGm: string;
@@ -25,6 +51,8 @@ export function WhereAmI({
   onAngleChange,
   onShowHelpChange,
 }: WhereAmIProps) {
+  const [showMap, setShowMap] = useState(false);
+
   // Analyze position based on distance
   const result = useMemo(() => {
     const gm = parseFloat(distanceGm);
@@ -114,10 +142,23 @@ export function WhereAmI({
           {result.currentBand ? (
             <>
               <div className="result-main">
-                <div className="result-label">You are in</div>
-                <div className="result-band">{result.currentBand.name}</div>
-                <div className="result-density">
-                  Density: {formatDensity(result.currentBand.relativeDensity)}
+                <div className="result-info">
+                  <div className="result-label">You are in</div>
+                  <div className="result-band">{result.currentBand.name}</div>
+                  <div className="result-density">
+                    Density: {formatDensity(result.currentBand.relativeDensity)}
+                  </div>
+                </div>
+                <div className="map-btn-container">
+                  <button
+                    className="map-icon-btn"
+                    onClick={() => setShowMap(true)}
+                    title="View Map"
+                    aria-label="View Map"
+                  >
+                    <SolarSystemIcon />
+                  </button>
+                  <span className="map-btn-label">MAP</span>
                 </div>
               </div>
               <div className="result-details">
@@ -130,9 +171,22 @@ export function WhereAmI({
           ) : result.isInHalo ? (
             <>
               <div className="result-main">
-                <div className="result-label">Between Bands</div>
-                <div className="result-band result-between">
-                  Near {result.closestBand.name}
+                <div className="result-info">
+                  <div className="result-label">Between Bands</div>
+                  <div className="result-band result-between">
+                    Near {result.closestBand.name}
+                  </div>
+                </div>
+                <div className="map-btn-container">
+                  <button
+                    className="map-icon-btn"
+                    onClick={() => setShowMap(true)}
+                    title="View Map"
+                    aria-label="View Map"
+                  >
+                    <SolarSystemIcon />
+                  </button>
+                  <span className="map-btn-label">MAP</span>
                 </div>
               </div>
               <div className="result-details">
@@ -142,9 +196,22 @@ export function WhereAmI({
           ) : (
             <>
               <div className="result-main result-outside">
-                <div className="result-label">Outside Aaron Halo</div>
-                <div className="result-band result-warning">
-                  {result.distanceFromStanton < 19_000_000 ? 'Too Close' : 'Too Far'}
+                <div className="result-info">
+                  <div className="result-label">Outside Aaron Halo</div>
+                  <div className="result-band result-warning">
+                    {result.distanceFromStanton < 19_000_000 ? 'Too Close' : 'Too Far'}
+                  </div>
+                </div>
+                <div className="map-btn-container">
+                  <button
+                    className="map-icon-btn"
+                    onClick={() => setShowMap(true)}
+                    title="View Map"
+                    aria-label="View Map"
+                  >
+                    <SolarSystemIcon />
+                  </button>
+                  <span className="map-btn-label">MAP</span>
                 </div>
               </div>
               <div className="result-details">
@@ -174,6 +241,19 @@ export function WhereAmI({
           )}
         </div>
       )}
+
+      {/* Map Modal */}
+      <MapModal
+        isOpen={showMap}
+        onClose={() => setShowMap(false)}
+        position={{
+          distanceFromStanton: result?.distanceFromStanton ?? 0,
+          angle: angleTheta ? parseFloat(angleTheta) : undefined,
+          label: 'You',
+        }}
+        title="Your Position in Stanton"
+        initialZoom={result?.isInHalo ? 'halo' : 'system'}
+      />
 
       {/* Empty state */}
       {!result && distanceGm === '' && (
