@@ -277,7 +277,32 @@
 }
 
 .result-main {
+  position: relative;
   text-align: center;
+}
+
+.result-info {
+  text-align: center;
+}
+
+/* Map button positioning for Where Am I - matches RoutePlanner */
+.position-result .map-btn-container {
+  position: absolute;
+  right: 25%;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.position-result .map-btn-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .result-label {
@@ -415,5 +440,20 @@
 
   .position-result {
     padding: 1rem;
+  }
+
+  /* On mobile, put map button inline next to band number */
+  .position-result .result-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .position-result .map-btn-container {
+    position: static;
+    transform: none;
+    margin-top: 0.5rem;
+    margin-left: 0.5rem;
   }
 }

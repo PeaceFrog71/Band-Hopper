@@ -10,6 +10,8 @@ import {
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
 import { RouteSummary } from './RouteSummary';
+import { MapModal } from './MapModal';
+import { SolarSystemIcon } from './SolarSystemIcon';
 import './RoutePlanner.css';
 
 // Helper to format location name for dropdowns (with note suffix if applicable)
@@ -73,6 +75,7 @@ export function RoutePlanner({
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
   const [bandSelectorCollapsed, setBandSelectorCollapsed] = useState(false);
   const [showSortInfo, setShowSortInfo] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   // Get available start locations grouped by planet
   const groupedStarts = useMemo(() => {
@@ -347,6 +350,17 @@ export function RoutePlanner({
                 <div className="collapse-hint">
                   {destTableCollapsed ? 'Tap to change band' : 'Tap to collapse'}
                 </div>
+                <div className="map-btn-container">
+                  <button
+                    className="map-icon-btn"
+                    onClick={(e) => { e.stopPropagation(); setShowMap(true); }}
+                    title="View Map"
+                    aria-label="View Map"
+                  >
+                    <SolarSystemIcon />
+                  </button>
+                  <span className="map-btn-label">MAP</span>
+                </div>
               </div>
 
               <LocationTip startLocation={startLocation} destLocation={destLocation} />
@@ -509,6 +523,17 @@ export function RoutePlanner({
                 </div>
                 <div className="collapse-hint">
                   {bandModeCollapsed ? 'Tap to change selection' : 'Tap to collapse'}
+                </div>
+                <div className="map-btn-container">
+                  <button
+                    className="map-icon-btn"
+                    onClick={(e) => { e.stopPropagation(); setShowMap(true); }}
+                    title="View Map"
+                    aria-label="View Map"
+                  >
+                    <SolarSystemIcon />
+                  </button>
+                  <span className="map-btn-label">MAP</span>
                 </div>
               </div>
 
@@ -682,6 +707,27 @@ export function RoutePlanner({
           Select a target band to see destinations sorted by easiest exit.
         </div>
       )}
+
+      {/* Map Modal - works for both Destination and Band modes */}
+      <MapModal
+        isOpen={showMap}
+        onClose={() => setShowMap(false)}
+        route={startLocation && destLocation && (selectedDestBandData || (selectedBandDestData && selectedBand)) ? {
+          start: {
+            distanceFromStanton: startLocation.distanceFromStanton,
+            label: startLocation.shortName,
+          },
+          destination: {
+            distanceFromStanton: destLocation.distanceFromStanton,
+            label: destLocation.shortName,
+          },
+          bandExitDistance: selectedDestBandData
+            ? selectedDestBandData.exit.distanceFromStanton
+            : selectedBand?.peakDensityDistance,
+        } : undefined}
+        title="Route Map"
+        initialZoom="halo"
+      />
     </div>
   );
 }

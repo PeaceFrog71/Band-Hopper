@@ -27,7 +27,7 @@ export const LOCATIONS: StantonLocation[] = [
     name: 'ARC-L1 Wide Forest Station',
     shortName: 'ARC-L1',
     type: 'refinery',
-    distanceFromStanton: 29_500_000,
+    distanceFromStanton: 26_020_000,  // 26.02 Gm - between Stanton and ArcCorp
     hasRefinery: true,
     orbitalBody: 'ArcCorp',
     description: 'Refinery station at ArcCorp L1'
@@ -37,7 +37,7 @@ export const LOCATIONS: StantonLocation[] = [
     name: 'ARC-L2 Lively Pathway Station',
     shortName: 'ARC-L2',
     type: 'refinery',
-    distanceFromStanton: 31_000_000,
+    distanceFromStanton: 31_810_000,  // 31.81 Gm - beyond ArcCorp from Stanton
     hasRefinery: true,
     orbitalBody: 'ArcCorp',
     description: 'Refinery station at ArcCorp L2'
@@ -216,7 +216,7 @@ export const LOCATIONS: StantonLocation[] = [
     name: 'ArcCorp',
     shortName: 'ArcCorp',
     type: 'planet',
-    distanceFromStanton: 28_460_000,
+    distanceFromStanton: 28_910_000,  // 28.91 Gm - matches polar coordinates
     hasRefinery: false,
     description: 'Ecumenopolis, home of Area18'
   },
