@@ -2,6 +2,7 @@
 // Shows planets, stations, Aaron Halo bands, and user position/route
 // Styled to match Star Citizen's in-game star map aesthetic
 
+import type React from 'react';
 import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { BANDS, HALO_INNER_EDGE, HALO_OUTER_EDGE } from '../types/bands';
 import { LOCATIONS } from '../types/locations';
@@ -85,6 +86,10 @@ export function StantonSystemMap({
   const isDragging = useRef(false);
   const lastMousePos = useRef({ x: 0, y: 0 });
 
+  // Touch state for pinch-to-zoom and drag-to-pan
+  const lastTouchPos = useRef({ x: 0, y: 0 });
+  const lastPinchDistance = useRef<number | null>(null);
+
   // Handle mouse wheel zoom - halo view has limited zoom out
   const handleWheel = useCallback((e: React.WheelEvent) => {
     e.preventDefault();
@@ -113,6 +118,71 @@ export function StantonSystemMap({
 
   const handleMouseUp = useCallback(() => {
     isDragging.current = false;
+  }, []);
+
+  // Touch event handlers for mobile pinch-to-zoom and drag-to-pan
+  const getTouchDistance = (touches: React.TouchList): number => {
+    if (touches.length < 2) return 0;
+    const dx = touches[1].clientX - touches[0].clientX;
+    const dy = touches[1].clientY - touches[0].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const getTouchCenter = (touches: React.TouchList): { x: number; y: number } => {
+    if (touches.length === 1) {
+      return { x: touches[0].clientX, y: touches[0].clientY };
+    }
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    };
+  };
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent page zoom
+    const touches = e.touches;
+    if (touches.length === 2) {
+      // Pinch start
+      lastPinchDistance.current = getTouchDistance(touches);
+    }
+    lastTouchPos.current = getTouchCenter(touches);
+    isDragging.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent page zoom
+    const touches = e.touches;
+
+    if (touches.length === 2 && lastPinchDistance.current !== null) {
+      // Pinch zoom
+      const newDistance = getTouchDistance(touches);
+      const delta = (newDistance - lastPinchDistance.current) * 0.01;
+      const minZoom = zoomLevel === 'halo' ? 0.8 : 0.5;
+      const maxZoom = zoomLevel === 'halo' ? 2.5 : 3;
+      setZoomScale(prev => Math.min(Math.max(prev + delta, minZoom), maxZoom));
+      lastPinchDistance.current = newDistance;
+    }
+
+    // Pan (works with 1 or 2 fingers)
+    if (isDragging.current) {
+      const touchCenter = getTouchCenter(touches);
+      const dx = touchCenter.x - lastTouchPos.current.x;
+      const dy = touchCenter.y - lastTouchPos.current.y;
+      lastTouchPos.current = touchCenter;
+      setPanOffset(prev => ({
+        x: prev.x + dx / zoomScale,
+        y: prev.y + dy / zoomScale,
+      }));
+    }
+  }, [zoomLevel, zoomScale]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length < 2) {
+      lastPinchDistance.current = null;
+    }
+    if (e.touches.length === 0) {
+      isDragging.current = false;
+    }
   }, []);
 
   // Reset zoom/pan when zoom level preset changes
@@ -471,7 +541,7 @@ export function StantonSystemMap({
           </button>
         )}
       </div>
-      <div className="map-zoom-hint">Scroll to zoom, drag to pan</div>
+      <div className="map-zoom-hint">Scroll or pinch to zoom, drag to pan</div>
 
       <svg
         ref={svgRef}
@@ -484,7 +554,11 @@ export function StantonSystemMap({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
-        style={{ cursor: isDragging.current ? 'grabbing' : 'grab' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        style={{ cursor: isDragging.current ? 'grabbing' : 'grab', touchAction: 'none' }}
       >
         {/* Definitions for gradients and filters */}
         <defs>
@@ -524,9 +598,8 @@ export function StantonSystemMap({
           </radialGradient>
         </defs>
 
-        {/* Space background with subtle gradient */}
+        {/* Space background */}
         <rect x="0" y="0" width={size} height={size} fill="#0a1a1a" />
-        <rect x="0" y="0" width={size} height={size} fill="url(#spaceGradient)" opacity="0.5" />
 
         {/* Scattered stars */}
         {Array.from({ length: 80 }).map((_, i) => {

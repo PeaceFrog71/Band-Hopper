@@ -730,6 +730,13 @@
   .exit-distance {
     font-size: 1.75rem;
   }
+
+  /* On mobile, position map button to the right without overlap */
+  .exit-result .map-btn-container {
+    right: 1rem;
+    top: 1rem;
+    transform: none;
+  }
 }
 
 /* ===== Info Icons ===== */
