@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://bandhopper.peacefroggaming.com/sitemap.xml

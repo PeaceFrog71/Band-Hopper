@@ -1,0 +1,17 @@
+{
+  "name": "Band Hopper - Aaron Halo Navigator",
+  "short_name": "Band Hopper",
+  "description": "Star Citizen mining route planner for the Aaron Halo asteroid belt",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0e27",
+  "theme_color": "#0a0e27",
+  "icons": [
+    {
+      "src": "/PFlogo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
