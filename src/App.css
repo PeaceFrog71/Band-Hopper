@@ -83,9 +83,16 @@ h1, h2, h3, h4, h5, h6 {
   margin-left: 10%;
 }
 
-.app-header > .kofi-link {
-  justify-self: center;
-  margin-right: 10%;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-self: end;
+  margin-right: 5%;
+}
+
+.header-actions > .kofi-link {
+  /* Kofi link styling inherited from .kofi-link */
 }
 
 .header-logo {
@@ -297,9 +304,14 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.65rem;
   }
 
-  /* Hide header Ko-fi link on mobile */
-  .kofi-link {
+  /* Hide header Ko-fi link on mobile, but keep sign-in */
+  .header-actions .kofi-link {
     display: none;
+  }
+
+  .header-actions {
+    margin-right: 0;
+    gap: 0.5rem;
   }
 
   /* Show footer Ko-fi link on mobile */
