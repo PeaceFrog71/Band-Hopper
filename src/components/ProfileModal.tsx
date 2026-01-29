@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAuth, getDisplayName, getAvatarUrl, getCustomAvatarUrl } from '../contexts/AuthContext';
+import { useAuth, getDisplayName, getAvatarUrl, getAvatarId, getCustomAvatarUrl } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { AVATAR_OPTIONS, getAvatarSrc } from '../utils/avatarMap';
 import './ProfileModal.css';
 
 interface ProfileModalProps {
@@ -52,6 +53,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [newEmail, setNewEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
@@ -66,6 +68,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   useEffect(() => {
     if (isOpen && user) {
       setDisplayName(getDisplayName(user));
+      setSelectedAvatar(getAvatarId(user));
       setUploadedPreview(getCustomAvatarUrl(user));
       setNewEmail(user.email ?? '');
       setCurrentPassword('');
@@ -90,8 +93,11 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
   const googleAvatarUrl = getAvatarUrl(user);
 
-  // Determine displayed avatar
-  const displayedAvatar = uploadedPreview || googleAvatarUrl;
+  // Determine displayed avatar based on selection
+  const presetAvatarSrc = getAvatarSrc(selectedAvatar);
+  const displayedAvatar = presetAvatarSrc
+    || (selectedAvatar === 'custom' ? uploadedPreview : null)
+    || googleAvatarUrl;
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,15 +122,10 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     try {
       const dataUrl = await resizeImage(file);
       setUploadedPreview(dataUrl);
+      setSelectedAvatar('custom');
     } catch {
       setError('Failed to process image.');
     }
-  };
-
-  const handleRemoveAvatar = () => {
-    setUploadedPreview(null);
-    setError('');
-    setSuccess('');
   };
 
   const handleSave = async () => {
@@ -175,15 +176,17 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
 
     // Save avatar and display name together (both are user metadata)
+    const currentAvatarId = getAvatarId(user);
     const currentDisplayName = getDisplayName(user);
-    const currentCustomAvatar = getCustomAvatarUrl(user);
+    const avatarChanged = selectedAvatar !== currentAvatarId;
     const nameChanged = displayName.trim() !== currentDisplayName;
-    const avatarChanged = uploadedPreview !== currentCustomAvatar;
+    const customAvatarChanged = selectedAvatar === 'custom' && uploadedPreview !== getCustomAvatarUrl(user);
 
-    if (nameChanged || avatarChanged) {
+    if (avatarChanged || nameChanged || customAvatarChanged) {
       const data: Record<string, string | null> = {};
-      if (avatarChanged) {
-        data.custom_avatar = uploadedPreview;
+      if (avatarChanged || customAvatarChanged) {
+        data.avatar_id = selectedAvatar;
+        data.custom_avatar = selectedAvatar === 'custom' ? uploadedPreview : null;
       }
       if (nameChanged) data.display_name = displayName.trim();
 
@@ -244,33 +247,63 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
           )}
         </div>
 
-        {/* Avatar Upload */}
+        {/* Avatar Selection */}
         <div className="profile-avatar-section">
-          <div className="profile-avatar-actions">
+          <div className="profile-avatar-label">Choose Avatar</div>
+          <div className="profile-avatar-options">
             <button
-              className="profile-avatar-upload-btn"
-              onClick={() => fileInputRef.current?.click()}
+              className={`profile-avatar-option${!selectedAvatar ? ' selected' : ''}`}
+              onClick={() => { setSelectedAvatar(null); setError(''); setSuccess(''); }}
+              title="Default"
               disabled={saving}
             >
-              Upload Avatar
+              {googleAvatarUrl ? (
+                <img src={googleAvatarUrl} alt="" />
+              ) : (
+                <svg className="avatar-default-icon" viewBox="0 0 24 24" width="32" height="32" fill="none">
+                  <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              )}
             </button>
-            {uploadedPreview && (
+            {AVATAR_OPTIONS.map((opt) => (
               <button
-                className="profile-avatar-remove-btn"
-                onClick={handleRemoveAvatar}
+                key={opt.id}
+                className={`profile-avatar-option${selectedAvatar === opt.id ? ' selected' : ''}`}
+                onClick={() => { setSelectedAvatar(opt.id); setError(''); setSuccess(''); }}
+                title={opt.label}
                 disabled={saving}
               >
-                Remove
+                <img src={opt.src} alt={opt.label} />
               </button>
-            )}
+            ))}
+            {/* Upload custom avatar */}
+            {uploadedPreview ? (
+              <button
+                className={`profile-avatar-option${selectedAvatar === 'custom' ? ' selected' : ''}`}
+                onClick={() => { setSelectedAvatar('custom'); setError(''); setSuccess(''); }}
+                title="Uploaded"
+                disabled={saving}
+              >
+                <img src={uploadedPreview} alt="Custom" />
+              </button>
+            ) : null}
+            <button
+              className="profile-avatar-option upload-option"
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload image"
+              disabled={saving}
+            >
+              +
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            style={{ display: 'none' }}
-          />
         </div>
 
         {error && <p className="profile-error">{error}</p>}

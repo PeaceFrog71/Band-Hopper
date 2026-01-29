@@ -85,10 +85,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .header-actions {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  justify-self: end;
-  margin-right: 5%;
+  gap: 0.5rem;
+  justify-self: center;
 }
 
 .header-actions > .kofi-link {

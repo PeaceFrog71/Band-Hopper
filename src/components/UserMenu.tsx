@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAuth, getDisplayName, getAvatarUrl, getCustomAvatarUrl } from '../contexts/AuthContext';
+import { useAuth, getDisplayName, getAvatarUrl, getAvatarId, getCustomAvatarUrl } from '../contexts/AuthContext';
+import { getAvatarSrc } from '../utils/avatarMap';
 import ProfileModal from './ProfileModal';
 import './UserMenu.css';
 
@@ -47,11 +48,15 @@ export default function UserMenu({ onSignInClick }: UserMenuProps) {
   }
 
   const displayName = getDisplayName(user);
-  const uploadedAvatarUrl = getCustomAvatarUrl(user);
+  const avatarId = getAvatarId(user);
+  const presetAvatarSrc = getAvatarSrc(avatarId);
+  const customAvatarUrl = getCustomAvatarUrl(user);
   const googleAvatarUrl = getAvatarUrl(user);
 
-  // Priority: uploaded avatar > Google avatar > default user icon
-  const avatarSrc = uploadedAvatarUrl || googleAvatarUrl;
+  // Priority: preset avatar > custom uploaded > Google avatar > default user icon
+  const avatarSrc = presetAvatarSrc
+    || (avatarId === 'custom' ? customAvatarUrl : null)
+    || googleAvatarUrl;
 
   const avatarElement = avatarSrc ? (
     <img className="user-avatar-img" src={avatarSrc} alt="" />
