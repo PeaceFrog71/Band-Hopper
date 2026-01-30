@@ -292,44 +292,72 @@ h6 {
   display: none;
 }
 
+/* Mobile footer info (version, feedback) - hidden on desktop */
+.footer-mobile-info {
+  display: none;
+}
+
 /* Mobile-First Responsive */
 @media (max-width: 570px) {
+  /* Disable background images on mobile for performance */
+  .app-bg-route,
+  .app-bg-whereami,
+  .app-bg-refinery {
+    background-image: none;
+  }
+
   .app-header {
-    grid-template-columns: auto 1fr;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.5rem;
     padding: 0.75rem;
   }
 
+  /* Logo on left */
   .app-header > a:first-child {
-    justify-self: start;
+    order: 1;
     margin-left: 0;
+    flex-shrink: 0;
   }
 
-  .header-logo {
-    width: 80px;
-    height: 80px;
+  /* Title in center - stacked BAND / HOPPER */
+  .header-title {
+    order: 2;
+    flex: 1;
+    text-align: center;
   }
 
   .header-title h1 {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    word-spacing: 100vw; /* Forces each word to its own line */
+    line-height: 1.2;
   }
 
-  .header-title .subtitle {
-    font-size: 0.75rem;
+  /* Hide subtitle, version, feedback on mobile */
+  .header-title .subtitle,
+  .header-title .version,
+  .header-title .feedback-link {
+    display: none;
   }
 
-  .feedback-link {
-    font-size: 0.65rem;
+  /* Sign-in on right */
+  .header-actions {
+    order: 3;
+    margin-right: 0;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .header-logo {
+    width: 60px;
+    height: 60px;
+    filter: none;
   }
 
   /* Hide header Ko-fi link on mobile, but keep sign-in */
   .header-actions .kofi-link {
     display: none;
-  }
-
-  .header-actions {
-    margin-right: 0;
-    gap: 0.5rem;
   }
 
   /* Show footer Ko-fi link on mobile */
@@ -343,6 +371,24 @@ h6 {
     text-decoration: none;
     border: 1px solid var(--success);
     border-radius: 6px;
+  }
+
+  /* Show version and feedback link in footer on mobile */
+  .footer-mobile-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .footer-mobile-info .version {
+    color: var(--text-muted);
+  }
+
+  .footer-mobile-info .feedback-link {
+    color: var(--accent-blue);
   }
 
   .tab-btn {
