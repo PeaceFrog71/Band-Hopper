@@ -5,7 +5,7 @@ import { RoutePlanner } from './components/RoutePlanner'
 import { WhereAmI } from './components/WhereAmI'
 import { RefineryFinder } from './components/RefineryFinder'
 import UserMenu from './components/UserMenu'
-import AuthModal from './components/AuthModal'
+import AuthModal, { type AuthView } from './components/AuthModal'
 import { useAuth } from './contexts/AuthContext'
 
 const version = __APP_VERSION__
@@ -17,13 +17,11 @@ const helpText: Record<string, string> = {
   refinery: 'Find the best refinery based on your mined material and location.'
 }
 
-type AuthModalView = 'signIn' | 'signUp' | 'forgotPassword' | 'resetPassword';
-
 function App() {
   const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
   const [showHelp, setShowHelp] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const [authModalView, setAuthModalView] = useState<AuthModalView | undefined>(undefined)
+  const [authModalView, setAuthModalView] = useState<AuthView | undefined>(undefined)
   const { isConfigured, passwordRecovery, clearPasswordRecovery } = useAuth()
 
   // Auto-open auth modal when user clicks password reset link from email

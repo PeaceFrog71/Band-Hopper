@@ -8,7 +8,7 @@ interface AuthModalProps {
   initialView?: AuthView;
 }
 
-type AuthView = 'signIn' | 'signUp' | 'forgotPassword' | 'resetPassword';
+export type AuthView = 'signIn' | 'signUp' | 'forgotPassword' | 'resetPassword';
 
 export default function AuthModal({ isOpen, onClose, initialView }: AuthModalProps) {
   const { signUp, signIn, signInWithGoogle, resetPassword, updatePassword } = useAuth();
@@ -167,7 +167,7 @@ export default function AuthModal({ isOpen, onClose, initialView }: AuthModalPro
   return (
     <div className="auth-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
       <div className="auth-modal">
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="close-button" onClick={onClose} aria-label="Close">×</button>
 
         {success ? (
           <>
@@ -213,7 +213,7 @@ export default function AuthModal({ isOpen, onClose, initialView }: AuthModalPro
                   autoComplete="current-password"
                 />
                 <div className="auth-toggle auth-forgot-link">
-                  <span>Forget your password?</span>
+                  <span>Forgot your password?</span>
                   <button type="button" onClick={() => switchView('forgotPassword')}>Reset Here</button>
                 </div>
               </div>

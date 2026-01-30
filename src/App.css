@@ -302,6 +302,7 @@ h6 {
 
   .app-header > a:first-child {
     justify-self: start;
+    margin-left: 0;
   }
 
   .header-logo {

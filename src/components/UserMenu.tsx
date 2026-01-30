@@ -76,22 +76,24 @@ export default function UserMenu({ onSignInClick }: UserMenuProps) {
           className="user-menu-trigger"
           onClick={() => setDropdownOpen(!dropdownOpen)}
           title={user.email ?? 'Account'}
+          aria-haspopup="menu"
+          aria-expanded={dropdownOpen}
         >
           {avatarElement}
           <span className="user-display-name">{displayName}</span>
         </button>
 
         {dropdownOpen && (
-          <div className="user-dropdown">
+          <div className="user-dropdown" role="menu">
             <div className="user-dropdown-header">
               <div className="user-dropdown-name">{displayName}</div>
               <div className="user-dropdown-email">{user.email}</div>
             </div>
             <div className="user-dropdown-actions">
-              <button className="dropdown-action-btn" onClick={handleProfileClick}>
+              <button className="dropdown-action-btn" onClick={handleProfileClick} role="menuitem">
                 Profile
               </button>
-              <button className="sign-out-button" onClick={handleSignOut}>
+              <button className="sign-out-button" onClick={handleSignOut} role="menuitem">
                 Sign Out
               </button>
             </div>

@@ -15,9 +15,9 @@ const AVATAR_SIZE = 128;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 /**
- * Resize an image file to a square JPEG data URL.
+ * Resize an image file to a square PNG data URL.
  * The image is scaled to fit within AVATAR_SIZE x AVATAR_SIZE,
- * centered on a transparent canvas, then exported as JPEG.
+ * centered on a transparent canvas, then exported as PNG.
  */
 function resizeImage(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -41,7 +41,7 @@ function resizeImage(file: File): Promise<string> {
       const y = (AVATAR_SIZE - h) / 2;
 
       ctx.drawImage(img, x, y, w, h);
-      resolve(canvas.toDataURL('image/jpeg', 0.8));
+      resolve(canvas.toDataURL('image/png'));
     };
     img.onerror = () => { URL.revokeObjectURL(img.src); reject(new Error('Failed to load image')); };
     img.src = URL.createObjectURL(file);
@@ -164,8 +164,13 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
     // Verify current password before allowing email/password changes
     if ((emailChanged || newPassword) && currentPassword) {
+      if (!user.email) {
+        setError('Email changes require an email-based account.');
+        setSaving(false);
+        return;
+      }
       const { error: verifyError } = await supabase.auth.signInWithPassword({
-        email: user.email!,
+        email: user.email,
         password: currentPassword,
       });
       if (verifyError) {
@@ -223,13 +228,15 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     }
 
     setSaving(false);
-    onClose();
+    setSuccess('Profile updated successfully!');
+    // Close after a brief delay to show success message
+    setTimeout(() => onClose(), 1000);
   };
 
   return (
     <div className="profile-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
       <div className="profile-modal">
-        <button className="close-button" onClick={onClose}>×</button>
+        <button className="close-button" onClick={onClose} aria-label="Close">×</button>
 
         <h2 id="profile-modal-title">Profile</h2>
 
