@@ -12,11 +12,17 @@ dist
 dist-ssr
 *.local
 
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Claude Code settings
 .claude/
 
 # Reference data (not for repo)
 ref data/
+docs/
 
 # Editor directories and files
 .vscode/*
