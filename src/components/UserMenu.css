@@ -192,7 +192,7 @@
 }
 
 /* Mobile: compact layout */
-@media (max-width: 480px) {
+@media (max-width: 570px) {
   .sign-in-button {
     font-size: 0.7rem;
     padding: 0.35rem 0.6rem;
