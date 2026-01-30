@@ -403,7 +403,95 @@ h6 {
   }
 }
 
-@media (min-width: 768px) {
+/* Mobile landscape - short height forces compact header */
+@media (max-height: 500px) and (orientation: landscape) {
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .app-header > a:first-child {
+    order: 1;
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  .header-title {
+    order: 2;
+    flex: 1;
+    text-align: center;
+  }
+
+  .header-title h1 {
+    font-size: 1.1rem;
+    word-spacing: 100vw;
+    line-height: 1.2;
+  }
+
+  .header-title .subtitle,
+  .header-title .version,
+  .header-title .feedback-link {
+    display: none;
+  }
+
+  .header-actions {
+    order: 3;
+    margin-right: 0;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .header-logo {
+    width: 50px;
+    height: 50px;
+    filter: none;
+  }
+
+  .header-actions .kofi-link {
+    display: none;
+  }
+
+  /* Disable background images in landscape mobile */
+  .app-bg-route,
+  .app-bg-whereami,
+  .app-bg-refinery {
+    background-image: none;
+  }
+}
+
+/* Tablet landscape (768-1024px) - compact header */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .app-header {
+    padding: 0.75rem 1.5rem;
+  }
+
+  .header-logo {
+    width: 80px;
+    height: 80px;
+  }
+
+  .header-title h1 {
+    font-size: 1.8rem;
+  }
+
+  .header-title .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .header-title .version {
+    font-size: 0.7rem;
+  }
+
+  .feedback-link {
+    font-size: 0.7rem;
+  }
+}
+
+/* Desktop (1025px+) */
+@media (min-width: 1025px) {
   .app-header {
     padding: 1.5rem 2rem;
   }
