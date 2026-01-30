@@ -66,20 +66,23 @@ export async function initSessionSync(): Promise<void> {
 
   // Check if we have a local session
   const { data: { session: localSession } } = await supabase.auth.getSession()
+  const sharedRefreshToken = getSharedRefreshToken()
 
-  if (!localSession) {
-    // No local session - check if another app logged in (shared cookie exists)
-    const sharedRefreshToken = getSharedRefreshToken()
-    if (sharedRefreshToken) {
-      // Try to restore session from the shared refresh token
-      const { data, error } = await supabase.auth.refreshSession({
-        refresh_token: sharedRefreshToken,
-      })
-      if (error || !data.session) {
-        // Invalid token - clear it
-        console.warn('Failed to restore session from shared token:', error?.message)
-        setSharedRefreshToken(null)
-      }
+  // Sync cookie if we have session but no cookie (handles OAuth callback timing)
+  if (localSession && !sharedRefreshToken) {
+    setSharedRefreshToken(localSession.refresh_token || null)
+  }
+
+  // No local session - check if another app logged in (shared cookie exists)
+  if (!localSession && sharedRefreshToken) {
+    // Try to restore session from the shared refresh token
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: sharedRefreshToken,
+    })
+    if (error || !data.session) {
+      // Invalid token - clear it
+      console.warn('Failed to restore session from shared token:', error?.message)
+      setSharedRefreshToken(null)
     }
   }
 
