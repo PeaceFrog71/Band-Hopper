@@ -15,12 +15,17 @@
   --danger: #ff3366;
   --border: #2a3254;
   --border-highlight: #3a4568;
-  --font-heading: 'Orbitron', 'Michroma', sans-serif;
-  --font-body: 'Electrolize', 'Segoe UI', sans-serif;
+  --font-heading: "Orbitron", "Michroma", sans-serif;
+  --font-body: "Electrolize", "Segoe UI", sans-serif;
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-heading);
   letter-spacing: 0.02em;
   color: var(--text-primary);
@@ -53,15 +58,15 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Tab-specific backgrounds */
 .app-bg-route {
-  background-image: url('./assets/starfield route.jpg');
+  background-image: url("./assets/starfield route.jpg");
 }
 
 .app-bg-whereami {
-  background-image: url('./assets/starfield where.jpg');
+  background-image: url("./assets/starfield where.jpg");
 }
 
 .app-bg-refinery {
-  background-image: url('./assets/starfield refine.jpg');
+  background-image: url("./assets/starfield refine.jpg");
 }
 
 /* Header */
@@ -80,7 +85,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .app-header > a:first-child {
   justify-self: center;
-  margin-left: 10%;
+  margin-left: 35%;
 }
 
 .header-actions {
@@ -89,6 +94,7 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   gap: 0.5rem;
   justify-self: center;
+  margin-right: 35%;
 }
 
 .header-actions > .kofi-link {
@@ -99,7 +105,8 @@ h1, h2, h3, h4, h5, h6 {
   width: 100px;
   height: 100px;
   object-fit: contain;
-  filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.6)) drop-shadow(0 0 30px rgba(0, 217, 255, 0.4));
+  filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.6))
+    drop-shadow(0 0 30px rgba(0, 217, 255, 0.4));
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -117,8 +124,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .header-title h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2.8rem;
+  font-weight: 800;
   color: var(--accent-blue);
   margin: 0;
 }
@@ -345,12 +352,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .header-logo {
-    width: 100px;
-    height: 100px;
+    width: 156px;
+    height: 156px;
   }
 
   .header-title h1 {
-    font-size: 1.75rem;
+    font-size: 2.8rem;
   }
 
   .app-content {
@@ -364,12 +371,12 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (min-width: 1024px) {
   .header-logo {
-    width: 120px;
-    height: 120px;
+    width: 156px;
+    height: 156px;
   }
 
   .header-title h1 {
-    font-size: 2rem;
+    font-size: 2.8rem;
   }
 
   .display-large {
@@ -415,20 +422,44 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Utility Classes */
-.text-center { text-align: center; }
-.text-success { color: var(--success); }
-.text-warning { color: var(--warning); }
-.text-danger { color: var(--danger); }
-.text-muted { color: var(--text-muted); }
+.text-center {
+  text-align: center;
+}
+.text-success {
+  color: var(--success);
+}
+.text-warning {
+  color: var(--warning);
+}
+.text-danger {
+  color: var(--danger);
+}
+.text-muted {
+  color: var(--text-muted);
+}
 
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+.mb-2 {
+  margin-bottom: 1rem;
+}
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
 
-.flex { display: flex; }
-.flex-col { flex-direction: column; }
-.gap-1 { gap: 0.5rem; }
-.gap-2 { gap: 1rem; }
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.gap-1 {
+  gap: 0.5rem;
+}
+.gap-2 {
+  gap: 1rem;
+}
 
 /* Not Implemented Stamp */
 .panel-not-implemented {
@@ -717,7 +748,11 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Modal container - larger for better map view */
 .map-modal {
-  background: linear-gradient(135deg, rgba(10, 26, 26, 0.98) 0%, rgba(10, 20, 30, 0.98) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(10, 26, 26, 0.98) 0%,
+    rgba(10, 20, 30, 0.98) 100%
+  );
   border: 2px solid #1a6b6b;
   border-radius: 12px;
   max-width: 700px;
@@ -725,8 +760,9 @@ h1, h2, h3, h4, h5, h6 {
   max-height: 95vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 0 60px rgba(0, 180, 180, 0.3),
-              0 0 100px rgba(0, 180, 180, 0.1);
+  box-shadow:
+    0 0 60px rgba(0, 180, 180, 0.3),
+    0 0 100px rgba(0, 180, 180, 0.1);
 }
 
 /* Modal header */
