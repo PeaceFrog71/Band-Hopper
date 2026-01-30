@@ -187,18 +187,18 @@ export default function AuthModal({ isOpen, onClose, initialView }: AuthModalPro
 
             {error && <p className="auth-error">{error}</p>}
 
-            <form className="auth-form" onSubmit={handleSignIn} name="signin">
+            <form className="auth-form" onSubmit={handleSignIn} name="signin" autoComplete="on">
               <div className="auth-field">
                 <label htmlFor="auth-email">Email</label>
                 <input
                   id="auth-email"
-                  name="email"
+                  name="username"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); clearError(); }}
                   placeholder="you@example.com"
                   required
-                  autoComplete="email"
+                  autoComplete="username"
                 />
               </div>
 
