@@ -55,6 +55,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [displayName, setDisplayName] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(null);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
+  const [hasNewUpload, setHasNewUpload] = useState(false);
   const [newEmail, setNewEmail] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -70,6 +71,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       setDisplayName(getDisplayName(user));
       setSelectedAvatar(getAvatarId(user));
       setUploadedPreview(getCustomAvatarUrl(user));
+      setHasNewUpload(false);
       setNewEmail(user.email ?? '');
       setCurrentPassword('');
       setNewPassword('');
@@ -123,6 +125,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       const dataUrl = await resizeImage(file);
       setUploadedPreview(dataUrl);
       setSelectedAvatar('custom');
+      setHasNewUpload(true);
     } catch {
       setError('Failed to process image.');
     }
@@ -185,13 +188,16 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
     const currentDisplayName = getDisplayName(user);
     const avatarChanged = selectedAvatar !== currentAvatarId;
     const nameChanged = displayName.trim() !== currentDisplayName;
-    const customAvatarChanged = selectedAvatar === 'custom' && uploadedPreview !== getCustomAvatarUrl(user);
 
-    if (avatarChanged || nameChanged || customAvatarChanged) {
+    if (avatarChanged || nameChanged || hasNewUpload) {
       const data: Record<string, string | null> = {};
-      if (avatarChanged || customAvatarChanged) {
+      if (avatarChanged) {
         data.avatar_id = selectedAvatar;
-        data.custom_avatar = selectedAvatar === 'custom' ? uploadedPreview : null;
+      }
+      // Only update custom_avatar when user uploaded a new image (don't clear on preset selection)
+      if (hasNewUpload) {
+        data.avatar_id = 'custom';
+        data.custom_avatar = uploadedPreview;
       }
       if (nameChanged) data.display_name = displayName.trim();
 
