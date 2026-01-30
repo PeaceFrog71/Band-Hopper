@@ -187,11 +187,12 @@ export default function AuthModal({ isOpen, onClose, initialView }: AuthModalPro
 
             {error && <p className="auth-error">{error}</p>}
 
-            <form className="auth-form" onSubmit={handleSignIn}>
+            <form className="auth-form" onSubmit={handleSignIn} name="signin">
               <div className="auth-field">
                 <label htmlFor="auth-email">Email</label>
                 <input
                   id="auth-email"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); clearError(); }}
@@ -205,6 +206,7 @@ export default function AuthModal({ isOpen, onClose, initialView }: AuthModalPro
                 <label htmlFor="auth-password">Password</label>
                 <input
                   id="auth-password"
+                  name="password"
                   type="password"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); clearError(); }}
