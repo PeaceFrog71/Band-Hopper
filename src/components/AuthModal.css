@@ -225,6 +225,12 @@
   color: var(--accent-gold);
 }
 
+/* Forgot password link - left aligned under password field */
+.auth-forgot-link {
+  text-align: left;
+  margin-top: 0.25rem;
+}
+
 /* Messages */
 .auth-error {
   background: rgba(255, 51, 102, 0.1);

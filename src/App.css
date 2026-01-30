@@ -102,8 +102,8 @@ h6 {
 }
 
 .header-logo {
-  width: 100px;
-  height: 100px;
+  width: 156px;
+  height: 156px;
   object-fit: contain;
   filter: drop-shadow(0 0 20px rgba(0, 217, 255, 0.6))
     drop-shadow(0 0 30px rgba(0, 217, 255, 0.4));
@@ -124,10 +124,20 @@ h6 {
 }
 
 .header-title h1 {
+  font-family: var(--font-heading);
   font-size: 2.8rem;
   font-weight: 800;
-  color: var(--accent-blue);
+  text-align: center;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin: 0;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  text-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+  font-style: italic;
+  transform: skewX(-8deg);
 }
 
 .header-title .subtitle {

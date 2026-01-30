@@ -17,11 +17,22 @@ const helpText: Record<string, string> = {
   refinery: 'Find the best refinery based on your mined material and location.'
 }
 
+type AuthModalView = 'signIn' | 'signUp' | 'forgotPassword' | 'resetPassword';
+
 function App() {
   const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
   const [showHelp, setShowHelp] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const { isConfigured } = useAuth()
+  const [authModalView, setAuthModalView] = useState<AuthModalView | undefined>(undefined)
+  const { isConfigured, passwordRecovery, clearPasswordRecovery } = useAuth()
+
+  // Auto-open auth modal when user clicks password reset link from email
+  useEffect(() => {
+    if (passwordRecovery) {
+      setAuthModalView('resetPassword')
+      setShowAuthModal(true)
+    }
+  }, [passwordRecovery])
 
   // Lifted route state - persists across tab switches
   const [startId, setStartId] = useState<string>('')
@@ -209,7 +220,8 @@ function App() {
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={() => { setShowAuthModal(false); setAuthModalView(undefined); clearPasswordRecovery(); }}
+        initialView={authModalView}
       />
     </div>
   )
