@@ -22,6 +22,7 @@ dist-ssr
 
 # Reference data (not for repo)
 ref data/
+docs/
 
 # Editor directories and files
 .vscode/*
