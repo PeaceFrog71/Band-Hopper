@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nslookup:*)",
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(npm test:*)",
+      "Bash(npm version:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh pr edit:*)",
+      "Bash(gh pr view:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
