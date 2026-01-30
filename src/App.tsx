@@ -205,6 +205,17 @@ function App() {
           Data source: <a href="https://cstone.space/resources/knowledge-base/36" target="_blank" rel="noopener noreferrer">CaptSheppard's Aaron Halo Travel Routes</a>
         </p>
         <p>Made by <a href="https://peacefroggaming.com" target="_blank" rel="noopener noreferrer">PeaceFrog Gaming</a></p>
+        <div className="footer-mobile-info">
+          <span className="version">v{version}</span>
+          <a
+            href="https://forms.gle/xbCK6DF3iYUHW6Hn6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="feedback-link"
+          >
+            Feedback
+          </a>
+        </div>
         <a
           href="https://ko-fi.com/peacefroggaming"
           target="_blank"
