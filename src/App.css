@@ -293,7 +293,7 @@ h6 {
 }
 
 /* Mobile-First Responsive */
-@media (max-width: 480px) {
+@media (max-width: 570px) {
   .app-header {
     grid-template-columns: auto 1fr;
     gap: 0.5rem;
