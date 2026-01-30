@@ -4,6 +4,9 @@ import pfLogo from './assets/PFlogo.png'
 import { RoutePlanner } from './components/RoutePlanner'
 import { WhereAmI } from './components/WhereAmI'
 import { RefineryFinder } from './components/RefineryFinder'
+import UserMenu from './components/UserMenu'
+import AuthModal, { type AuthView } from './components/AuthModal'
+import { useAuth } from './contexts/AuthContext'
 
 const version = __APP_VERSION__
 
@@ -17,6 +20,17 @@ const helpText: Record<string, string> = {
 function App() {
   const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
   const [showHelp, setShowHelp] = useState(false)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authModalView, setAuthModalView] = useState<AuthView | undefined>(undefined)
+  const { isConfigured, passwordRecovery, clearPasswordRecovery } = useAuth()
+
+  // Auto-open auth modal when user clicks password reset link from email
+  useEffect(() => {
+    if (passwordRecovery) {
+      setAuthModalView('resetPassword')
+      setShowAuthModal(true)
+    }
+  }, [passwordRecovery])
 
   // Lifted route state - persists across tab switches
   const [startId, setStartId] = useState<string>('')
@@ -65,15 +79,20 @@ function App() {
             Bug Report / Feature Requests / Feedback
           </a>
         </div>
-        <a
-          href="https://ko-fi.com/peacefroggaming"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="kofi-link"
-        >
-          <img src="/rieger-icon.png" alt="" />
-          <span>Support on Ko-fi</span>
-        </a>
+        <div className="header-actions">
+          {isConfigured && (
+            <UserMenu onSignInClick={() => setShowAuthModal(true)} />
+          )}
+          <a
+            href="https://ko-fi.com/peacefroggaming"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="kofi-link"
+          >
+            <img src="/rieger-icon.png" alt="" />
+            <span>Support on Ko-fi</span>
+          </a>
+        </div>
       </header>
 
       <main className="app-content">
@@ -195,6 +214,13 @@ function App() {
           Support on Ko-fi
         </a>
       </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => { setShowAuthModal(false); setAuthModalView(undefined); clearPasswordRecovery(); }}
+        initialView={authModalView}
+      />
     </div>
   )
 }
