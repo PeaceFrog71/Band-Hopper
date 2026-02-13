@@ -55,7 +55,7 @@ function App() {
     setDestinationId(tempStart);
   };
 
-  // Clear Route Start and Destination with New Clear button next to Reverse button
+  // Clear route, resetting start, destination, and selected band
   const handleClearRoute = () => {
     setStartId("");
     setDestinationId("");
