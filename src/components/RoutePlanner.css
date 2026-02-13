@@ -50,8 +50,8 @@
   }
 }
 
-/* Swap Route Button (inline in route summary) */
-.swap-route-btn {
+/* Reverse Route Button (inline in route summary) */
+.reverse-route-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -69,13 +69,42 @@
   transition: all 0.2s ease;
 }
 
-.swap-route-btn:hover {
+.reverse-route-btn:hover {
   border-color: var(--accent-cyan);
   color: var(--accent-cyan);
   background: var(--bg-medium);
 }
 
-.swap-route-btn:active {
+.reverse-route-btn:active {
+  transform: scale(0.95);
+}
+
+/* Clear Route Button (inline in route summary) */
+.clear-route-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0;
+  margin-left: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-route-btn:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: var(--bg-medium);
+}
+
+.clear-route-btn:active {
   transform: scale(0.95);
 }
 
@@ -166,7 +195,6 @@
   box-shadow: none !important;
   border-color: var(--border) !important;
 }
-
 
 .sort-btn:hover {
   background: var(--bg-light);
@@ -700,7 +728,9 @@
 
 .exit-result.clickable {
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .exit-result.clickable:hover {
@@ -869,37 +899,37 @@
 
 /* Color-coded Labels - Muted when inactive, bright when active */
 .number-label {
-  color: #b3b3b3;  /* Muted light grey with improved contrast */
+  color: #b3b3b3; /* Muted light grey with improved contrast */
 }
 
 .density-label {
-  color: #66b97a;  /* Muted light green with improved contrast */
+  color: #66b97a; /* Muted light green with improved contrast */
 }
 
 .opportunity-label {
-  color: #c279c2;  /* Muted light pink/purple with improved contrast */
+  color: #c279c2; /* Muted light pink/purple with improved contrast */
 }
 
 .sort-btn.active .number-label {
-  color: #ffffff;  /* Bright white when selected */
+  color: #ffffff; /* Bright white when selected */
 }
 
 .sort-btn.active .density-label {
-  color: #00ff88;  /* Bright green when selected */
+  color: #00ff88; /* Bright green when selected */
 }
 
 .sort-btn.active .opportunity-label {
-  color: #ff00cc;  /* Bright pink when selected */
+  color: #ff00cc; /* Bright pink when selected */
 }
 
 /* Legend D / M colors */
 .legend-d {
-  color: #00ff88;  /* Bright green */
+  color: #00ff88; /* Bright green */
   font-weight: 600;
 }
 
 .legend-m {
-  color: #ff00cc;  /* Bright pink */
+  color: #ff00cc; /* Bright pink */
   font-weight: 600;
 }
 
@@ -927,14 +957,14 @@
 
 .density-bar {
   height: 4px;
-  background: linear-gradient(90deg, #008844, #00ff88);  /* Green */
+  background: linear-gradient(90deg, #008844, #00ff88); /* Green */
   border-radius: 2px;
   min-width: 3%;
 }
 
 .opportunity-bar {
   height: 4px;
-  background: linear-gradient(90deg, #cc00aa, #ff00cc);  /* Magenta */
+  background: linear-gradient(90deg, #cc00aa, #ff00cc); /* Magenta */
   border-radius: 2px;
   min-width: 3%;
 }
