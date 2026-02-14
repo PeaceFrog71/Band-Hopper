@@ -1,12 +1,16 @@
 import { useState, useMemo, Fragment } from 'react';
-import { getLocationById, getGroupedLocationsForDropdown, type StantonLocation } from '../types/locations';
+import {
+  getLocationById,
+  getGroupedLocationsForDropdown,
+  type StantonLocation,
+} from '../types/locations';
 import { BANDS } from '../types/bands';
 import {
   getAvailableStartLocations,
   getAvailableDestinations,
   getRouteWithBandInfo,
   getDestinationsByBandWidth,
-  calculateExitWidths
+  calculateExitWidths,
 } from '../types/routes';
 import { formatDistance } from '../utils/calculator';
 import { RouteSummary } from './RouteSummary';
@@ -22,7 +26,13 @@ function formatLocationName(loc: StantonLocation, indent = true): string {
 }
 
 // Reusable component for location notes/tips
-function LocationTip({ startLocation, destLocation }: { startLocation: StantonLocation | null; destLocation: StantonLocation | null }) {
+function LocationTip({
+  startLocation,
+  destLocation,
+}: {
+  startLocation: StantonLocation | null;
+  destLocation: StantonLocation | null;
+}) {
   if (!startLocation?.note && !destLocation?.note) return null;
 
   return (
@@ -55,7 +65,8 @@ interface RoutePlannerProps {
   onStartChange: (id: string) => void;
   onDestinationChange: (id: string) => void;
   onSelectedBandChange: (bandId: number | null) => void;
-  onSwapRoute: () => void;
+  onReverseRoute: () => void;
+  onClearRoute: () => void;
 }
 
 export function RoutePlanner({
@@ -65,12 +76,15 @@ export function RoutePlanner({
   onStartChange,
   onDestinationChange,
   onSelectedBandChange,
-  onSwapRoute
+  onReverseRoute,
+  onClearRoute,
 }: RoutePlannerProps) {
   const [mode, setMode] = useState<PlannerMode>('band');
   const [bandSortBy, setBandSortBy] = useState<BandSortBy>('number');
   const [destModeSortBy, setDestModeSortBy] = useState<BandSortBy>('number');
-  const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(null);
+  const [selectedDestBandId, setSelectedDestBandId] = useState<number | null>(
+    null,
+  );
   const [destTableCollapsed, setDestTableCollapsed] = useState(false);
   const [bandModeCollapsed, setBandModeCollapsed] = useState(false);
   const [bandSelectorCollapsed, setBandSelectorCollapsed] = useState(false);
@@ -101,14 +115,18 @@ export function RoutePlanner({
     if (!routeData) return [];
     const withWidths = calculateExitWidths(routeData.route.bandExits);
     const details = routeData.bandDetails.map(({ band, exit }) => {
-      const widthData = withWidths.find(w => w.bandId === band.id);
+      const widthData = withWidths.find((w) => w.bandId === band.id);
       return { band, exit, exitWidth: widthData?.exitWidth ?? 0 };
     });
     switch (destModeSortBy) {
       case 'density':
-        return details.sort((a, b) => b.band.relativeDensity - a.band.relativeDensity);
+        return details.sort(
+          (a, b) => b.band.relativeDensity - a.band.relativeDensity,
+        );
       case 'opportunity':
-        return details.sort((a, b) => b.band.miningOpportunity - a.band.miningOpportunity);
+        return details.sort(
+          (a, b) => b.band.miningOpportunity - a.band.miningOpportunity,
+        );
       case 'number':
       default:
         return details.sort((a, b) => a.band.id - b.band.id);
@@ -118,15 +136,17 @@ export function RoutePlanner({
   // Get selected band data for destination mode result display
   const selectedDestBandData = useMemo(() => {
     if (selectedDestBandId === null || !routeData) return null;
-    return sortedBandDetails.find(d => d.band.id === selectedDestBandId) || null;
+    return (
+      sortedBandDetails.find((d) => d.band.id === selectedDestBandId) || null
+    );
   }, [selectedDestBandId, routeData, sortedBandDetails]);
 
   // Get destinations sorted by band width (for band mode)
   const destinationsByWidth = useMemo(() => {
     if (!startId || selectedBandId === null) return [];
-    return getDestinationsByBandWidth(startId, selectedBandId).map(d => ({
+    return getDestinationsByBandWidth(startId, selectedBandId).map((d) => ({
       ...d,
-      location: getLocationById(d.destinationId)
+      location: getLocationById(d.destinationId),
     }));
   }, [startId, selectedBandId]);
 
@@ -136,15 +156,17 @@ export function RoutePlanner({
       case 'density':
         return [...BANDS].sort((a, b) => b.relativeDensity - a.relativeDensity);
       case 'opportunity':
-        return [...BANDS].sort((a, b) => b.miningOpportunity - a.miningOpportunity);
+        return [...BANDS].sort(
+          (a, b) => b.miningOpportunity - a.miningOpportunity,
+        );
       case 'number':
       default:
         return BANDS;
     }
   }, [bandSortBy]);
 
-  // Check if route can be swapped (reverse route exists)
-  const canSwap = useMemo(() => {
+  // Check if route can be reversed (reverse route exists)
+  const canReverse = useMemo(() => {
     if (!startId || !destinationId) return false;
     const availableStarts = getAvailableStartLocations();
     if (!availableStarts.includes(destinationId)) return false;
@@ -152,10 +174,10 @@ export function RoutePlanner({
     return validDests.includes(startId);
   }, [startId, destinationId]);
 
-  // Handle swap route - preserve band selection
-  const handleSwap = () => {
-    if (!canSwap) return;
-    onSwapRoute();
+  // Handle reverse route - preserve band selection
+  const handleReverse = () => {
+    if (!canReverse) return;
+    onReverseRoute();
   };
 
   // Handle start change
@@ -173,6 +195,12 @@ export function RoutePlanner({
     } else {
       onDestinationChange('');
     }
+  };
+
+  // Handle clear route - reset all selections and return to current mode
+  const handleClearRoute = () => {
+    onClearRoute(); // Parent component will reset startId, destinationId, and selectedBandId
+    handleStartChange(''); // This will also reset dependent state and collapse tables/selectors
   };
 
   // Handle destination change in destination mode
@@ -249,12 +277,15 @@ export function RoutePlanner({
 
   const startLocation = startId ? getLocationById(startId) : null;
   const destLocation = destinationId ? getLocationById(destinationId) : null;
-  const selectedBand = selectedBandId !== null ? BANDS.find(b => b.id === selectedBandId) : null;
+  const selectedBand =
+    selectedBandId !== null ? BANDS.find((b) => b.id === selectedBandId) : null;
 
   // Get the selected destination's data in band mode
   const selectedBandDestData = useMemo(() => {
     if (!destinationId || selectedBandId === null) return null;
-    return destinationsByWidth.find(d => d.destinationId === destinationId) || null;
+    return (
+      destinationsByWidth.find((d) => d.destinationId === destinationId) || null
+    );
   }, [destinationId, selectedBandId, destinationsByWidth]);
 
   return (
@@ -263,31 +294,31 @@ export function RoutePlanner({
       <div className="mode-toggle">
         <button
           className={`mode-btn ${mode === 'band' ? 'active' : ''}`}
-          onClick={() => handleModeChange('band')}
-        >
+          onClick={() => handleModeChange('band')}>
           By Band
         </button>
         <button
           className={`mode-btn ${mode === 'destination' ? 'active' : ''}`}
-          onClick={() => handleModeChange('destination')}
-        >
+          onClick={() => handleModeChange('destination')}>
           By Destination
         </button>
       </div>
 
       {/* Start Location (both modes) - hidden when collapsed */}
-      {!((mode === 'destination' && destTableCollapsed) || (mode === 'band' && bandModeCollapsed)) && (
+      {!(
+        (mode === 'destination' && destTableCollapsed) ||
+        (mode === 'band' && bandModeCollapsed)
+      ) && (
         <div className="route-selectors">
           <div className="form-group">
             <label>Start Location</label>
             <select
               value={startId}
-              onChange={(e) => handleStartChange(e.target.value)}
-            >
+              onChange={(e) => handleStartChange(e.target.value)}>
               <option value="">Select start...</option>
-              {groupedStarts.map(group => (
+              {groupedStarts.map((group) => (
                 <Fragment key={group.planet}>
-                  {group.locations.map(loc => (
+                  {group.locations.map((loc) => (
                     <option key={loc.id} value={loc.id}>
                       {formatLocationName(loc)}
                     </option>
@@ -304,12 +335,11 @@ export function RoutePlanner({
               <select
                 value={destinationId}
                 onChange={(e) => handleDestinationChange(e.target.value)}
-                disabled={!startId}
-              >
+                disabled={!startId}>
                 <option value="">Select destination...</option>
-                {groupedDestinations.map(group => (
+                {groupedDestinations.map((group) => (
                   <Fragment key={group.planet}>
-                    {group.locations.map(loc => (
+                    {group.locations.map((loc) => (
                       <option key={loc.id} value={loc.id}>
                         {formatLocationName(loc)}
                       </option>
@@ -331,49 +361,80 @@ export function RoutePlanner({
               <RouteSummary
                 startLocation={startLocation}
                 destLocation={destLocation}
-                canSwap={canSwap}
-                onSwap={handleSwap}
+                canReverse={canReverse}
+                onReverse={handleReverse}
+                onClearRoute={handleClearRoute}
               />
 
               <div
                 className="exit-result clickable"
                 onClick={() => setDestTableCollapsed(!destTableCollapsed)}
-                title={destTableCollapsed ? 'Click to show all bands' : 'Click to collapse'}
-              >
+                title={
+                  destTableCollapsed
+                    ? 'Click to show all bands'
+                    : 'Click to collapse'
+                }>
                 <div className="exit-result-main">
-                  <span className="exit-label">Exit at {selectedDestBandData.band.name}</span>
-                  <span className="exit-distance">{formatDistance(selectedDestBandData.exit.distanceToDestination)}</span>
+                  <span className="exit-label">
+                    Exit at {selectedDestBandData.band.name}
+                  </span>
+                  <span className="exit-distance">
+                    {formatDistance(
+                      selectedDestBandData.exit.distanceToDestination,
+                    )}
+                  </span>
                 </div>
-                <div className={`exit-margin ${getWidthClass(selectedDestBandData.exitWidth)}`}>
-                  {formatDistanceCompact(selectedDestBandData.exitWidth)} margin for error
+                <div
+                  className={`exit-margin ${getWidthClass(selectedDestBandData.exitWidth)}`}>
+                  {formatDistanceCompact(selectedDestBandData.exitWidth)} margin
+                  for error
                 </div>
                 <div className="collapse-hint">
-                  {destTableCollapsed ? 'Tap to change band' : 'Tap to collapse'}
+                  {destTableCollapsed
+                    ? 'Tap to change band'
+                    : 'Tap to collapse'}
                 </div>
                 <div className="map-btn-container">
                   <button
                     className="map-icon-btn"
-                    onClick={(e) => { e.stopPropagation(); setShowMap(true); }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowMap(true);
+                    }}
                     title="View Map"
-                    aria-label="View Map"
-                  >
+                    aria-label="View Map">
                     <SolarSystemIcon />
                   </button>
                   <span className="map-btn-label">MAP</span>
                 </div>
               </div>
 
-              <LocationTip startLocation={startLocation} destLocation={destLocation} />
+              <LocationTip
+                startLocation={startLocation}
+                destLocation={destLocation}
+              />
 
               <div className="route-instructions">
                 <p className="instruction-title">How to use:</p>
                 <ol>
-                  <li>Start quantum travel toward <strong>{destLocation.shortName}</strong></li>
+                  <li>
+                    Start quantum travel toward{' '}
+                    <strong>{destLocation.shortName}</strong>
+                  </li>
                   <li>Watch the remaining distance to your destination</li>
-                  <li>Exit QT at <strong>{formatDistance(selectedDestBandData.exit.distanceToDestination)}</strong></li>
+                  <li>
+                    Exit QT at{' '}
+                    <strong>
+                      {formatDistance(
+                        selectedDestBandData.exit.distanceToDestination,
+                      )}
+                    </strong>
+                  </li>
                 </ol>
                 <p className="instruction-tip">
-                  <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then restart QT. The slower acceleration makes timing your exit easier.
+                  <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then
+                  restart QT. The slower acceleration makes timing your exit
+                  easier.
                 </p>
               </div>
             </div>
@@ -387,20 +448,17 @@ export function RoutePlanner({
                   <span className="sort-label">Sort:</span>
                   <button
                     className={`sort-btn ${destModeSortBy === 'number' ? 'active' : ''}`}
-                    onClick={() => setDestModeSortBy('number')}
-                  >
+                    onClick={() => setDestModeSortBy('number')}>
                     <span className="number-label">Band #</span>
                   </button>
                   <button
                     className={`sort-btn ${destModeSortBy === 'density' ? 'active' : ''}`}
-                    onClick={() => setDestModeSortBy('density')}
-                  >
+                    onClick={() => setDestModeSortBy('density')}>
                     <span className="density-label">Density</span>
                   </button>
                   <button
                     className={`sort-btn ${destModeSortBy === 'opportunity' ? 'active' : ''}`}
-                    onClick={() => setDestModeSortBy('opportunity')}
-                  >
+                    onClick={() => setDestModeSortBy('opportunity')}>
                     <span className="opportunity-label">Mining Opp.</span>
                   </button>
                   <span
@@ -414,18 +472,37 @@ export function RoutePlanner({
                         e.preventDefault();
                         setShowSortInfo(!showSortInfo);
                       }
-                    }}
-                  >ⓘ</span>
+                    }}>
+                    ⓘ
+                  </span>
                   {showSortInfo && (
                     <>
-                      <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                      <div
+                        className="sort-info-overlay"
+                        onClick={() => setShowSortInfo(false)}
+                      />
                       <div className="sort-info-popup">
                         <div className="sort-info-content">
-                          <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
-                          <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
-                          <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                          <div className="sort-info-row">
+                            <span className="number-label">Band #</span>: Sort
+                            by band number 1-10.
+                          </div>
+                          <div className="sort-info-row">
+                            <span className="density-label">Density</span> (D):
+                            Percentage of max peak asteroid concentration.
+                          </div>
+                          <div className="sort-info-row">
+                            <span className="opportunity-label">
+                              Mining Opp.
+                            </span>{' '}
+                            (MO): Total mining potential (density × band width).
+                          </div>
                         </div>
-                        <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
+                        <button
+                          className="sort-info-close"
+                          onClick={() => setShowSortInfo(false)}>
+                          Got it
+                        </button>
                       </div>
                     </>
                   )}
@@ -436,9 +513,15 @@ export function RoutePlanner({
                 <span className="band-col-dest">Exit at Distance</span>
                 <span className="band-col-density">
                   {destModeSortBy === 'opportunity' ? (
-                    <><span className="legend-m">MO</span> / <span className="legend-d">D</span></>
+                    <>
+                      <span className="legend-m">MO</span> /{' '}
+                      <span className="legend-d">D</span>
+                    </>
                   ) : (
-                    <><span className="legend-d">D</span> / <span className="legend-m">MO</span></>
+                    <>
+                      <span className="legend-d">D</span> /{' '}
+                      <span className="legend-m">MO</span>
+                    </>
                   )}
                 </span>
               </div>
@@ -446,32 +529,53 @@ export function RoutePlanner({
                 <div
                   key={band.id}
                   className={`band-row clickable density-${getDensityClass(band.relativeDensity)} ${selectedDestBandId === band.id ? 'selected' : ''}`}
-                  onClick={() => handleDestBandClick(band.id)}
-                >
+                  onClick={() => handleDestBandClick(band.id)}>
                   <span className="band-col-name">{band.name}</span>
-                  <span className="band-col-dest">{formatDistance(exit.distanceToDestination)}</span>
+                  <span className="band-col-dest">
+                    {formatDistance(exit.distanceToDestination)}
+                  </span>
                   <span className="band-col-density">
                     <div className="dual-bars">
                       {destModeSortBy === 'opportunity' ? (
                         <>
                           <div className="bar-row">
                             <span className="bar-label">MO</span>
-                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                            <span
+                              className="opportunity-bar"
+                              style={{
+                                width: `${band.miningOpportunity * 100}%`,
+                              }}
+                            />
                           </div>
                           <div className="bar-row">
                             <span className="bar-label">D</span>
-                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                            <span
+                              className="density-bar"
+                              style={{
+                                width: `${band.relativeDensity * 100}%`,
+                              }}
+                            />
                           </div>
                         </>
                       ) : (
                         <>
                           <div className="bar-row">
                             <span className="bar-label">D</span>
-                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                            <span
+                              className="density-bar"
+                              style={{
+                                width: `${band.relativeDensity * 100}%`,
+                              }}
+                            />
                           </div>
                           <div className="bar-row">
                             <span className="bar-label">MO</span>
-                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                            <span
+                              className="opportunity-bar"
+                              style={{
+                                width: `${band.miningOpportunity * 100}%`,
+                              }}
+                            />
                           </div>
                         </>
                       )}
@@ -488,8 +592,13 @@ export function RoutePlanner({
               <p className="instruction-title">How to use:</p>
               <ol>
                 <li>Click a band above to select your target</li>
-                <li>Start quantum travel toward <strong>{destLocation.shortName}</strong></li>
-                <li>Exit QT when it matches your target band's exit distance</li>
+                <li>
+                  Start quantum travel toward{' '}
+                  <strong>{destLocation.shortName}</strong>
+                </li>
+                <li>
+                  Exit QT when it matches your target band's exit distance
+                </li>
               </ol>
             </div>
           )}
@@ -500,82 +609,111 @@ export function RoutePlanner({
       {mode === 'band' && startId && (
         <div className="band-mode-content">
           {/* Result Display (at top when collapsed) */}
-          {selectedBandDestData && destLocation && selectedBand && startLocation && (
-            <div className="band-result">
-              <RouteSummary
-                startLocation={startLocation}
-                destLocation={destLocation}
-                canSwap={canSwap}
-                onSwap={handleSwap}
-              />
+          {selectedBandDestData &&
+            destLocation &&
+            selectedBand &&
+            startLocation && (
+              <div className="band-result">
+                <RouteSummary
+                  startLocation={startLocation}
+                  destLocation={destLocation}
+                  canReverse={canReverse}
+                  onReverse={handleReverse}
+                  onClearRoute={handleClearRoute}
+                />
 
-              <div
-                className="exit-result clickable"
-                onClick={() => setBandModeCollapsed(!bandModeCollapsed)}
-                title={bandModeCollapsed ? 'Click to show options' : 'Click to collapse'}
-              >
-                <div className="exit-result-main">
-                  <span className="exit-label">Exit at {selectedBand.name}</span>
-                  <span className="exit-distance">{formatDistance(selectedBandDestData.exitDistance)}</span>
+                <div
+                  className="exit-result clickable"
+                  onClick={() => setBandModeCollapsed(!bandModeCollapsed)}
+                  title={
+                    bandModeCollapsed
+                      ? 'Click to show options'
+                      : 'Click to collapse'
+                  }>
+                  <div className="exit-result-main">
+                    <span className="exit-label">
+                      Exit at {selectedBand.name}
+                    </span>
+                    <span className="exit-distance">
+                      {formatDistance(selectedBandDestData.exitDistance)}
+                    </span>
+                  </div>
+                  <div
+                    className={`exit-margin ${getWidthClass(selectedBandDestData.exitWidth)}`}>
+                    {formatDistanceCompact(selectedBandDestData.exitWidth)}{' '}
+                    margin for error
+                  </div>
+                  <div className="collapse-hint">
+                    {bandModeCollapsed
+                      ? 'Tap to change selection'
+                      : 'Tap to collapse'}
+                  </div>
+                  <div className="map-btn-container">
+                    <button
+                      className="map-icon-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMap(true);
+                      }}
+                      title="View Map"
+                      aria-label="View Map">
+                      <SolarSystemIcon />
+                    </button>
+                    <span className="map-btn-label">MAP</span>
+                  </div>
                 </div>
-                <div className={`exit-margin ${getWidthClass(selectedBandDestData.exitWidth)}`}>
-                  {formatDistanceCompact(selectedBandDestData.exitWidth)} margin for error
-                </div>
-                <div className="collapse-hint">
-                  {bandModeCollapsed ? 'Tap to change selection' : 'Tap to collapse'}
-                </div>
-                <div className="map-btn-container">
-                  <button
-                    className="map-icon-btn"
-                    onClick={(e) => { e.stopPropagation(); setShowMap(true); }}
-                    title="View Map"
-                    aria-label="View Map"
-                  >
-                    <SolarSystemIcon />
-                  </button>
-                  <span className="map-btn-label">MAP</span>
+
+                <LocationTip
+                  startLocation={startLocation}
+                  destLocation={destLocation}
+                />
+
+                <div className="route-instructions">
+                  <p className="instruction-title">How to use:</p>
+                  <ol>
+                    <li>
+                      Start quantum travel toward{' '}
+                      <strong>{destLocation.shortName}</strong>
+                    </li>
+                    <li>Watch the remaining distance to your destination</li>
+                    <li>
+                      Exit QT at{' '}
+                      <strong>
+                        {formatDistance(selectedBandDestData.exitDistance)}
+                      </strong>
+                    </li>
+                  </ol>
+                  <p className="instruction-tip">
+                    <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then
+                    restart QT. The slower acceleration makes timing your exit
+                    easier.
+                  </p>
                 </div>
               </div>
-
-              <LocationTip startLocation={startLocation} destLocation={destLocation} />
-
-              <div className="route-instructions">
-                <p className="instruction-title">How to use:</p>
-                <ol>
-                  <li>Start quantum travel toward <strong>{destLocation.shortName}</strong></li>
-                  <li>Watch the remaining distance to your destination</li>
-                  <li>Exit QT at <strong>{formatDistance(selectedBandDestData.exitDistance)}</strong></li>
-                </ol>
-                <p className="instruction-tip">
-                  <strong>Pro tip:</strong> Drop out 0.1–0.2 Gm early, then restart QT. The slower acceleration makes timing your exit easier.
-                </p>
-              </div>
-            </div>
-          )}
+            )}
 
           {/* Band Selector (hidden when collapsed) */}
           {!bandModeCollapsed && (
             <div className="band-selector-section">
               <div className="band-selector-header">
-                <label>{bandSelectorCollapsed ? 'Target Band' : 'Select Target Band'}</label>
+                <label>
+                  {bandSelectorCollapsed ? 'Target Band' : 'Select Target Band'}
+                </label>
                 {!bandSelectorCollapsed && (
                   <div className="band-sort-toggle">
                     <button
                       className={`sort-btn ${bandSortBy === 'number' ? 'active' : ''}`}
-                      onClick={() => setBandSortBy('number')}
-                    >
+                      onClick={() => setBandSortBy('number')}>
                       <span className="number-label">Band #</span>
                     </button>
                     <button
                       className={`sort-btn ${bandSortBy === 'density' ? 'active' : ''}`}
-                      onClick={() => setBandSortBy('density')}
-                    >
+                      onClick={() => setBandSortBy('density')}>
                       <span className="density-label">Density</span>
                     </button>
                     <button
                       className={`sort-btn ${bandSortBy === 'opportunity' ? 'active' : ''}`}
-                      onClick={() => setBandSortBy('opportunity')}
-                    >
+                      onClick={() => setBandSortBy('opportunity')}>
                       <span className="opportunity-label">Mining Opp.</span>
                     </button>
                     <span
@@ -589,20 +727,39 @@ export function RoutePlanner({
                           e.preventDefault();
                           setShowSortInfo(!showSortInfo);
                         }
-                      }}
-                    >
+                      }}>
                       ⓘ
                     </span>
                     {showSortInfo && (
                       <>
-                        <div className="sort-info-overlay" onClick={() => setShowSortInfo(false)} />
+                        <div
+                          className="sort-info-overlay"
+                          onClick={() => setShowSortInfo(false)}
+                        />
                         <div className="sort-info-popup">
                           <div className="sort-info-content">
-                            <div className="sort-info-row"><span className="number-label">Band #</span>: Sort by band number 1-10.</div>
-                            <div className="sort-info-row"><span className="density-label">Density</span> (D): Percentage of max peak asteroid concentration.</div>
-                            <div className="sort-info-row"><span className="opportunity-label">Mining Opp.</span> (MO): Total mining potential (density × band width).</div>
+                            <div className="sort-info-row">
+                              <span className="number-label">Band #</span>: Sort
+                              by band number 1-10.
+                            </div>
+                            <div className="sort-info-row">
+                              <span className="density-label">Density</span>{' '}
+                              (D): Percentage of max peak asteroid
+                              concentration.
+                            </div>
+                            <div className="sort-info-row">
+                              <span className="opportunity-label">
+                                Mining Opp.
+                              </span>{' '}
+                              (MO): Total mining potential (density × band
+                              width).
+                            </div>
                           </div>
-                          <button className="sort-info-close" onClick={() => setShowSortInfo(false)}>Got it</button>
+                          <button
+                            className="sort-info-close"
+                            onClick={() => setShowSortInfo(false)}>
+                            Got it
+                          </button>
                         </div>
                       </>
                     )}
@@ -611,34 +768,56 @@ export function RoutePlanner({
               </div>
 
               <div className="band-selector-grid">
-                {(bandSelectorCollapsed && selectedBand ? [selectedBand] : sortedBands).map(band => (
+                {(bandSelectorCollapsed && selectedBand
+                  ? [selectedBand]
+                  : sortedBands
+                ).map((band) => (
                   <button
                     key={band.id}
                     className={`band-select-btn ${selectedBandId === band.id ? 'selected' : ''} density-${getDensityClass(band.relativeDensity)}`}
-                    onClick={() => handleBandSelect(band.id)}
-                  >
+                    onClick={() => handleBandSelect(band.id)}>
                     <span className="band-select-name">{band.name}</span>
                     <div className="band-select-bars">
                       {bandSortBy === 'opportunity' ? (
                         <>
                           <div className="bar-row">
                             <span className="bar-label">MO</span>
-                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                            <span
+                              className="opportunity-bar"
+                              style={{
+                                width: `${band.miningOpportunity * 100}%`,
+                              }}
+                            />
                           </div>
                           <div className="bar-row">
                             <span className="bar-label">D</span>
-                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                            <span
+                              className="density-bar"
+                              style={{
+                                width: `${band.relativeDensity * 100}%`,
+                              }}
+                            />
                           </div>
                         </>
                       ) : (
                         <>
                           <div className="bar-row">
                             <span className="bar-label">D</span>
-                            <span className="density-bar" style={{ width: `${band.relativeDensity * 100}%` }} />
+                            <span
+                              className="density-bar"
+                              style={{
+                                width: `${band.relativeDensity * 100}%`,
+                              }}
+                            />
                           </div>
                           <div className="bar-row">
                             <span className="bar-label">MO</span>
-                            <span className="opportunity-bar" style={{ width: `${band.miningOpportunity * 100}%` }} />
+                            <span
+                              className="opportunity-bar"
+                              style={{
+                                width: `${band.miningOpportunity * 100}%`,
+                              }}
+                            />
                           </div>
                         </>
                       )}
@@ -657,21 +836,27 @@ export function RoutePlanner({
             <div className="destination-list-section">
               <div className="destination-list-header">
                 <label>Destinations for {selectedBand.name}</label>
-                <span className="width-hint">Sorted by exit margin (easiest first)</span>
+                <span className="width-hint">
+                  Sorted by exit margin (easiest first)
+                </span>
               </div>
 
               {destinationsByWidth.length > 0 ? (
                 <div className="destination-list">
-                  {destinationsByWidth.map(dest => (
+                  {destinationsByWidth.map((dest) => (
                     <button
                       key={dest.destinationId}
                       className={`destination-card ${destinationId === dest.destinationId ? 'selected' : ''}`}
-                      onClick={() => handleBandDestinationSelect(dest.destinationId)}
-                    >
+                      onClick={() =>
+                        handleBandDestinationSelect(dest.destinationId)
+                      }>
                       <span className="dest-name">
-                        {dest.location ? formatLocationName(dest.location, false) : dest.destinationId}
+                        {dest.location
+                          ? formatLocationName(dest.location, false)
+                          : dest.destinationId}
                       </span>
-                      <span className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
+                      <span
+                        className={`dest-width ${getWidthClass(dest.exitWidth)}`}>
                         {formatDistanceCompact(dest.exitWidth)} margin
                       </span>
                     </button>
@@ -712,19 +897,25 @@ export function RoutePlanner({
       <MapModal
         isOpen={showMap}
         onClose={() => setShowMap(false)}
-        route={startLocation && destLocation && (selectedDestBandData || (selectedBandDestData && selectedBand)) ? {
-          start: {
-            distanceFromStanton: startLocation.distanceFromStanton,
-            label: startLocation.shortName,
-          },
-          destination: {
-            distanceFromStanton: destLocation.distanceFromStanton,
-            label: destLocation.shortName,
-          },
-          bandExitDistance: selectedDestBandData
-            ? selectedDestBandData.exit.distanceFromStanton
-            : selectedBand?.peakDensityDistance,
-        } : undefined}
+        route={
+          startLocation &&
+          destLocation &&
+          (selectedDestBandData || (selectedBandDestData && selectedBand))
+            ? {
+                start: {
+                  distanceFromStanton: startLocation.distanceFromStanton,
+                  label: startLocation.shortName,
+                },
+                destination: {
+                  distanceFromStanton: destLocation.distanceFromStanton,
+                  label: destLocation.shortName,
+                },
+                bandExitDistance: selectedDestBandData
+                  ? selectedDestBandData.exit.distanceFromStanton
+                  : selectedBand?.peakDensityDistance,
+              }
+            : undefined
+        }
         title="Route Map"
         initialZoom="halo"
       />

@@ -125,8 +125,8 @@ describe('Distance Formatting', () => {
       expect(formatDistance(19_700_000)).toBe('19.7 Gm');
       expect(formatDistance(20_000_000)).toBe('20.0 Gm');
       expect(formatDistance(15_500_000)).toBe('15.5 Gm');
-      // Values < 10 Gm use two decimals
-      expect(formatDistance(5_500_000)).toBe('5.50 Gm');
+      // Values < 10 Gm also use one decimal (matches in-game precision)
+      expect(formatDistance(5_500_000)).toBe('5.5 Gm');
     });
 
     it('formats tens of gigameters with one decimal', () => {
@@ -142,8 +142,8 @@ describe('Distance Formatting', () => {
 
   describe('formatDistanceCompact', () => {
     it('formats compactly for mobile', () => {
-      expect(formatDistanceCompact(19_700_000)).toBe('19.70 Gm');
-      expect(formatDistanceCompact(20_320_000)).toBe('20.32 Gm');
+      expect(formatDistanceCompact(19_700_000)).toBe('19.7 Gm');
+      expect(formatDistanceCompact(20_320_000)).toBe('20.3 Gm');
     });
   });
 
