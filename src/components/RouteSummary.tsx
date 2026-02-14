@@ -3,15 +3,17 @@ import { StantonLocation } from '../types/locations';
 interface RouteSummaryProps {
   startLocation: StantonLocation;
   destLocation: StantonLocation;
-  canSwap: boolean;
-  onSwap: () => void;
+  canReverse: boolean;
+  onReverse: () => void;
+  onClearRoute: () => void;
 }
 
 export function RouteSummary({
   startLocation,
   destLocation,
-  canSwap,
-  onSwap
+  canReverse,
+  onReverse,
+  onClearRoute,
 }: RouteSummaryProps) {
   return (
     <div className="route-summary">
@@ -19,16 +21,22 @@ export function RouteSummary({
       <span className="route-path">
         {startLocation.shortName} → {destLocation.shortName}
       </span>
-      {canSwap && (
+      {canReverse && (
         <button
-          className="swap-route-btn"
-          onClick={onSwap}
+          className="reverse-route-btn"
+          onClick={onReverse}
           title="Reverse course"
-          aria-label="Reverse course"
-        >
+          aria-label="Reverse course">
           ⇄
         </button>
       )}
+      <button
+        className="clear-route-btn"
+        onClick={onClearRoute}
+        title="Clear route"
+        aria-label="Clear route">
+        ✖
+      </button>
     </div>
   );
 }

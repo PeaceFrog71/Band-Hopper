@@ -1,69 +1,86 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import pfLogo from './assets/PFlogo.png'
-import { RoutePlanner } from './components/RoutePlanner'
-import { WhereAmI } from './components/WhereAmI'
-import { RefineryFinder } from './components/RefineryFinder'
-import UserMenu from './components/UserMenu'
-import AuthModal, { type AuthView } from './components/AuthModal'
-import { useAuth } from './contexts/AuthContext'
+import { useState, useEffect } from 'react';
+import './App.css';
+import pfLogo from './assets/PFlogo.png';
+import { RoutePlanner } from './components/RoutePlanner';
+import { WhereAmI } from './components/WhereAmI';
+import { RefineryFinder } from './components/RefineryFinder';
+import UserMenu from './components/UserMenu';
+import AuthModal, { type AuthView } from './components/AuthModal';
+import { useAuth } from './contexts/AuthContext';
 
-const version = __APP_VERSION__
+const version = __APP_VERSION__;
 
 // Help text for each tab
 const helpText: Record<string, string> = {
-  route: 'Select your start, desired Halo band and target destination to calculate exit distances.',
-  whereami: 'Enter your coordinates from the star map to identify your position in the Aaron Halo.',
-  refinery: 'Find the best refinery based on your mined material and location.'
-}
+  route:
+    'Select your start, desired Halo band and target destination to calculate exit distances.',
+  whereami:
+    'Enter your coordinates from the star map to identify your position in the Aaron Halo.',
+  refinery: 'Find the best refinery based on your mined material and location.',
+};
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>('route')
-  const [showHelp, setShowHelp] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState(false)
-  const [authModalView, setAuthModalView] = useState<AuthView | undefined>(undefined)
-  const { isConfigured, passwordRecovery, clearPasswordRecovery } = useAuth()
+  const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>(
+    'route',
+  );
+  const [showHelp, setShowHelp] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalView, setAuthModalView] = useState<AuthView | undefined>(
+    undefined,
+  );
+  const { isConfigured, passwordRecovery, clearPasswordRecovery } = useAuth();
 
   // Auto-open auth modal when user clicks password reset link from email
   useEffect(() => {
     if (passwordRecovery) {
-      setAuthModalView('resetPassword')
-      setShowAuthModal(true)
+      setAuthModalView('resetPassword');
+      setShowAuthModal(true);
     }
-  }, [passwordRecovery])
+  }, [passwordRecovery]);
 
   // Lifted route state - persists across tab switches
-  const [startId, setStartId] = useState<string>('')
-  const [destinationId, setDestinationId] = useState<string>('')
-  const [selectedBandId, setSelectedBandId] = useState<number | null>(null)
+  const [startId, setStartId] = useState<string>('');
+  const [destinationId, setDestinationId] = useState<string>('');
+  const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
 
   // Lifted Where Am I state - used by both WhereAmI and RefineryFinder
-  const [whereAmIDistance, setWhereAmIDistance] = useState<string>('')
-  const [whereAmIAngle, setWhereAmIAngle] = useState<string>('')
-  const [showWhereAmIHelp, setShowWhereAmIHelp] = useState(false)
+  const [whereAmIDistance, setWhereAmIDistance] = useState<string>('');
+  const [whereAmIAngle, setWhereAmIAngle] = useState<string>('');
+  const [showWhereAmIHelp, setShowWhereAmIHelp] = useState(false);
 
-  // Swap start and destination
-  const handleSwapRoute = () => {
-    const tempStart = startId
-    setStartId(destinationId)
-    setDestinationId(tempStart)
-  }
+  // Reverse start and destination
+  const handleReverseRoute = () => {
+    const tempStart = startId;
+    setStartId(destinationId);
+    setDestinationId(tempStart);
+  };
+
+  // Clear route, resetting start, destination, and selected band
+  const handleClearRoute = () => {
+    setStartId('');
+    setDestinationId('');
+    setSelectedBandId(null);
+  };
 
   // Close help modal on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && showHelp) {
-        setShowHelp(false)
+        setShowHelp(false);
       }
-    }
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [showHelp])
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [showHelp]);
 
   return (
     <div className={`app app-bg-${activeTab}`}>
       <header className="app-header">
-        <a href="https://peacefroggaming.com" target="_blank" rel="noopener noreferrer" title="PeaceFrog Gaming">
+        <a
+          href="https://peacefroggaming.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          title="PeaceFrog Gaming">
           <img src={pfLogo} alt="PeaceFrog Gaming" className="header-logo" />
         </a>
         <div className="header-title">
@@ -74,8 +91,7 @@ function App() {
             href="https://forms.gle/xbCK6DF3iYUHW6Hn6"
             target="_blank"
             rel="noopener noreferrer"
-            className="feedback-link"
-          >
+            className="feedback-link">
             Bug Report / Feature Requests / Feedback
           </a>
         </div>
@@ -87,8 +103,7 @@ function App() {
             href="https://ko-fi.com/peacefroggaming"
             target="_blank"
             rel="noopener noreferrer"
-            className="kofi-link"
-          >
+            className="kofi-link">
             <img src="/rieger-icon.png" alt="" />
             <span>Support on Ko-fi</span>
           </a>
@@ -100,38 +115,39 @@ function App() {
         <div className="tab-nav">
           <button
             className={`tab-btn ${activeTab === 'route' ? 'active' : ''}`}
-            onClick={() => setActiveTab('route')}
-          >
+            onClick={() => setActiveTab('route')}>
             Route Planner
           </button>
           <button
             className={`tab-btn ${activeTab === 'whereami' ? 'active' : ''}`}
-            onClick={() => setActiveTab('whereami')}
-          >
+            onClick={() => setActiveTab('whereami')}>
             Where Am I?
           </button>
           <button
             className={`tab-btn ${activeTab === 'refinery' ? 'active' : ''}`}
-            onClick={() => setActiveTab('refinery')}
-          >
+            onClick={() => setActiveTab('refinery')}>
             Refinery Finder
           </button>
         </div>
 
         {/* Tab Content - Using CSS display to keep components mounted and preserve state */}
-        <div className="panel" style={{ display: activeTab === 'route' ? 'block' : 'none' }}>
+        <div
+          className="panel"
+          style={{ display: activeTab === 'route' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Route Planner</h2>
             <button
               className="help-icon-header"
               onClick={() => setShowHelp(true)}
               type="button"
-              aria-label="Help"
-            >
+              aria-label="Help">
               ?
             </button>
           </div>
-          <p className="text-muted">Select your start, desired Halo band and target destination to calculate exit distances.</p>
+          <p className="text-muted">
+            Select your start, desired Halo band and target destination to
+            calculate exit distances.
+          </p>
           <RoutePlanner
             startId={startId}
             destinationId={destinationId}
@@ -139,23 +155,27 @@ function App() {
             onStartChange={setStartId}
             onDestinationChange={setDestinationId}
             onSelectedBandChange={setSelectedBandId}
-            onSwapRoute={handleSwapRoute}
+            onReverseRoute={handleReverseRoute}
+            onClearRoute={handleClearRoute}
           />
         </div>
 
-        <div className="panel" style={{ display: activeTab === 'whereami' ? 'block' : 'none' }}>
+        <div
+          className="panel"
+          style={{ display: activeTab === 'whereami' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Where Am I?</h2>
             <button
               className="help-icon-header"
               onClick={() => setShowWhereAmIHelp(true)}
               type="button"
-              aria-label="How to find your coordinates"
-            >
+              aria-label="How to find your coordinates">
               ?
             </button>
           </div>
-          <p className="text-muted">Enter your coordinates from the star map to identify your position.</p>
+          <p className="text-muted">
+            Enter your coordinates from the star map to identify your position.
+          </p>
           <WhereAmI
             distanceGm={whereAmIDistance}
             angleTheta={whereAmIAngle}
@@ -166,19 +186,22 @@ function App() {
           />
         </div>
 
-        <div className="panel" style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
+        <div
+          className="panel"
+          style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Refinery Finder</h2>
             <button
               className="help-icon-header"
               onClick={() => setShowHelp(true)}
               type="button"
-              aria-label="Help"
-            >
+              aria-label="Help">
               ?
             </button>
           </div>
-          <p className="text-muted">Find the best refinery based on your mined material and location.</p>
+          <p className="text-muted">
+            Find the best refinery based on your mined material and location.
+          </p>
           <RefineryFinder
             startId={startId}
             destinationId={destinationId}
@@ -190,9 +213,22 @@ function App() {
 
         {/* Help Modal - Mobile only */}
         {showHelp && (
-          <div className="help-modal-overlay" onClick={() => setShowHelp(false)} role="presentation">
-            <div className="help-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
-              <button className="help-modal-close" onClick={() => setShowHelp(false)} aria-label="Close">×</button>
+          <div
+            className="help-modal-overlay"
+            onClick={() => setShowHelp(false)}
+            role="presentation">
+            <div
+              className="help-modal"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="help-modal-title">
+              <button
+                className="help-modal-close"
+                onClick={() => setShowHelp(false)}
+                aria-label="Close">
+                ×
+              </button>
               <h3 id="help-modal-title">Help</h3>
               <p>{helpText[activeTab]}</p>
             </div>
@@ -202,17 +238,30 @@ function App() {
 
       <footer className="app-footer">
         <p>
-          Data source: <a href="https://cstone.space/resources/knowledge-base/36" target="_blank" rel="noopener noreferrer">CaptSheppard's Aaron Halo Travel Routes</a>
+          Data source:{' '}
+          <a
+            href="https://cstone.space/resources/knowledge-base/36"
+            target="_blank"
+            rel="noopener noreferrer">
+            CaptSheppard's Aaron Halo Travel Routes
+          </a>
         </p>
-        <p>Made by <a href="https://peacefroggaming.com" target="_blank" rel="noopener noreferrer">PeaceFrog Gaming</a></p>
+        <p>
+          Made by{' '}
+          <a
+            href="https://peacefroggaming.com"
+            target="_blank"
+            rel="noopener noreferrer">
+            PeaceFrog Gaming
+          </a>
+        </p>
         <div className="footer-mobile-info">
           <span className="version">v{version}</span>
           <a
             href="https://forms.gle/xbCK6DF3iYUHW6Hn6"
             target="_blank"
             rel="noopener noreferrer"
-            className="feedback-link"
-          >
+            className="feedback-link">
             Feedback
           </a>
         </div>
@@ -220,8 +269,7 @@ function App() {
           href="https://ko-fi.com/peacefroggaming"
           target="_blank"
           rel="noopener noreferrer"
-          className="kofi-link-mobile"
-        >
+          className="kofi-link-mobile">
           Support on Ko-fi
         </a>
       </footer>
@@ -229,11 +277,15 @@ function App() {
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => { setShowAuthModal(false); setAuthModalView(undefined); clearPasswordRecovery(); }}
+        onClose={() => {
+          setShowAuthModal(false);
+          setAuthModalView(undefined);
+          clearPasswordRecovery();
+        }}
         initialView={authModalView}
       />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
