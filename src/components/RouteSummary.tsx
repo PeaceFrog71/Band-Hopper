@@ -1,4 +1,4 @@
-import { StantonLocation } from "../types/locations";
+import { StantonLocation } from '../types/locations';
 
 interface RouteSummaryProps {
   startLocation: StantonLocation;

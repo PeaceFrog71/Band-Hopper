@@ -1,27 +1,27 @@
-import { useState, useEffect } from "react";
-import "./App.css";
-import pfLogo from "./assets/PFlogo.png";
-import { RoutePlanner } from "./components/RoutePlanner";
-import { WhereAmI } from "./components/WhereAmI";
-import { RefineryFinder } from "./components/RefineryFinder";
-import UserMenu from "./components/UserMenu";
-import AuthModal, { type AuthView } from "./components/AuthModal";
-import { useAuth } from "./contexts/AuthContext";
+import { useState, useEffect } from 'react';
+import './App.css';
+import pfLogo from './assets/PFlogo.png';
+import { RoutePlanner } from './components/RoutePlanner';
+import { WhereAmI } from './components/WhereAmI';
+import { RefineryFinder } from './components/RefineryFinder';
+import UserMenu from './components/UserMenu';
+import AuthModal, { type AuthView } from './components/AuthModal';
+import { useAuth } from './contexts/AuthContext';
 
 const version = __APP_VERSION__;
 
 // Help text for each tab
 const helpText: Record<string, string> = {
   route:
-    "Select your start, desired Halo band and target destination to calculate exit distances.",
+    'Select your start, desired Halo band and target destination to calculate exit distances.',
   whereami:
-    "Enter your coordinates from the star map to identify your position in the Aaron Halo.",
-  refinery: "Find the best refinery based on your mined material and location.",
+    'Enter your coordinates from the star map to identify your position in the Aaron Halo.',
+  refinery: 'Find the best refinery based on your mined material and location.',
 };
 
 function App() {
-  const [activeTab, setActiveTab] = useState<"route" | "whereami" | "refinery">(
-    "route",
+  const [activeTab, setActiveTab] = useState<'route' | 'whereami' | 'refinery'>(
+    'route',
   );
   const [showHelp, setShowHelp] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -33,19 +33,19 @@ function App() {
   // Auto-open auth modal when user clicks password reset link from email
   useEffect(() => {
     if (passwordRecovery) {
-      setAuthModalView("resetPassword");
+      setAuthModalView('resetPassword');
       setShowAuthModal(true);
     }
   }, [passwordRecovery]);
 
   // Lifted route state - persists across tab switches
-  const [startId, setStartId] = useState<string>("");
-  const [destinationId, setDestinationId] = useState<string>("");
+  const [startId, setStartId] = useState<string>('');
+  const [destinationId, setDestinationId] = useState<string>('');
   const [selectedBandId, setSelectedBandId] = useState<number | null>(null);
 
   // Lifted Where Am I state - used by both WhereAmI and RefineryFinder
-  const [whereAmIDistance, setWhereAmIDistance] = useState<string>("");
-  const [whereAmIAngle, setWhereAmIAngle] = useState<string>("");
+  const [whereAmIDistance, setWhereAmIDistance] = useState<string>('');
+  const [whereAmIAngle, setWhereAmIAngle] = useState<string>('');
   const [showWhereAmIHelp, setShowWhereAmIHelp] = useState(false);
 
   // Reverse start and destination
@@ -57,20 +57,20 @@ function App() {
 
   // Clear route, resetting start, destination, and selected band
   const handleClearRoute = () => {
-    setStartId("");
-    setDestinationId("");
+    setStartId('');
+    setDestinationId('');
     setSelectedBandId(null);
   };
 
   // Close help modal on Escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && showHelp) {
+      if (e.key === 'Escape' && showHelp) {
         setShowHelp(false);
       }
     };
-    document.addEventListener("keydown", handleEscape);
-    return () => document.removeEventListener("keydown", handleEscape);
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [showHelp]);
 
   return (
@@ -114,18 +114,18 @@ function App() {
         {/* Tab Navigation */}
         <div className="tab-nav">
           <button
-            className={`tab-btn ${activeTab === "route" ? "active" : ""}`}
-            onClick={() => setActiveTab("route")}>
+            className={`tab-btn ${activeTab === 'route' ? 'active' : ''}`}
+            onClick={() => setActiveTab('route')}>
             Route Planner
           </button>
           <button
-            className={`tab-btn ${activeTab === "whereami" ? "active" : ""}`}
-            onClick={() => setActiveTab("whereami")}>
+            className={`tab-btn ${activeTab === 'whereami' ? 'active' : ''}`}
+            onClick={() => setActiveTab('whereami')}>
             Where Am I?
           </button>
           <button
-            className={`tab-btn ${activeTab === "refinery" ? "active" : ""}`}
-            onClick={() => setActiveTab("refinery")}>
+            className={`tab-btn ${activeTab === 'refinery' ? 'active' : ''}`}
+            onClick={() => setActiveTab('refinery')}>
             Refinery Finder
           </button>
         </div>
@@ -133,7 +133,7 @@ function App() {
         {/* Tab Content - Using CSS display to keep components mounted and preserve state */}
         <div
           className="panel"
-          style={{ display: activeTab === "route" ? "block" : "none" }}>
+          style={{ display: activeTab === 'route' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Route Planner</h2>
             <button
@@ -162,7 +162,7 @@ function App() {
 
         <div
           className="panel"
-          style={{ display: activeTab === "whereami" ? "block" : "none" }}>
+          style={{ display: activeTab === 'whereami' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Where Am I?</h2>
             <button
@@ -188,7 +188,7 @@ function App() {
 
         <div
           className="panel"
-          style={{ display: activeTab === "refinery" ? "block" : "none" }}>
+          style={{ display: activeTab === 'refinery' ? 'block' : 'none' }}>
           <div className="panel-header">
             <h2>Refinery Finder</h2>
             <button
@@ -238,7 +238,7 @@ function App() {
 
       <footer className="app-footer">
         <p>
-          Data source:{" "}
+          Data source:{' '}
           <a
             href="https://cstone.space/resources/knowledge-base/36"
             target="_blank"
@@ -247,7 +247,7 @@ function App() {
           </a>
         </p>
         <p>
-          Made by{" "}
+          Made by{' '}
           <a
             href="https://peacefroggaming.com"
             target="_blank"
